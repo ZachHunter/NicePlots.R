@@ -1,0 +1,23 @@
+addNicePoints           Add a datapoint overlay to a box or violin plot
+calcStats               calculate preliminary statistical significance
+                        analysis
+drawBar                 drawBar
+drawBoxPlot             draw a custom box and whisker plot
+drawPoints              draw dots for a dot plot
+errorBars               draw custom error bars
+facetSpacing            Generate plotting locations for subgrouping
+                        data
+formatPlotColors        format a NicePlots color list
+makeColorMatrix         Create a matrix of increasingly transparent
+                        colors
+makeLogTicks            format a log scale axis
+niceBar                 draw a bar plot
+niceBox                 draw a box plot
+niceDots                draw a dot plot
+niceVio                 draw a violin plot
+prepCategoryWindow      prepare a plotting environment for categorical
+                        data such as bar plots or box plots
+prepNiceData            Prepare and print basic statistics for niceBox
+                        and niceVio
+quantileTrim            Filter data by interquartile range
+setAlpha                add alpha transparency to a named color

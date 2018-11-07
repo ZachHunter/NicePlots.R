@@ -1,0 +1,14 @@
+Package: NicePlots
+Type: Package
+Title: Nice Plots for Data Exploration
+Version: 0.1.2
+Author: Zachary Hunter
+Maintainer: Zachary Hunter <zhunter7@gmail.com>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
+Depends: tidyverse,beeswarm,vioplot,RColorBrewer
+ 

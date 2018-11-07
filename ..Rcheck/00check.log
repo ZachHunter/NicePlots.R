@@ -1,0 +1,150 @@
+* using log directory ‘/Users/Hunter/Desktop/R Scripts/NicePlots/..Rcheck’
+* using R version 3.5.1 (2018-07-02)
+* using platform: x86_64-apple-darwin15.6.0 (64-bit)
+* using session charset: UTF-8
+* checking for file ‘./DESCRIPTION’ ... OK
+* checking extension type ... Package
+* this is package ‘NicePlots’ version ‘0.1.1’
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... NOTE
+Found the following hidden files and directories:
+  ..pdf
+  .DS_Store
+  .Rhistory
+  ..Rcheck
+  .Rd2pdf11013
+  .Rd2pdf54619
+  .Rd2pdf7395
+  .Rproj.user
+These were most likely included in error. See section ‘Package
+structure’ in the ‘Writing R Extensions’ manual.
+* checking for portable file names ... OK
+* checking for sufficient/correct file permissions ... OK
+* checking whether package ‘NicePlots’ can be installed ... OK
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking DESCRIPTION meta-information ... NOTE
+License components which are templates and need '+ file LICENSE':
+  MIT
+Checking should be performed on sources prepared by ‘R CMD build’.
+* checking top-level files ... OK
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... WARNING
+Found the following directory with the name of a check directory:
+  ./..Rcheck
+Most likely, these were included erroneously.
+Found the following directories with names of Rd2pdf directories:
+  ./.Rd2pdf11013
+  ./.Rd2pdf54619
+  ./.Rd2pdf7395
+Most likely, these were included erroneously.
+* checking R files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking dependencies in R code ... OK
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... NOTE
+addNicePoints: no visible binding for global variable ‘fact’
+addNicePoints: no visible binding for global variable ‘tFilter’
+addNicePoints: no visible binding for global variable ‘facetLevel’
+addNicePoints: no visible binding for global variable ‘pfact’
+drawBar: no visible binding for global variable ‘yt’
+drawBar: no visible binding for global variable ‘UpperError’
+drawBar: no visible binding for global variable ‘LowerError’
+drawBar: no visible binding for global variable ‘start’
+drawPoints: no visible binding for global variable ‘Shape’
+drawPoints: no visible binding for global variable ‘Col’
+drawPoints: no visible binding for global variable ‘at’
+drawPoints: no visible binding for global variable ‘groupAt’
+niceBar.default: no visible global function definition for ‘ncols’
+niceBar.default: no visible binding for global variable ‘fact’
+niceBar.default: no visible binding for global variable ‘Stack’
+niceBar.default: no visible binding for global variable ‘Mean’
+niceBar.default: no visible binding for global variable ‘Median’
+niceBar.default: no visible binding for global variable ‘sumMean’
+niceBar.default: no visible binding for global variable ‘sumMedian’
+niceBar.default: no visible global function definition for ‘sd’
+niceBar.default: no visible binding for global variable ‘N’
+niceBar.default: no visible binding for global variable ‘at’
+niceBar.default: no visible binding for global variable ‘SD’
+niceBar.default: no visible binding for global variable ‘SE’
+niceBar.default: no visible binding for global variable ‘Min’
+niceBar.default: no visible binding for global variable ‘Max’
+niceBar.default: no visible binding for global variable ‘facetLevel’
+niceBar.default: no visible binding for global variable ‘Group’
+niceBar.default: no visible binding for global variable ‘q1’
+niceBar.default: no visible binding for global variable ‘q3’
+niceBar.default: no visible binding for global variable ‘tmin’
+niceBar.default: no visible binding for global variable ‘tmax’
+niceBar.default : <anonymous>: no visible binding for global variable
+  ‘drawBox’
+niceBar.default : <anonymous>: no visible binding for global variable
+  ‘medianMarkerShape’
+niceBar.default : <anonymous>: no visible binding for global variable
+  ‘h’
+niceBar.default: no visible binding for global variable
+  ‘pointHighlights’
+niceBar.default: no visible binding for global variable ‘pointMethod’
+niceBar.default: no visible binding for global variable ‘pointShape’
+niceBar.default: no visible binding for global variable ‘pointSize’
+niceBar.default: no visible binding for global variable
+  ‘pointLaneWidth’
+niceBar.default : <anonymous> : <anonymous>: no visible binding for
+  global variable ‘drawBox’
+niceBar.default : <anonymous> : <anonymous>: no visible binding for
+  global variable ‘medianMarkerShape’
+niceBar.default : <anonymous> : <anonymous>: no visible binding for
+  global variable ‘h’
+niceBar.default: no visible binding for global variable ‘pfact’
+prepNiceData: no visible binding for global variable ‘fact’
+prepNiceData: no visible binding for global variable ‘q1’
+prepNiceData: no visible binding for global variable ‘q3’
+prepNiceData: no visible binding for global variable ‘tmin’
+prepNiceData: no visible binding for global variable ‘tmax’
+Undefined global functions or variables:
+  Col Group LowerError Max Mean Median Min N SD SE Shape Stack
+  UpperError at drawBox facetLevel fact groupAt h medianMarkerShape
+  ncols pfact pointHighlights pointLaneWidth pointMethod pointShape
+  pointSize q1 q3 sd start sumMean sumMedian tFilter tmax tmin yt
+Consider adding
+  importFrom("stats", "sd", "start")
+to your NAMESPACE file.
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... WARNING
+Undocumented arguments in documentation object 'drawBar'
+  ‘capSize’ ‘lineWidth’
+
+Undocumented arguments in documentation object 'niceBar'
+  ‘calcValues’ ‘aggFun’ ‘errFun’ ‘stack’ ‘errorMultiple’ ‘errorBars’
+  ‘errorCap’ ‘errorLineType’ ‘capSize’ ‘lineWidth’
+Documented arguments not in \usage in documentation object 'niceBar':
+  ‘pointSize’ ‘pointMethod’ ‘h’ ‘medMarkerShape’ ‘pointShape’ ‘drawBox’
+  ‘drawPoints’ ‘pointHighlights’ ‘pointLaneWidth’
+
+Functions with \usage entries need to have the appropriate \alias
+entries, and all their arguments documented.
+The \usage entries must correspond to syntactically valid R code.
+See chapter ‘Writing R documentation files’ in the ‘Writing R
+Extensions’ manual.
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking examples ... OK
+* checking PDF version of manual ... OK
+* DONE
+Status: 2 WARNINGs, 3 NOTEs
