@@ -213,6 +213,7 @@ errorBars<-function(x,capType=c("none","bar","ball"),capSize=NULL,side=FALSE,col
 #' @param whiskerLty positive integer; sets the line type or \code{lty} option for plotting the wiskers.
 #' @param side logical; if set to \code{\link{TRUE}}, the box plots will be drawn horizontally.
 #' @param lWidth positive integer; corresponds to lwd line width setting in base R.
+#' @param capWidth numeric; size of the error bar cap relative to the box width.
 #'
 #' @examples
 #' data(iris)
@@ -224,12 +225,12 @@ errorBars<-function(x,capType=c("none","bar","ball"),capSize=NULL,side=FALSE,col
 #' \donttest{drawBoxPlot(iData)}
 #' @importFrom graphics segments rect points
 #' @seealso \code{\link[graphics]{boxplot}}, \code{\link{niceBox}}
-drawBoxPlot<-function(x,col="black",fill=NULL,drawBox=T,drawDot=F, whiskerLty =2,side=FALSE,lWidth=1){
+drawBoxPlot<-function(x,col="black",fill=NULL,drawBox=T,drawDot=F, whiskerLty =2,side=FALSE,lWidth=1,capWidth=.25){
   if(side) {
     if(drawBox){
       rect(x$q1,x$at-x$width,x$q3,x$at+x$width,col=fill,lwd=lWidth,border=col)
-      errorBars(bind_cols(at=x$at,start=x$q1,stop=x$min),capType="bar",capSize=.25*x$width,col=col,lType= whiskerLty,width=lWidth,side=side)
-      errorBars(bind_cols(at=x$at,start=x$q3,stop=x$max),capType="bar",capSize=.25*x$width,col=col,lType= whiskerLty,width=lWidth,side=side)
+      errorBars(bind_cols(at=x$at,start=x$q1,stop=x$min),capType="bar",capSize=capWidth*x$width,col=col,lType= whiskerLty,width=lWidth,side=side)
+      errorBars(bind_cols(at=x$at,start=x$q3,stop=x$max),capType="bar",capSize=capWidth*x$width,col=col,lType= whiskerLty,width=lWidth,side=side)
     }
     segments(x$median,x$at-x$width,x$median,x$at+x$width,col=col,lwd=lWidth*2)
     if(drawDot){
@@ -238,8 +239,8 @@ drawBoxPlot<-function(x,col="black",fill=NULL,drawBox=T,drawDot=F, whiskerLty =2
   } else {
     if(drawBox){
       rect(x$at-x$width,x$q1,x$at+x$width,x$q3,col=fill,lwd=lWidth,border=col)
-      errorBars(bind_cols(at=x$at,start=x$q1,stop=x$min),capType="bar",capSize=.25*x$width,col=col,lType= whiskerLty,width=lWidth)
-      errorBars(bind_cols(at=x$at,start=x$q3,stop=x$max),capType="bar",capSize=.25*x$width,col=col,lType= whiskerLty,width=lWidth)
+      errorBars(bind_cols(at=x$at,start=x$q1,stop=x$min),capType="bar",capSize=capWidth*x$width,col=col,lType= whiskerLty,width=lWidth)
+      errorBars(bind_cols(at=x$at,start=x$q3,stop=x$max),capType="bar",capSize=capWidth*x$width,col=col,lType= whiskerLty,width=lWidth)
     }
     segments(x$at-x$width,x$median,x$at+x$width,x$median,col=col,lwd=lWidth*2)
     if(drawDot){
@@ -753,6 +754,8 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
 #' @param sidePlot logical; switches the axis to plot horizontally instead of vertically.
 #' @param subGroupLabels character vector; sets the labels used for the \code{subGroup} factor. Defaults to the levels of the factor.
 #' @param strictLimits logical; eliminates padding on the value axis so 0 can be flush with the x-axis. Defaults to \code{\link{FALSE}}.
+#' @param legend logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.
+#' @param pointHighlights logical; Is pointHightlights turned on? This is used to determin with column of \code{by} should be used for legend factor levels.
 #'
 #' @return formats the plotting area and returns a named list with 'data' and 'labels' corresponding to the trimmed and/or transformed data and the labels for the primary factors, respectively.
 #' @examples
@@ -763,11 +766,72 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
 #' @importFrom utils data str
 #'
 #' @seealso \code{\link[grDevices]{axisTicks}}, \code{\link[graphics]{axis}}, \code{\link{makeLogTicks}}, \code{\link{facetSpacing}}
-prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, guides=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, plotColors=list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white"), trim=FALSE, logScale=FALSE, axisText=c(NULL,NULL), minorGuides=FALSE, extendTicks=F,subGroup=FALSE, expLabels=TRUE,sidePlot=FALSE,subGroupLabels=NULL,strictLimits=F) {
+prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, guides=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, theme=NA, plotColors=if(is.na(theme)){list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white")}else{theme$plotColors}, trim=FALSE, logScale=FALSE, axisText=c(NULL,NULL), minorGuides=FALSE, extendTicks=F,subGroup=FALSE, expLabels=TRUE,sidePlot=FALSE,subGroupLabels=NULL,strictLimits=F, legend=FALSE, pointHighlights=FALSE) {
   levelCount<-1
   tData<-x
   tBy<-by
   plotColors<-formatPlotColors(plotColors)
+  oMai<-par()$mai
+  cFont<-par()$family
+  if(!is.na(theme[1])) {
+    par(family=theme$fontFamily)
+  }
+
+  #Set margins for legends now
+  legendIndex<-NA
+  legendTitle<-""
+  legendSize<-.66
+  legendLevels<-NULL
+  if(!is.na(theme[1])){
+    legendSize<-theme$LegendSize
+  }
+  if(legend!=FALSE) {
+    maxLabelW<-0
+    maxLabelH<-0
+    if(pointHighlights==FALSE & subGroup==TRUE) {
+      legendIndex<-2
+    } else if(pointHighlights==TRUE & subGroup==TRUE) {
+      legendIndex<-3
+    } else if(pointHighlights==TRUE & subGroup==FALSE) {
+      legendIndex<-2
+    }
+    if(is.data.frame(x)){
+      if(is.data.frame(by) & pointHighlights==TRUE){
+        legendTitle<-colnames(by)[2]
+        legendLevels<-levels(by[,2])
+      } else {
+        legendTitle<-"Legend"
+        legendLevels<-colnames(x)
+      }
+    } else {
+      if(is.data.frame(by)){
+        if(dim(by)[2]>=legendIndex) {
+          legendTitle<-colnames(by)[legendIndex]
+          legendLevels<-levels(by[,legendIndex])
+        } else {
+          warn(paste0("Warning: Unable to determine level which factor to use for legend.\nExpected ",legendIndex," columns for by but only found ",dim(by)[2],".\nProceeding  using the 2nd column of by."))
+          legendTitle<-colnames(by)[2]
+          legendLevels<-levels(by[,2])
+        }
+      } else {
+        legendTitle<-"Legend"
+        legendLevels<-levels(by)
+      }
+    }
+    if(!(is.na(legend) | is.null(legend) | legend==TRUE)) {
+      legendTitle<-legend
+    }
+    maxLabelW<-map_dbl(legendLevels,strwidth,cex=legendSize,units="in") %>% max()
+    titleW<-strwidth(legendTitle,font=2,cex=legendSize,units="in")
+    if(titleW>maxLabelW){maxLabelW<-titleW}
+    maxLabelH<-map_dbl(legendLevels, strheight,cex=legendSize,units="in") %>% max()
+    titleH<-strheight(legendTitle,font=2,cex=legendSize,units="in")
+    nMai<-oMai
+    nMai[4]<-nMai[4]+maxLabelW
+    par(mai=nMai)
+  }
+
+  #capture data range for plot formating
   dataRange<-NULL
   if(is.null(yLim)==FALSE) {
     dataRange<-yLim
@@ -842,7 +906,7 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
     }
   }
   if (is.null(groupNames)) {groupNames<-seq(1:levelCount)}
-  opar<-par()
+  oBg<-par("bg")
   par(bg=plotColors$marginBg)
   plot.new()
   if(sidePlot) {
@@ -864,44 +928,75 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
   } else {
     rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col=plotColors$bg, lwd=2.5,border=plotColors$axis)
   }
-  par(bg=opar$bg)
+  par(bg=oBg)
   if(rotateLabels!=0){rotateLabels<-2}
   if(rotateY!=0){rotateY <-2}
   myLabels<-NULL
   whichSide<-1
-  if(!is.numeric(x)) {
+  groupCex<-1
+  subGroupCex<-.66
+  if(!is.na(theme[1])){
+    if(is.numeric(theme$groupLabSize)){
+      groupCex<-theme$groupLabSize
+    }
+    if(is.numeric(theme$subGroupLabSize)) {
+      subGroupCex<-theme$subGroupLabSize
+    }
+  }
+  if(is.data.frame(x)) {
     subLabLoc<-facetSpacing(length(x),length(groupNames))
     if(is.null(subGroupLabels)){subGroupLabels<-names(x)}
     if(sidePlot) {
-      axis(side=2,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,line=.85,col=plotColors$axis,col.ticks=plotColors$majorTicks)
-      axis(side=2,at=subLabLoc,labels=rep(subGroupLabels,length(groupNames)),lwd=0,lwd.ticks=1,cex.axis=0.66,col=plotColors$axis,col.ticks=plotColors$minorTicks)
+      if(legend==FALSE | pointHighlights==TRUE) {
+        axis(side=2,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,line=.85,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
+        axis(side=2,at=subLabLoc,labels=rep(subGroupLabels,length(groupNames)),lwd=0,lwd.ticks=1,cex.axis=subGroupCex,col=plotColors$axis,col.ticks=plotColors$minorTicks)
+      } else {
+        axis(side=2,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
+      }
     } else {
-      axis(side=1,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,line=.85,col=plotColors$axis,col.ticks=plotColors$majorTicks)
+      if(legend==FALSE | pointHighlights==TRUE) {
+        axis(side=1,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,line=.85,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
+        axis(side=1,at=subLabLoc,labels=rep(subGroupLabels,length(groupNames)),lwd=0,lwd.ticks=1,cex.axis=0.66,col=plotColors$axis,col.ticks=plotColors$minorTicks,cex.axis=subGroupCex)
+      } else {
+        axis(side=1,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
+      }
       whichSide<-2
-      axis(side=1,at=subLabLoc,labels=rep(subGroupLabels,length(groupNames)),lwd=0,lwd.ticks=1,cex.axis=0.66,col=plotColors$axis,col.ticks=plotColors$minorTicks)
     }
-  } else if(subGroup & is.data.frame(by)) {
+  } else if(subGroup==TRUE & is.data.frame(by)) {
     subLabLoc<-facetSpacing(length(levels(by[,2])),length(groupNames))
     if(is.null(subGroupLabels)){subGroupLabels<-levels(by[,2])}
     if(sidePlot) {
-      axis(side=2,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,line=.85,col=plotColors$axis,col.ticks=plotColors$majorTicks)
-      axis(side=2,at=subLabLoc,labels=rep(subGroupLabels,length(groupNames)),lwd=0,lwd.ticks=1,cex.axis=0.66,col=plotColors$axis,col.ticks=plotColors$minorTicks)
+      if(legend==FALSE | (legend!=FALSE & pointHighlights==TRUE)) {
+        axis(side=2,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,line=.85,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
+        axis(side=2,at=subLabLoc,labels=rep(subGroupLabels,length(groupNames)),lwd=0,lwd.ticks=1,cex.axis=0.66,col=plotColors$axis,col.ticks=plotColors$minorTicks,cex.axis=subGroupCex)
+      } else {
+        axis(side=2,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
+      }
     } else {
-      axis(side=1,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,line=.85,col=plotColors$axis,col.ticks=plotColors$majorTicks)
+      if(legend==FALSE | (legend!=FALSE & pointHighlights==TRUE)) {
+        axis(side=1,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,line=.85,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
+        axis(side=1,at=subLabLoc,labels=rep(subGroupLabels,length(groupNames)),lwd=0,lwd.ticks=1,cex.axis=0.66,col=plotColors$axis,col.ticks=plotColors$minorTicks,cex.axis=subGroupCex)
+      } else {
+        axis(side=1,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
+      }
       whichSide<-2
-      axis(side=1,at=subLabLoc,labels=rep(subGroupLabels,length(groupNames)),lwd=0,lwd.ticks=1,cex.axis=0.66,col=plotColors$axis,col.ticks=plotColors$minorTicks)
     }
   } else {
     if(sidePlot) {
-      axis(side=2,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTicks)
+      axis(side=2,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
     } else {
-      axis(side=1,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTicks)
+      axis(side=1,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
       whichSide<-2
     }
   }
   #Formating the numeric axis and making sure it fits withing the margins.
   #If it is too long, the axis cex is lowered untill .666 at which point it switches to scientific notation
   labelCex<-.9
+  if(!is.na(theme[1])){
+    if(is.numeric(theme$yAxisLabSize)){
+      labelCex<-theme$yAxisLabSize
+    }
+  }
   myMajorTicks<-axTicks(side=whichSide)
   myLabels<-paste0(axisText[1],axTicks(side=whichSide), axisText[2])
   if(logScale>0){
@@ -981,6 +1076,7 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
       abline(h=myMajorTicks[myMajorTicks!=par("usr")[3]],col=plotColors$guides,lwd=1)
     }
   }
+  par(mai=oMai,family=cFont)
   return(list(data=tData,labels=groupNames))
 }
 
@@ -1194,6 +1290,67 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
   }
 }
 
+#' @title Draw a nice plot legened
+#' @description Draws a customizable legend in the margins based on factor levels.
+#' @details This functions works with plot enviroment initializing functions such as \code{\link{prepCategoryWindow}}
+#' to expand the right margin to accomodate a figure legend.
+#'
+#' @examples
+#' ToDo<-1
+#'
+#' @param labels character vector; The names of the levels decribed in the legend. Typically factor levels.
+#' @param title character; The title of the legend. This defaults to "Legend" if unspecificed.
+#' @param fontCol R color; Color of the legend text.
+#' @param border R color; The color of the rectanglar border surrounding the legend. Defaults to \code{\link{NULL}} which supresses this feature
+#' @param lineCol R color; The color of the line colors for the color key. Optional. Defaults to \code{\link{NA}}.
+#' @param bg R color; Sets the background color for the legend aread. Note that this can be distinct the the margin background.
+#' @param col R color vector; A vector of colors determining the color of the color code boxes.
+#' @param shape character; Determins if the color code is rectangles or circles. Valid ptions are "rect", "rectangle", "circ", or "circle". Not there is no funcitonal difference between the synonyms.
+#' @param size numeric; Sets the legend font cex sizing.
+#' @param spacing numeric; Determins the total amount of padding (sum of upper and lower padding) surrounding each line. in the legend in units of font line hight.
+#'
+#' @import tidyverse
+#' @seealso \code{\link{legend}}, \code{\link{prepCategoryWindow}}, \code{\link{niceBox}}, \code{\link{niceDots}}, \code{\link{niceBar}}, \code{\link{niceVio}}
+makeNiceLegend<-function(labels, title="Legend", fontCol="black", border=NULL, lineCol=NA, bg=NA, col=makeColorMatrix()[,3], shape="rect",size=.66,spacing=.2) {
+  maxLabelW<-map_dbl(c(labels),strwidth,cex=size,units="in") %>% max()
+  titleW<-strwidth(title,font=2,cex=size,units="in")
+  if(titleW>maxLabelW){maxLabelW<-titleW}
+  maxLabelH<-map_dbl(labels, strheight,cex=size,units="in") %>% max()
+  titleH<-strheight(title,font=2,cex=size,units="in")
+  oMai<-par("mai")
+  nMai<-oMai
+  nMai[4]<-nMai[4]+maxLabelW #+maxLabelH
+  par(mai=nMai)
+
+  par(xpd=NA)
+  iRange<-par("pin")[1]
+  uRange<-par("usr")[2]-par("usr")[1]
+  ConvertW<-iRange/uRange
+  iRange<-par("pin")[2]
+  uRange<-par("usr")[4]-par("usr")[3]
+  ConvertH<-iRange/uRange
+  LegendCo<-oMai[4]/3/ConvertW +par("usr")[2]
+
+  totalLegendH<-maxLabelH*1.2*length(labels)+titleH
+  startH<-0
+  if(totalLegendH/2>iRange/3){
+    startH<-par("usr")[4]
+  } else {
+    startH<-par("usr")[4]-iRange/3/ConvertH + totalLegendH/2/ConvertH
+  }
+  if(!is.null(border)){
+    rect(LegendCo-oMai[4]/9/ConvertW,startH-totalLegendH/ConvertH-oMai[4]/9/ConvertH*2,LegendCo+ maxLabelW/ConvertW+oMai[4]/9/ConvertW, startH+oMai[4]/9/ConvertH*2,col=bg,border=border)
+  }
+  text(LegendCo, startH, label=title,cex=size, font=2, offset=0, pos=4, col=fontCol)
+  for(i in 1:length(labels)){
+    cH<-startH-titleH/ConvertH*(1+ spacing/2)-.5*maxLabelH/ConvertH-(i-1)*maxLabelH/ConvertH*(1+ spacing)
+    rect(LegendCo, cH-.3*maxLabelH/ConvertH,LegendCo+maxLabelH/ConvertW, cH +.7* maxLabelH/ConvertH, border=lineCol,col=col[i])
+    text(LegendCo+maxLabelH/ConvertW, cH,labels=labels[i],cex=size,pos=4,offset=.2,col=fontCol)
+  }
+
+  par(xpd=F,mai=oMai)
+
+}
 
 #' @title Prepare and print basic statistics for niceBox and niceVio
 #' @description Uses filtred data with subgroup and factor information to calculate quartile data for display and plotting.
@@ -1362,7 +1519,6 @@ prepNiceData<- function(prepedData,by, subGroup=FALSE,outliers=TRUE,filter,group
 #' @param pointLaneWidth numeric; This controls how far data point dots can move along the categorical axis when plotting. Used for \code{pointMethod} options 'jitter', 'beeswarm', and 'distribution'.
 #' @param flipFacts logical; When a dataframe of values is given, column names are used as a secondary grouping factor by default. Setting \code{flipFacts=\link{TRUE}} makes the column names the primary factor and \code{by} the secondary factor.
 #' @param na.rm logical; Should \code{NA}s be removed from the data set? Both data input and the factor input from \code{by} with be checked.
-#' @param lWidth numeric; Line width for drawing the plots.
 #' @param verbose logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.
 #' @param ... additional options for S3 method variants
 #'
@@ -1386,14 +1542,17 @@ prepNiceData<- function(prepedData,by, subGroup=FALSE,outliers=TRUE,filter,group
 #' @import tidyverse
 #' @export
 #' @seealso \code{\link{boxplot}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{quantileTrim}}, \code{\link{prepCategoryWindow}}
-niceBox <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, theme=basicTheme, minorTick=FALSE, guides=TRUE, outliers=1.5, pointSize=1, width=1, pointShape=16, plotColors=list(bg="open"), logScale=FALSE, trim=FALSE, pointMethod="jitter", axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, drawCenterDot=!drawPoints, pointLaneWidth=.7, lWidth=1, flipFacts=FALSE, na.rm=FALSE, verbose=FALSE, ...) {UseMethod("niceBox",x)}
+niceBox <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, theme=basicTheme, minorTick=FALSE, guides=TRUE, outliers=1.5, pointSize=1, width=1, pointShape=16, plotColors=list(bg="open"), logScale=FALSE, trim=FALSE, pointMethod="jitter", axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, drawCenterDot=!drawPoints, pointLaneWidth=.7, flipFacts=FALSE, na.rm=FALSE, verbose=FALSE, legend=FALSE, ...) {UseMethod("niceBox",x)}
 
 #' @import tidyverse
 #' @export
-niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, theme=basicTheme, minorTick=NULL, guides=NULL, outliers=1.5, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, drawCenterDot=!drawPoints, pointLaneWidth=NULL, lWidth=NULL, flipFacts=FALSE, na.rm=FALSE, verbose=FALSE, ...) {
+niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, theme=basicTheme, minorTick=NULL, guides=NULL, outliers=1.5, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, drawCenterDot=!drawPoints, pointLaneWidth=NULL, flipFacts=FALSE, na.rm=FALSE, verbose=FALSE, legend=FALSE, ...) {
   if(any(is.na(x))){warning("Warning: NAs detected in dataset")}
   prepedData<-NULL
   plotData<-NULL
+  lWidth<-NULL
+  wiskerLineType<-NULL
+  capWidth<-NULL
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = flipFacts)
   x<-checked$d
   by<-checked$b
@@ -1422,6 +1581,8 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
     }
     if(is.null(pointLaneWidth)){pointLaneWidth<-1}
     if(is.null(lWidth)){lWidth<-1}
+    if(is.null(capWidth)){capWidth<-.25}
+    if(is.null(wiskerLineType)){wiskerLineType<-2}
     if(is.null(pointMethod)){pointMethod<-"jitter"}
   } else {
     if(is.null(plotColors)){plotColors<-theme$plotColors}
@@ -1442,18 +1603,34 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
     }
     if(is.null(pointLaneWidth)){pointLaneWidth<-theme$pointLaneWidthBP}
     if(is.null(lWidth)){lWidth<-theme$lWidthBP}
+    if(is.null(capWidth)){capWidth<-theme$errorBarCapWidthBP}
+    if(is.null(wiskerLineType)){wiskerLineType<-theme$errorBarLineTypeBP}
     if(is.null(pointMethod)){pointMethod<-theme$pointMethodBP}
   }
   myLevels<-1
   #Calcuate the relevant factor levels formating the graph.
   if(is.data.frame(x)){
-    myLevels<-dim(x)[2]
+    if(pointHighlights==TRUE) {
+      myLevels<-length(levels(by[,2]))
+    } else {
+      myLevels<-dim(x)[2]
+    }
   } else if(subGroup==TRUE) {
     if(is.data.frame(by)){
-      myLevels<-length(levels(factor(by[,2])))
+      if(pointHighlights==TRUE) {
+        myLevels<-length(levels(factor(by[,3])))
+      } else {
+        myLevels<-length(levels(factor(by[,2])))
+      }
+    } else {
+      myLevels<-length(levels(by))
     }
   } else if(is.data.frame(by)){
-    myLevels<-length(levels(by[,1]))
+    if(pointHighlights==TRUE) {
+      myLevels<-length(levels(by[,2]))
+    } else {
+      myLevels<-length(levels(by[,1]))
+    }
   } else {
     myLevels<-length(levels(by))
   }
@@ -1462,6 +1639,10 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
   if(length(plotColors$points)>1 & defaultPoints==FALSE){plotColors$points<-plotColors$points[1:myLevels]}
   if(length(plotColors$fill)>1 & defaultFill==FALSE){plotColors$fill<-plotColors$fill[1:myLevels]}
   if(length(plotColors$lines)>1 & defaultLines==FALSE){plotColors$lines<-plotColors$lines[1:myLevels]}
+  if(pointMethod=="beeswarm" | pointMethod=="Beeswarm") {
+    plotColors$points<-map_chr(plotColors$points,setAlpha,1)
+    plotColors$points[length(plotColors$points)]<-"black"
+  }
 
   #Capturing default group names
   if(is.data.frame(by)) {
@@ -1481,9 +1662,9 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
       }
     }
   }
-  if(flipFacts & is.data.frame(x)){subGroup<-TRUE}
+  #if(flipFacts & is.data.frame(x)){subGroup<-TRUE}
   #Handling adding plots to existing graph
-  if(add) {
+  if(add==TRUE) {
     if(logScale>0) {
       prepedData<-list(data=log(x+1,logScale))
     } else {
@@ -1498,39 +1679,71 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
         minorGuides<-FALSE
       }
     }
-    prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels)
+    prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels, theme=theme, legend=legend, pointHighlights=pointHighlights)
   }
   pvalue<-NULL
   filter<-rep(TRUE,length(x))
   if(trim>0){filter<-quantileTrim(x,trim,na.rm=T,returnFilter=T)[[2]]}
+
+  #Initialize legend variables so we can update based on options
+  legendTitle<-"Legend"
+  legendLabels<-NULL
+  legendColors<-plotColors$points
+  #Handles cases where users want the points overlay to be consistant and the fill to change.
+  if(length(legendColors)<=1 & length(plotColors$fill)>1){
+    legendColors<-plotColors$fill
+  }
+
   #Data is set and ready to go. Plotting is handled based on cases handling if 'x' and 'by' are vectors or dataframes
   if(is.numeric(prepedData[[1]])){
-    #CASE: by is a factor data is a numeric vector
+    #CASE: by is a factor and data is a numeric vector
     if(is.factor(by)) {
       if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[filter],calcType[1],verbose=verbose)}
       plotLoc<-seq(1,length(groupNames),by=1)
       names(plotLoc)<-groupNames
+      legend<-FALSE
       plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,verbose=verbose)
-      plotData %>% drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=drawCenterDot,drawBox=drawBox, lWidth=lWidth)
+      plotData %>% drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=drawCenterDot,drawBox=drawBox, lWidth=lWidth,whiskerLty=wiskerLineType,capWidth=capWidth)
       addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers)
     } else {
       if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[filter,1],calcType[1])}
-    #CASE: by is not a factor data is a numeric vector and subGroup is TRUE
+    #CASE: by is not a factor, data is a numeric vector and subGroup is TRUE
       if(subGroup) {
         facetLoc<-facetSpacing(length(levels(by[,2])),length(groupNames))
         names(facetLoc)<-unlist(lapply(levels(by[,1]),FUN=function(x) paste0(x,levels(by[,2]),sep=".")))
         plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,verbose=verbose)
         cLoc<-facetLoc[plotData$facetLevel]
         plotData %>% bind_cols(at=cLoc,width=rep(.25*width/length(levels(by[,2])),length(cLoc))) %>%
-          drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=drawCenterDot,drawBox=drawBox,lWidth = lWidth)
+          drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=drawCenterDot,drawBox=drawBox,lWidth = lWidth,whiskerLty=wiskerLineType,capWidth=capWidth)
         addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers)
+        if(legend!=FALSE) {
+          if(pointHighlights){
+            if(legend==TRUE){
+              legendTitle<-colnames(by)[3]
+            }
+            legendLabels<-levels(by[,3])
+          } else {
+            if(legend==TRUE){
+              legendTitle<-colnames(by)[2]
+            }
+            legendLabels<-levels(by[,2])
+          }
+        }
       } else {
       #CASE: by is not a factor, data is a numeric vector and subGroup is FALSE
         plotLoc<-seq(1,length(groupNames),by=1)
         names(plotLoc)<-groupNames
         plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,verbose=verbose)
-        plotData %>% drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=drawCenterDot,drawBox=drawBox,lWidth=lWidth)
+        plotData %>% drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=drawCenterDot,drawBox=drawBox,lWidth=lWidth,whiskerLty=wiskerLineType,capWidth=capWidth)
         addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers)
+        if(legend!=FALSE) {
+          if(pointHighlights==TRUE){
+            if(legend==TRUE){
+              legendTitle<-colnames(by)[2]
+            }
+            legendLabels<-levels(by[,2])
+          }
+        }
       }
     }
   } else {
@@ -1542,8 +1755,22 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
       plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,flipFacts=flipFacts,verbose=verbose)
       cLoc<-facetLoc[plotData$facetLevel]
       plotData %>% bind_cols(at=cLoc,width=rep(.25*width/length(x),length(cLoc))) %>%
-        drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=drawCenterDot,drawBox=drawBox, lWidth=lWidth)
+        drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=drawCenterDot,drawBox=drawBox, lWidth=lWidth,whiskerLty=wiskerLineType,capWidth=capWidth)
       addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x))
+      #Note we are ignoring pointHighlights here as by is a factor
+      if(legend!=FALSE) {
+        if(flipFacts) {
+          if(legend==TRUE){
+            legendTitle<-"Legend"
+          }
+          legendLabels<-levels(by)
+        } else {
+          if(legend==TRUE){
+            legendTitle<-"Legend"
+          }
+          legendLabels<-colnames(prepedData[[1]])
+        }
+      }
     } else {
     #CASE: data is a dataframe, by is a dataframe, subGroup is ignored
       facetLoc<-facetSpacing(length(prepedData[[1]]),length(groupNames))
@@ -1552,9 +1779,47 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
       plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,flipFacts=flipFacts,verbose=verbose)
       cLoc<-facetLoc[plotData$facetLevel]
       plotData %>% bind_cols(at=cLoc,width=rep(.25*width/length(x),length(cLoc))) %>%
-        drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=drawCenterDot,drawBox=drawBox,lWidth=lWidth)
+        drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=drawCenterDot,drawBox=drawBox,lWidth=lWidth,whiskerLty=wiskerLineType,capWidth=capWidth)
       addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x))
+      if(legend!=FALSE) {
+        if(pointHighlights){
+          if(legend==TRUE){
+            legendTitle<-colnames(by)[2]
+          }
+          legendLabels<-levels(by[,2])
+        } else {
+          if(flipFacts) {
+            if(legend==TRUE){
+              legendTitle<-"Legend"
+            }
+            legendLabels<-levels(by[,1])
+          } else {
+            if(legend==TRUE){
+              legendTitle<-"Legend"
+            }
+            legendLabels<-colnames(prepedData[[1]])
+          }
+        }
+      }
     }
+  }
+  if(length(legendColors)<length(legendLabels) & legend!=FALSE){
+    legend<-FALSE
+    warning("Not enough point colors to uniquely color subGroups levels\nPlease update plotColors point options to use legend options with this subgroup.")
+  }
+
+  oFont<-par()$family
+  oCexMain<-par()$cex.main
+  oCexlab<-par()$cex.lab
+  oCexSub<-par()$cex.sub
+  if(!is.na(theme[1]) & !is.null(theme[1])){
+    par(cex.main=theme$titleSize, cex.lab=theme$axisLabelSize, cex.sub=theme$subSize, family=theme$fontFamily)
+  }
+  if(legend!=FALSE) {
+    if(is.na(legendTitle) | legendTitle=="factTwo") {
+      legendTitle<="Legend"
+    }
+    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=theme$LegendBorder, lineCol=theme$LegendLineCol, bg=theme$LegendBG, col=legendColors, shape="rect",size=theme$LegendSize,spacing=theme$LegendSpacing)
   }
   if(add==FALSE) {
     if(is.null(sub) & showCalc==T & is.null(pvalue)==FALSE){
@@ -1566,6 +1831,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
       title(main=main,sub=sub,ylab=ylab)
     }
   }
+  par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)
   dataOut<-list(data=data.frame(prepedData$data,by),summary=plotData,stats=pvalue)
   invisible(dataOut)
 }
@@ -1584,7 +1850,9 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
 #' is used to highlight points data point overlay (assuming \code{drawPoints=\link{TRUE}}). If \code{subGroup=\link{FALSE}} and \code{subGroup=\link{TRUE}}, then the second column of \code{by} is used to control
 #' the point highlighting. If \code{x} itself is a data frame of numeric vectors, \code{subGroup} is automatically set to false and each column of \code{x} is plotted like a sub-group and grouped
 #' by the first column of \code{by}. Data point highlighting with \code{pointHighlights=\link{TRUE}} can still be used when \code{x} is a data frame and the highlighting factor will be drawn from the second column of \code{by}.
-#' Please note that the p-values can not always be calculated and are for general exploratory use only. More careful analysis is necessary to determine statistical significance. This function is as S3 generic and can be extended to provide class specific functionality. To further facilitate data exploration, outputs from statistical testing and data set summaries
+#' Please note that the p-values can not always be calculated and are for general exploratory use only. More careful analysis is necessary to determine statistical significance.
+#' This function is as S3 generic and can be extended to provide class specific functionality.
+#' To further facilitate data exploration, outputs from statistical testing and data set summaries
 #' are printed to the console.
 #'
 #' @inheritParams niceBox
@@ -1598,15 +1866,16 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
 #'
 #' @export
 #' @seealso \code{\link[graphics]{stripchart}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{quantileTrim}}, \code{\link{prepCategoryWindow}}, \code{\link{niceBox}}
-niceDots <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=1, pointShape=1, plotColors=list(bg="open"), logScale=FALSE, trim=FALSE, pointMethod="beeswarm", axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=1, na.rm=FALSE, lWidth=NULL, flipFacts=FALSE, verbose=FALSE, ...) {UseMethod("niceDots",x)}
+niceDots <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=1, pointShape=1, plotColors=list(bg="open"), logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=1, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE, ...) {UseMethod("niceDots",x)}
 
 #' @export
-niceDots.default<-function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=1, pointShape=1, plotColors=list(bg="open"), logScale=FALSE, trim=FALSE, pointMethod="beeswarm", axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=1, na.rm=FALSE, lWidth=NULL, flipFacts=FALSE, verbose=FALSE, ...) {
+niceDots.default<-function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=1, pointShape=1, plotColors=list(bg="open"), logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=1, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE, ...) {
   #Here we check to see if the user specified any options so that they are left unaltered if present
   defaultPoints<-FALSE
   defaultLines<-FALSE
   defaultFill<-FALSE
   defaultShapes<-FALSE
+  lWidth<-NULL
   if(is.vector(plotColors,mode="list")){
     pcNames<-names(plotColors)
     if(!("points" %in% pcNames)){defaultPoints<-TRUE}
@@ -1638,26 +1907,43 @@ niceDots.default<-function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab
       }
     }
     if(is.null(guides)){guides<-theme$guides}
-    if(is.null(pointSize)){pointSize<-theme$pointSizeDP}
-    if(is.null(width)){width<-theme$widthDP}
+    if(is.null(pointSize)){theme$pointSizeBP<-theme$pointSizeDP}
+    if(is.null(width)){theme$widthBP<-theme$widthDP}
     if(is.null(pointShape)){
-      pointShape<-theme$pointShapeDP
+      theme$pointShapeBP<-theme$pointShapeDP
       defaultShapes<-TRUE
     }
-    if(is.null(pointLaneWidth)){pointLaneWidth<-theme$pointLaneWidthDP}
-    if(is.null(lWidth)){lWidth<-theme$lWidthDP}
-    if(is.null(pointMethod)){pointMethod<-theme$pointMethodDP}
+    if(is.null(pointLaneWidth)){theme$pointLaneWidthBP<-theme$pointLaneWidthDP}
+    if(is.null(lWidth)){theme$lWidthBP<-theme$lWidthDP}
+    if(is.null(pointMethod)){
+      theme$pointMethodBP<-theme$pointMethodDP
+      pointMethod<-theme$pointMethodDP
+    }
   }
   myLevels<-1
   #Calcuate the relevant factor levels formating the graph.
   if(is.data.frame(x)){
-    myLevels<-dim(x)[2]
+    if(pointHighlights==TRUE) {
+      myLevels<-length(levels(by[,2]))
+    } else {
+      myLevels<-dim(x)[2]
+    }
   } else if(subGroup==TRUE) {
     if(is.data.frame(by)){
-      myLevels<-length(levels(factor(by[,2])))
+      if(pointHighlights==TRUE) {
+        myLevels<-length(levels(factor(by[,3])))
+      } else {
+        myLevels<-length(levels(factor(by[,2])))
+      }
+    } else {
+      myLevels<-length(levels(by))
     }
   } else if(is.data.frame(by)){
-    myLevels<-length(levels(by[,1]))
+    if(pointHighlights==TRUE) {
+      myLevels<-length(levels(by[,2]))
+    } else {
+      myLevels<-length(levels(by[,1]))
+    }
   } else {
     myLevels<-length(levels(by))
   }
@@ -1666,8 +1952,12 @@ niceDots.default<-function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab
   if(length(plotColors$points)>1 & defaultPoints==FALSE){plotColors$points<-plotColors$points[1:myLevels]}
   if(length(plotColors$fill)>1 & defaultFill==FALSE){plotColors$fill<-plotColors$fill[1:myLevels]}
   if(length(plotColors$lines)>1 & defaultLines==FALSE){plotColors$lines<-plotColors$lines[1:myLevels]}
-
-  niceBox(x=x,by=by,groupNames=groupNames,main=main,ylab=ylab,minorTick=minorTick,guides=guides,theme=theme,outliers=outliers,pointSize=pointSize,width=width,pointShape=pointShape,plotColors=plotColors,logScale=logScale,trim=trim,pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks,subGroup=subGroup,subGroupLabels=subGroupLabels,expLabels=expLabels,sidePlot=sidePlot, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth, drawBox=FALSE, drawPoints=TRUE, drawCenterDot=FALSE,na.rm=na.rm, flipFacts=flipFacts, lWidth=lWidth, verbose=verbose)
+  if(pointMethod=="beeswarm" | pointMethod=="Beeswarm") {
+    plotColors$points<-map_chr(plotColors$points,setAlpha,1)
+    plotColors$points[length(plotColors$points)]<-"black"
+  }
+  theme$plotColors<-plotColors
+  niceBox(x=x,by=by,groupNames=groupNames,theme=theme,main=main,ylab=ylab,minorTick=minorTick,guides=guides,outliers=outliers,pointSize=pointSize,width=width,pointShape=pointShape,plotColors=plotColors,logScale=logScale,trim=trim,pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks,subGroup=subGroup,subGroupLabels=subGroupLabels,expLabels=expLabels,sidePlot=sidePlot, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth, drawBox=FALSE, drawPoints=TRUE, drawCenterDot=FALSE,na.rm=na.rm, flipFacts=flipFacts, verbose=verbose, legend=legend)
 }
 
 #' @title draw a violin plot
@@ -1694,7 +1984,6 @@ niceDots.default<-function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab
 #' @param width numeric; scaling factor controlling the width of the violins.
 #' @param theme list object; Themes are are an optional way of storing graphical preset options that are compatible with all nicePlot graphing functions.
 #' @param h numeric; Used to override the \code{h} hight of density estimator setting in \code{\link[vioplot]{vioplot}}. Default value is \code{\link{NULL}}.
-#' @param medianMarkerShape positive integer; sets the shape type (\code{pch}) for the median marker.
 #' @param pointShape positive integer; sets pty for plotting data points. Can be a vector to support additional graphical customization.
 #' @param showCalc logical; if a p-value can be easily calculated for your data, it will be displayed using the \code{sub} annotation setting.
 #' @param calcType character; should match one of 'none', 'wilcox', 'Tukey','t.test','anova' which will determine which, if any statistical test should be performed on the data.
@@ -1708,7 +1997,7 @@ niceDots.default<-function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab
 #' @param pointLaneWidth numeric; This controls how far data point dots can move along the categorical axis when plotting. Used for \code{pointMethod} options 'jitter', 'beeswarm', and 'distribution'.
 #' @param flipFacts logical; When a dataframe of values is given, column names are used as a secondary grouping factor by default. Setting \code{flipFacts=\link{TRUE}} makes the column names the primary factor and \code{by} the secondary factor.
 #' @param na.rm logical; Should \code{NA}s be removed from the data set? Both data input and the factor input from \code{by} with be checked.
-#' @param lWidth numeric; Line width for drawing the plots.
+#' @param legend logical/character; if not equal to \code{\link{FALSE}} with cause a legend to be drawn in the margins. If set to a character string instead of a logical value, the string will be used as the legend title insteas of the factor column name from \code{by}.
 #' @param verbose logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.
 #' @param ... additional options for S3 method variants
 #'
@@ -1730,15 +2019,13 @@ niceDots.default<-function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab
 #' niceVio(iris$Sepal.Length, by=factorFrame, minorTick=4,subGroup=TRUE,
 #'     ylab=Lab,main=Title,plotColors=myCols)
 #' @import tidyverse
-#' @import vioplot
 #' @export
 #' @seealso \code{\link[vioplot]{vioplot}}, \code{\link{boxplot}}, \code{\link{niceBox}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{prepCategoryWindow}}
-niceVio <- function(x, by=NULL, h=NULL,medianMarkerShape=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=1.5, pointSize=1, width=1, pointShape=16, plotColors=list(bg="open"), logScale=FALSE, trim=FALSE, pointMethod="jitter", axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=.7,flipFacts=FALSE, na.rm=FALSE, lWidth=NULL, verbose=FALSE, ...) {UseMethod("niceVio",x)}
+niceVio <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=1.5, pointSize=1, width=1, pointShape=16, plotColors=list(bg="open"), logScale=FALSE, trim=FALSE, pointMethod="jitter", axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=.7,flipFacts=FALSE, na.rm=FALSE, verbose=FALSE, legend=FALSE, ...) {UseMethod("niceVio",x)}
 
 #' @import tidyverse
-#' @import vioplot
 #' @export
-niceVio.default <- function(x, by=NULL, h=NULL,medianMarkerShape=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=FALSE, pointSize=.7, width=1, pointShape=16, plotColors=list(bg="open"), logScale=FALSE, trim=FALSE, pointMethod="beeswarm", axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=.7,flipFacts=FALSE,  na.rm=FALSE, lWidth=NULL, verbose=FALSE, ...) {
+niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=FALSE, pointSize=.7, width=1, pointShape=16, plotColors=list(bg="open"), logScale=FALSE, trim=FALSE, pointMethod="beeswarm", axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=.7,flipFacts=FALSE,  na.rm=FALSE, verbose=FALSE,legend=FALSE, ...) {
   if(any(is.na(x))){warning("Warning: NAs detected in dataset")}
   prepedData<-NULL
   plotData<-NULL
@@ -1746,11 +2033,14 @@ niceVio.default <- function(x, by=NULL, h=NULL,medianMarkerShape=NULL, groupName
   x<-checked$d
   by<-checked$b
   rm(checked)
+
   #Here we check to see if the user specified any options so that they are left unaltered if present
   defaultPoints<-FALSE
   defaultLines<-FALSE
   defaultFill<-FALSE
   defaultShapes<-FALSE
+  lWidth<-NULL
+  medianMarkerShape<-NULL
   if(is.vector(plotColors,mode="list")){
     pcNames<-names(plotColors)
     if(!("points" %in% pcNames)){defaultPoints<-TRUE}
@@ -1786,7 +2076,7 @@ niceVio.default <- function(x, by=NULL, h=NULL,medianMarkerShape=NULL, groupName
     if(is.null(pointSize)){pointSize<-theme$pointSizeVP}
     if(is.null(width)){width<-theme$widthVP}
     if(is.null(pointShape)){
-      pointShape<-theme$pointShapeVP
+      pointShape<-theme$pointShapeBP
       defaultShapes<-TRUE
     }
     if(is.null(pointLaneWidth)){pointLaneWidth<-theme$pointLaneWidthVP}
@@ -1797,13 +2087,27 @@ niceVio.default <- function(x, by=NULL, h=NULL,medianMarkerShape=NULL, groupName
   myLevels<-1
   #Calcuate the relevant factor levels formating the graph.
   if(is.data.frame(x)){
-    myLevels<-dim(x)[2]
+    if(pointHighlights==TRUE) {
+      myLevels<-length(levels(by[,2]))
+    } else {
+      myLevels<-dim(x)[2]
+    }
   } else if(subGroup==TRUE) {
     if(is.data.frame(by)){
-      myLevels<-length(levels(factor(by[,2])))
+      if(pointHighlights==TRUE) {
+        myLevels<-length(levels(factor(by[,3])))
+      } else {
+        myLevels<-length(levels(factor(by[,2])))
+      }
+    } else {
+      myLevels<-length(levels(by))
     }
   } else if(is.data.frame(by)){
-    myLevels<-length(levels(by[,1]))
+    if(pointHighlights==TRUE) {
+      myLevels<-length(levels(by[,2]))
+    } else {
+      myLevels<-length(levels(by[,1]))
+    }
   } else {
     myLevels<-length(levels(by))
   }
@@ -1812,7 +2116,10 @@ niceVio.default <- function(x, by=NULL, h=NULL,medianMarkerShape=NULL, groupName
   if(length(plotColors$points)>1 & defaultPoints==FALSE){plotColors$points<-plotColors$points[1:myLevels]}
   if(length(plotColors$fill)>1 & defaultFill==FALSE){plotColors$fill<-plotColors$fill[1:myLevels]}
   if(length(plotColors$lines)>1 & defaultLines==FALSE){plotColors$lines<-plotColors$lines[1:myLevels]}
-
+  if(pointMethod=="beeswarm" | pointMethod=="Beeswarm") {
+    plotColors$points<-map_chr(plotColors$points,setAlpha,1)
+    plotColors$points[myLevels]<-"black"
+  }
   #Capturing default group names
   if(is.data.frame(by)) {
     if(is.null(groupNames)){
@@ -1831,7 +2138,7 @@ niceVio.default <- function(x, by=NULL, h=NULL,medianMarkerShape=NULL, groupName
       }
     }
   }
-  if(flipFacts & is.data.frame(x)){subGroup<-TRUE}
+  #if(flipFacts==TRUE & is.data.frame(x)){subGroup<-TRUE}
   #Handling adding plots to existing graph
   if(add) {
     if(logScale>0) {
@@ -1848,8 +2155,18 @@ niceVio.default <- function(x, by=NULL, h=NULL,medianMarkerShape=NULL, groupName
         minorGuides<-FALSE
       }
     }
-    prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels)
+    prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels, theme=theme, legend=legend, pointHighlights=pointHighlights)
   }
+
+  #Initialize legend variables so we can update based on options
+  legendTitle<-"Legend"
+  legendLabels<-NULL
+  legendColors<-plotColors$points
+  #Handles cases where users want the points overlay to be consistant and the fill to change.
+  if(length(legendColors)<=1 & length(plotColors$fill)>1){
+    legendColors<-plotColors$fill
+  }
+
   pvalue<-NULL
   if(subGroup==TRUE){width<-width*2}
   filter<-rep(TRUE,length(x))
@@ -1862,6 +2179,7 @@ niceVio.default <- function(x, by=NULL, h=NULL,medianMarkerShape=NULL, groupName
       names(plotLoc)<-groupNames
       plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,verbose=verbose)
       cLevels<-levels(factor(by[filter]))
+      legend<-FALSE
       lapply(cLevels, function(x) if(sum(by[filter]==x)>0){vioplot(
         prepedData[[1]][which(by[filter]==x)],at=grep(x,cLevels),add=T,horizontal=sidePlot,
         col=plotColors$fill,border=plotColors$lines,wex=width,drawRect=drawBox,
@@ -1889,6 +2207,19 @@ niceVio.default <- function(x, by=NULL, h=NULL,medianMarkerShape=NULL, groupName
         if(drawPoints) {
           addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers)
         }
+        if(legend!=FALSE) {
+          if(pointHighlights){
+            if(legend==TRUE){
+              legendTitle<-colnames(by)[3]
+            }
+            legendLabels<-levels(by[,3])
+          } else {
+            if(legend==TRUE){
+              legendTitle<-colnames(by)[2]
+            }
+            legendLabels<-levels(by[,2])
+          }
+        }
       } else {
        #CASE: by is not a factor, data is a numeric vector and subGroup is FALSE
         plotLoc<-seq(1,length(groupNames),by=1)
@@ -1906,6 +2237,14 @@ niceVio.default <- function(x, by=NULL, h=NULL,medianMarkerShape=NULL, groupName
         )
         if(drawPoints) {
           addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers)
+        }
+        if(legend!=FALSE) {
+          if(pointHighlights==TRUE){
+            if(legend==TRUE){
+              legendTitle<-colnames(by)[2]
+            }
+            legendLabels<-levels(by[,2])
+          }
         }
       }
     }
@@ -1932,6 +2271,19 @@ niceVio.default <- function(x, by=NULL, h=NULL,medianMarkerShape=NULL, groupName
       if(drawPoints) {
         addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x))
       }
+      if(legend!=FALSE) {
+        if(flipFacts) {
+          if(legend==TRUE){
+            legendTitle<-"Legend"
+          }
+          legendLabels<-levels(by)
+        } else {
+          if(legend==TRUE){
+            legendTitle<-"Legend"
+          }
+          legendLabels<-colnames(prepedData[[1]])
+        }
+      }
     } else {
       #CASE: data is a dataframe, by is a dataframe, subGroup is ignored
       facetLoc<-facetSpacing(length(prepedData[[1]]),length(groupNames))
@@ -1953,7 +2305,46 @@ niceVio.default <- function(x, by=NULL, h=NULL,medianMarkerShape=NULL, groupName
       if(drawPoints) {
         addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x))
       }
+      if(legend!=FALSE) {
+        if(pointHighlights){
+          if(legend==TRUE){
+            legendTitle<-colnames(by)[2]
+          }
+          legendLabels<-levels(by[,2])
+        } else {
+          if(flipFacts) {
+            if(legend==TRUE){
+              legendTitle<-"Legend"
+            }
+            legendLabels<-levels(by[,1])
+          } else {
+            if(legend==TRUE){
+              legendTitle<-"Legend"
+            }
+            legendLabels<-colnames(prepedData[[1]])
+          }
+        }
+      }
     }
+  }
+
+  if(length(legendColors)<length(legendLabels) & legend!=FALSE){
+    legend<-FALSE
+    warning("Not enough point colors to uniquely color subGroups levels\nPlease update plotColors point options to use legend options with this subgroup.")
+  }
+
+  oFont<-par()$family
+  oCexMain<-par()$cex.main
+  oCexlab<-par()$cex.lab
+  oCexSub<-par()$cex.sub
+  if(!is.na(theme[1]) & !is.null(theme[1])){
+    par(cex.main=theme$titleSize, cex.lab=theme$axisLabelSize, cex.sub=theme$subSize, family=theme$fontFamily)
+  }
+  if(legend!=FALSE) {
+    if(is.na(legendTitle) | legendTitle=="factTwo") {
+      legendTitle<="Legend"
+    }
+    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=theme$LegendBorder, lineCol=theme$LegendLineCol, bg=theme$LegendBG, col=legendColors, shape="rect",size=theme$LegendSize,spacing=theme$LegendSpacing)
   }
   if(add==FALSE) {
     if(is.null(sub) & showCalc==T & is.null(pvalue)==FALSE){
@@ -1965,6 +2356,7 @@ niceVio.default <- function(x, by=NULL, h=NULL,medianMarkerShape=NULL, groupName
       title(main=main,sub=sub,ylab=ylab)
     }
   }
+  par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)
   dataOut<-list(data=data.frame(prepedData$data,by),summary=plotData,stats=pvalue)
   invisible(dataOut)
 }

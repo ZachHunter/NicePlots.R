@@ -527,7 +527,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       }
       width<-width*(facetLoc[2]-facetLoc[1])/4
       printData<-printData %>% mutate(Group=facetLevel)
-      print(plotData)
+      #print(plotData)
       if(aggFun[1]=="mean") {
         if(errFun[1]=="sd"){
           if(verbose){print(select(printData,Group,N,Mean,starts_with("SD")))}

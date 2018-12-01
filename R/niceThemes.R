@@ -1,18 +1,41 @@
 #Themes
+
+#' @title Nice Plots Theme: Basic
+#' @description This is the default theme for nicePlots
+#' @details This default theme has uses transparent solid circles for point overlays with up to 8 colors.
+#' Fill and line options as constant.
+#' @export
 basicTheme<- list(
+  #General Plot Settings
+  fontFamily="sans", #Possible values: 'sans', 'mono', or 'serif'
+  groupLabSize=1, #Label cex for the primary group labels
+  subGroupLabSize=.6, #Label cex for subgroup labels
+  yAxisLabSize=.9, #Label cex for y-axis tick labels
+  axisLabelSize=1, #overall axis label cex (ei, not the tick mark labels)
+  titleSize=1.2, #Plot title cex
+  subSize=1, #Sub label cex
   guides=TRUE, #Logical; draws guide lines at major ticks
   minorTick=FALSE, #Numeric; number of minor tick marks to draw between major marks. Set to FALSE to disable
   minorTickLS=4, #Numeric; number of minor tick marks to draw between major marks if logScale is active. Set to FALSE to disable
+
+  #Legend Settings
+  LegendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
+  LegendLineCol=NA, #Border color for the legend color boxes
+  LegendBG=NA, #Legend background color
+  LegendSize=.66, #overall legend cex
+  LegendSpacing=.2, #Relative spacing padding legend entries
+
+  #Plot Specific Defaults
   pointSizeBP=.7, #cex-like Numeric; size of points in overlay for boxplots
   pointSizeVP=.6, #cex-like Numeric; size of points in overlay for violin plots
   pointSizeDP=.5, #cex-like Numeric; size of points in overlay for dot plots
   widthBP=1, #Relative box width of each category for box plots
-  widthVP=1, #Relative violin width of each category for box plots
-  widthDP=1, #Relative category width of each category for box plots
-  widthBar=1, #Relative bar width of each category for box plots
+  widthVP=1, #Relative violin width of each category for violin plots
+  widthDP=1, #Relative category width of each category for dot plots
+  widthBar=1, #Relative bar width of each category for bar plots
   pointShapeBP=16, #Numeric vector; point shapes for box plots
   pointShapeVP=16, #Numeric vector; point shapes for vioin plots
-  pointShapeDP=16, #Numeric vector; point shapes for dot plots
+  pointShapeDP=1, #Numeric vector; point shapes for dot plots
   pointLaneWidthBP=.7, #Restricts the point overlay to a fraction of the box width
   pointLaneWidthDP=.7, #Restricts the point overlay to a fraction of the category width
   pointLaneWidthVP=.7, #Restricts the point overlay to a fraction of the violin width
@@ -23,7 +46,14 @@ basicTheme<- list(
   lWidthDP=1, #Line width (lwd) for dot plots
   lWidthVP=1, #Line width (lwd) for violin plots
   lWidthBar=1, #Line width (lwd) for violin plots
+  errorBarLineTypeBP=2, #Line type (lty) for boxplot wiskers
+  errorBarLineTypeBar=1, #Line type (lty) for bar plot error bars
+  errorBarCapWidthBP=.25, #relative width of cap on box plot wiskers
+  errorBarCapWidthBar=1, #relative width of cap on bar plot error bars
+  errorCapType="bar", #Error bar cap type for bar plots.
   medianMarkerShape=16, #Numeric; pch shape for median marker for violin plots
+
+  #PlotColor Options
   plotColors=formatPlotColors(list(
     bg="open", #Plot area background
     marginBg="transparent", #plot margin background
@@ -41,16 +71,3 @@ basicTheme<- list(
     medianMarkerCol=setAlpha("white",.8) #Median marker color for violin plots
   ))
 )
-
-#strwidth("hello")
-
-#legend("topright", inset=c(-0.2,0), legend=c("A","B"), pch=c(1,3), title="Group")
-
-#legend(x=1,y=1.7,legend=LETTERS[1:5],col=unique(cols),pch=16,bty="n",xpd=NA)
-
-#w <- grconvertX(l$rect$w, to='ndc') - grconvertX(0, to='ndc')
-#par(omd=c(0, 1-w, 0, 1))
-#plot(1:3, rnorm(3), pch=1, lty=1, type="o", ylim=c(-2, 2))
-#lines(1:3, rnorm(3), pch=2, lty=2, type="o")
-#legend(par('usr')[2], par('usr')[4], bty='n', xpd=NA,
-#       c("group A", "group B"), pch=c(1, 2), lty=c(1, 2))

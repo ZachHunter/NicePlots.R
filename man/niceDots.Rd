@@ -8,12 +8,12 @@ niceDots(x, by = NULL, groupNames = NULL, main = NULL, sub = NULL,
   ylab = NULL, minorTick = FALSE, theme = basicTheme, guides = TRUE,
   outliers = 1.5, pointSize = 1, width = 1, pointShape = 1,
   plotColors = list(bg = "open"), logScale = FALSE, trim = FALSE,
-  pointMethod = "beeswarm", axisText = c(NULL, NULL), showCalc = FALSE,
+  pointMethod = NULL, axisText = c(NULL, NULL), showCalc = FALSE,
   calcType = "none", yLim = NULL, rotateLabels = FALSE, rotateY = FALSE,
   add = FALSE, minorGuides = NULL, extendTicks = TRUE, subGroup = FALSE,
   subGroupLabels = NULL, expLabels = TRUE, sidePlot = FALSE,
   pointHighlights = FALSE, pointLaneWidth = 1, na.rm = FALSE,
-  lWidth = NULL, flipFacts = FALSE, verbose = FALSE, ...)
+  flipFacts = FALSE, verbose = FALSE, legend = FALSE, ...)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
@@ -82,11 +82,11 @@ niceDots(x, by = NULL, groupNames = NULL, main = NULL, sub = NULL,
 
 \item{na.rm}{logical; Should \code{NA}s be removed from the data set? Both data input and the factor input from \code{by} with be checked.}
 
-\item{lWidth}{numeric; Line width for drawing the plots.}
-
 \item{flipFacts}{logical; When a dataframe of values is given, column names are used as a secondary grouping factor by default. Setting \code{flipFacts=\link{TRUE}} makes the column names the primary factor and \code{by} the secondary factor.}
 
 \item{verbose}{logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.}
+
+\item{legend}{logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.}
 
 \item{...}{additional options for S3 method variants}
 }
@@ -102,7 +102,9 @@ is used as the grouping factor and the second column is used as the sub-grouping
 is used to highlight points data point overlay (assuming \code{drawPoints=\link{TRUE}}). If \code{subGroup=\link{FALSE}} and \code{subGroup=\link{TRUE}}, then the second column of \code{by} is used to control
 the point highlighting. If \code{x} itself is a data frame of numeric vectors, \code{subGroup} is automatically set to false and each column of \code{x} is plotted like a sub-group and grouped
 by the first column of \code{by}. Data point highlighting with \code{pointHighlights=\link{TRUE}} can still be used when \code{x} is a data frame and the highlighting factor will be drawn from the second column of \code{by}.
-Please note that the p-values can not always be calculated and are for general exploratory use only. More careful analysis is necessary to determine statistical significance. This function is as S3 generic and can be extended to provide class specific functionality. To further facilitate data exploration, outputs from statistical testing and data set summaries
+Please note that the p-values can not always be calculated and are for general exploratory use only. More careful analysis is necessary to determine statistical significance.
+This function is as S3 generic and can be extended to provide class specific functionality.
+To further facilitate data exploration, outputs from statistical testing and data set summaries
 are printed to the console.
 }
 \examples{

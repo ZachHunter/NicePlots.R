@@ -4,17 +4,18 @@
 \alias{niceVio}
 \title{draw a violin plot}
 \usage{
-niceVio(x, by = NULL, h = NULL, medianMarkerShape = NULL,
-  groupNames = NULL, main = NULL, sub = NULL, ylab = NULL,
-  minorTick = FALSE, guides = TRUE, theme = basicTheme, outliers = 1.5,
-  pointSize = 1, width = 1, pointShape = 16, plotColors = list(bg =
-  "open"), logScale = FALSE, trim = FALSE, pointMethod = "jitter",
-  axisText = c(NULL, NULL), showCalc = FALSE, calcType = "none",
-  drawBox = TRUE, yLim = NULL, rotateLabels = FALSE, rotateY = FALSE,
-  add = FALSE, minorGuides = NULL, extendTicks = TRUE, subGroup = FALSE,
+niceVio(x, by = NULL, h = NULL, groupNames = NULL, main = NULL,
+  sub = NULL, ylab = NULL, minorTick = FALSE, guides = TRUE,
+  theme = basicTheme, outliers = 1.5, pointSize = 1, width = 1,
+  pointShape = 16, plotColors = list(bg = "open"), logScale = FALSE,
+  trim = FALSE, pointMethod = "jitter", axisText = c(NULL, NULL),
+  showCalc = FALSE, calcType = "none", drawBox = TRUE, yLim = NULL,
+  rotateLabels = FALSE, rotateY = FALSE, add = FALSE,
+  minorGuides = NULL, extendTicks = TRUE, subGroup = FALSE,
   subGroupLabels = NULL, expLabels = TRUE, sidePlot = FALSE,
   drawPoints = TRUE, pointHighlights = FALSE, pointLaneWidth = 0.7,
-  flipFacts = FALSE, na.rm = FALSE, lWidth = NULL, verbose = FALSE, ...)
+  flipFacts = FALSE, na.rm = FALSE, verbose = FALSE, legend = FALSE,
+  ...)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
@@ -22,8 +23,6 @@ niceVio(x, by = NULL, h = NULL, medianMarkerShape = NULL,
 \item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subGroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
 
 \item{h}{numeric; Used to override the \code{h} hight of density estimator setting in \code{\link[vioplot]{vioplot}}. Default value is \code{\link{NULL}}.}
-
-\item{medianMarkerShape}{positive integer; sets the shape type (\code{pch}) for the median marker.}
 
 \item{groupNames}{character vector; overrides the factor levels of \code{by} to label the groups}
 
@@ -93,9 +92,9 @@ niceVio(x, by = NULL, h = NULL, medianMarkerShape = NULL,
 
 \item{na.rm}{logical; Should \code{NA}s be removed from the data set? Both data input and the factor input from \code{by} with be checked.}
 
-\item{lWidth}{numeric; Line width for drawing the plots.}
-
 \item{verbose}{logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.}
+
+\item{legend}{logical/character; if not equal to \code{\link{FALSE}} with cause a legend to be drawn in the margins. If set to a character string instead of a logical value, the string will be used as the legend title insteas of the factor column name from \code{by}.}
 
 \item{...}{additional options for S3 method variants}
 }

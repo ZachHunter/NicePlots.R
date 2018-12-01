@@ -6,11 +6,13 @@
 \usage{
 prepCategoryWindow(x, by = NULL, groupNames = levels(by),
   minorTick = FALSE, guides = TRUE, yLim = NULL, rotateLabels = FALSE,
-  rotateY = TRUE, plotColors = list(bg = "open", guides = "black", lines =
-  "gray22", points = "darkgrey", fill = "white"), trim = FALSE,
-  logScale = FALSE, axisText = c(NULL, NULL), minorGuides = FALSE,
-  extendTicks = F, subGroup = FALSE, expLabels = TRUE, sidePlot = FALSE,
-  subGroupLabels = NULL, strictLimits = F)
+  rotateY = TRUE, theme = NA, plotColors = if (is.na(theme)) {     list(bg
+  = "open", guides = "black", lines = "gray22", points = "darkgrey", fill =
+  "white") } else {     theme$plotColors }, trim = FALSE, logScale = FALSE,
+  axisText = c(NULL, NULL), minorGuides = FALSE, extendTicks = F,
+  subGroup = FALSE, expLabels = TRUE, sidePlot = FALSE,
+  subGroupLabels = NULL, strictLimits = F, legend = FALSE,
+  pointHighlights = FALSE)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
@@ -28,6 +30,8 @@ prepCategoryWindow(x, by = NULL, groupNames = levels(by),
 \item{rotateLabels}{logical; sets \code{las=2} for the x-axis category labels. Will affect y-axis if \code{side=\link{TRUE}}. Note that this may not work well if long names or with subgrouped data.}
 
 \item{rotateY}{logical; sets \code{las=2} for the y-axis major tick-mark labels. Will affect x-axis if \code{side=\link{TRUE}}.}
+
+\item{theme}{list; A \code{NicePlots} plotColor list from a theme.}
 
 \item{plotColors}{list; a named list of vectors of colors that set the color options for all NicePlot functions. Names left unspecified will be added and set to default values automatically.}
 
@@ -50,6 +54,10 @@ prepCategoryWindow(x, by = NULL, groupNames = levels(by),
 \item{subGroupLabels}{character vector; sets the labels used for the \code{subGroup} factor. Defaults to the levels of the factor.}
 
 \item{strictLimits}{logical; eliminates padding on the value axis so 0 can be flush with the x-axis. Defaults to \code{\link{FALSE}}.}
+
+\item{legend}{logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.}
+
+\item{pointHighlights}{logical; Is pointHightlights turned on? This is used to determin with column of \code{by} should be used for legend factor levels.}
 }
 \value{
 formats the plotting area and returns a named list with 'data' and 'labels' corresponding to the trimmed and/or transformed data and the labels for the primary factors, respectively.

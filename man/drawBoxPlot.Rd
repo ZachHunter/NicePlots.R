@@ -5,7 +5,7 @@
 \title{draw a custom box and whisker plot}
 \usage{
 drawBoxPlot(x, col = "black", fill = NULL, drawBox = T, drawDot = F,
-  whiskerLty = 2, side = FALSE, lWidth = 1)
+  whiskerLty = 2, side = FALSE, lWidth = 1, capWidth = 0.25)
 }
 \arguments{
 \item{x}{named list or data frame; \code{x$at}, \code{x$q2}, \code{x$q4}, \code{x$median}, \code{x$min}, \code{x$max} and \code{x$width} must all be defined as numeric vectors in a named list or data.frame object.}
@@ -23,6 +23,8 @@ drawBoxPlot(x, col = "black", fill = NULL, drawBox = T, drawDot = F,
 \item{side}{logical; if set to \code{\link{TRUE}}, the box plots will be drawn horizontally.}
 
 \item{lWidth}{positive integer; corresponds to lwd line width setting in base R.}
+
+\item{capWidth}{numeric; size of the error bar cap relative to the box width.}
 }
 \description{
 takes a date frame with columns labeled 'at', 'q1', 'q3', 'min', 'max', 'median' and 'width' to draw a series of boxplots.

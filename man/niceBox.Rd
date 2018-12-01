@@ -13,8 +13,8 @@ niceBox(x, by = NULL, groupNames = NULL, main = NULL, sub = NULL,
   rotateY = FALSE, add = FALSE, minorGuides = NULL, extendTicks = TRUE,
   subGroup = FALSE, subGroupLabels = NULL, expLabels = TRUE,
   sidePlot = FALSE, drawPoints = TRUE, pointHighlights = FALSE,
-  drawCenterDot = !drawPoints, pointLaneWidth = 0.7, lWidth = 1,
-  flipFacts = FALSE, na.rm = FALSE, verbose = FALSE, ...)
+  drawCenterDot = !drawPoints, pointLaneWidth = 0.7, flipFacts = FALSE,
+  na.rm = FALSE, verbose = FALSE, legend = FALSE, ...)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
@@ -87,13 +87,13 @@ niceBox(x, by = NULL, groupNames = NULL, main = NULL, sub = NULL,
 
 \item{pointLaneWidth}{numeric; This controls how far data point dots can move along the categorical axis when plotting. Used for \code{pointMethod} options 'jitter', 'beeswarm', and 'distribution'.}
 
-\item{lWidth}{numeric; Line width for drawing the plots.}
-
 \item{flipFacts}{logical; When a dataframe of values is given, column names are used as a secondary grouping factor by default. Setting \code{flipFacts=\link{TRUE}} makes the column names the primary factor and \code{by} the secondary factor.}
 
 \item{na.rm}{logical; Should \code{NA}s be removed from the data set? Both data input and the factor input from \code{by} with be checked.}
 
 \item{verbose}{logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.}
+
+\item{legend}{logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.}
 
 \item{...}{additional options for S3 method variants}
 }
