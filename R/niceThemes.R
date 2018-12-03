@@ -17,6 +17,7 @@ basicTheme<- list(
   guides=TRUE, #Logical; draws guide lines at major ticks
   minorTick=FALSE, #Numeric; number of minor tick marks to draw between major marks. Set to FALSE to disable
   minorTickLS=4, #Numeric; number of minor tick marks to draw between major marks if logScale is active. Set to FALSE to disable
+  swarmOverflow="wrap", #Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.
 
   #Legend Settings
   LegendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
@@ -36,9 +37,9 @@ basicTheme<- list(
   pointShapeBP=16, #Numeric vector; point shapes for box plots
   pointShapeVP=16, #Numeric vector; point shapes for vioin plots
   pointShapeDP=1, #Numeric vector; point shapes for dot plots
-  pointLaneWidthBP=.7, #Restricts the point overlay to a fraction of the box width
-  pointLaneWidthDP=.7, #Restricts the point overlay to a fraction of the category width
-  pointLaneWidthVP=.7, #Restricts the point overlay to a fraction of the violin width
+  pointLaneWidthBP=.85, #Restricts the point overlay to a fraction of the box width
+  pointLaneWidthDP=.85, #Restricts the point overlay to a fraction of the category width
+  pointLaneWidthVP=.75, #Restricts the point overlay to a fraction of the violin width
   pointMethodBP="jitter", #Point drawing method for box plots
   pointMethodVP="beeswarm", #Point drawing method for violin plots
   pointMethodDP="distribution", #Point drawing method for dot plots
