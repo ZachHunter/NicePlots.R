@@ -5,7 +5,8 @@
 \title{draw dots for a dot plot}
 \usage{
 drawPoints(x, type = "jitter", col = "black", size = 1, shape = 1,
-  highlight = FALSE, width = 0.2, sidePlot = FALSE)
+  highlight = FALSE, width = 0.2, sidePlot = FALSE,
+  swarmOverflow = "random")
 }
 \arguments{
 \item{x}{named list or data frame; \code{x$at}, \code{x$data} and \code{x$pfact} (optional) should all be defined. These vectors are used to place the the point on the chart and determine the point level grouping (highlighting)}
@@ -23,6 +24,8 @@ drawPoints(x, type = "jitter", col = "black", size = 1, shape = 1,
 \item{width}{numeric; determines how far points can deviate from the center category label for \code{type} options other than 'linear'.}
 
 \item{sidePlot}{logical; plots dots for a horizontal rather than vertical axis.}
+
+\item{swarmOverflow}{character; How to handle beeswarms that would normally overflow the \code{width} argument. Valid options are "random", "gutter", "wrap", "omit", and "none".}
 }
 \description{
 takes a data frame of locations, values and an optional subgrouping factor and adds the data points to the active plot

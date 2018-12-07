@@ -6,7 +6,7 @@
 \usage{
 niceBar(x, by = NULL, groupNames = NULL, aggFun = c("mean", "median",
   "none"), errFun = c("sd", "se", "range"), theme = basicTheme,
-  stack = FALSE, main = NULL, sub = NULL, ylab = NULL,
+  legend = FALSE, stack = FALSE, main = NULL, sub = NULL, ylab = NULL,
   minorTick = FALSE, guides = TRUE, outliers = FALSE, width = 1,
   errorMultiple = 2, plotColors = list(bg = "open", fill = setAlpha("grey",
   0.8)), logScale = FALSE, trim = FALSE, axisText = c(NULL, NULL),
@@ -29,6 +29,8 @@ niceBar(x, by = NULL, groupNames = NULL, aggFun = c("mean", "median",
 \item{errFun}{character; How the data spread is charactarized by the error bars. Valid options are \code{sd} (standard deviation), \code{se} (standard error of the mean) or \code{range}.}
 
 \item{theme}{list object; Themes are are an optional way of storing graphical preset options that are compatible with all nicePlot graphing functions.}
+
+\item{legend}{logical/character; if not equal to \code{\link{FALSE}} with cause a legend to be drawn in the margins. If set to a character string instead of a logical value, the string will be used as the legend title insteas of the factor column name from \code{by}.}
 
 \item{stack}{logical; Should one of the factors in \code{by} be used make a stacked bar plot. Note that this sort of analysis is nonsensical for many data sets.}
 

@@ -267,6 +267,7 @@ drawBoxPlot<-function(x,col="black",fill=NULL,drawBox=T,drawDot=F, whiskerLty =2
 #' @param highlight logical; Should the point highlighting option be turned on (assumes that pfact is defined).
 #' @param width numeric; determines how far points can deviate from the center category label for \code{type} options other than 'linear'.
 #' @param sidePlot logical; plots dots for a horizontal rather than vertical axis.
+#' @param swarmOverflow character; How to handle beeswarms that would normally overflow the \code{width} argument. Valid options are "random", "gutter", "wrap", "omit", and "none".
 #' @import tidyverse
 #' @import beeswarm
 #' @importFrom graphics points stripchart
@@ -282,14 +283,14 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
   #Process color options
   gfact<-NULL
   if(any(names(x)=="subGroup")) {
-    gfact<-x$subGroup
+    gfact<-factor(x$subGroup)
   } else {
-    gfact<-x$fact
+    gfact<-factor(x$fact)
   }
   myLevels<-levels(gfact)
   if(length(col)>1){
     if(highlight) {
-      myLevels<-levels(x$pfact)
+      myLevels<-levels(factor(x$pfact))
       newCol<-rep(col[1],length(x$data))
       if(length(myLevels)>1) {
         for (i in 2:length(myLevels)){
@@ -313,7 +314,7 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
   #Process pch shape options
   if(length(shape)>1){
     if(highlight) {
-      myLevels<-levels(x$pfact)
+      myLevels<-levels(factor(x$pfact))
       newShape<-rep(shape[1],length(x$data))
       if(length(myLevels)>1) {
         for (i in 2:length(myLevels)){
@@ -335,7 +336,7 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
   #Process size/cex options
   if(length(size)>1){
     if(highlight) {
-      myLevels<-levels(x$pfact)
+      myLevels<-levels(factor(x$pfact))
       newSize<-rep(size[1],length(x$data))
       if(length(myLevels)>1) {
         for (i in 2:length(myLevels)){
@@ -376,18 +377,18 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
     filter<-list()
     #I had a hard time getting the beeswarm point wise coloring and grouping working properly
     #While there is surely a better way, the swarms are calculated seperately for each group with only the new x coordinate saved for plotting later.
-    for(i in 1:length(levels(x$fact))) {
+    for(i in 1:length(levels(factor(x$fact)))) {
       if(any(names(x)=="subGroup")){
-        for(n in 1:length(levels(x$subGroup))){
-          cFilter<-(x$fact==levels(x$fact)[i] & x$subGroup==levels(x$subGroup)[n])
+        for(n in 1:length(levels(factor(x$subGroup)))){
+          cFilter<-(x$fact==levels(factor(x$fact))[i] & x$subGroup==levels(factor(x$subGroup))[n])
           #this is here to avoid running subset calculations for subgroups with no samples
           if(any(cFilter)){
             filter[[length(filter)+1]]<-data.frame(x=beeswarm(x$data[cFilter],pch=shape[cFilter][1],at=x[cFilter,"at"][1],do.plot=F,corralWidth=width*2,corral=swarmOverflow,cex=size[cFilter][1])$x,y=x$data[cFilter],color=col[cFilter],size=size[cFilter],shape=shape[cFilter])
-            print(filter[[length(filter)]]$color)
+            #print(filter[[length(filter)]]$color)
           }
         }
       } else {
-        cFilter<-x$fact==levels(x$fact)[i]
+        cFilter<-x$fact==levels(factor(x$fact))[i]
         if(any(cFilter)){
           filter[[i]]<-data.frame(x=beeswarm(x$data[cFilter],pch=shape[cFilter][1],do.plot=F,at=x[cFilter,"at"][1],corralWidth=width*2,corral=swarmOverflow,cex=size[cFilter][1])$x,y=x$data[cFilter],color=col[cFilter],size=size[cFilter],shape=shape[cFilter])
         }
@@ -412,10 +413,16 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
       arrange(-data,.by_group=TRUE) %>%
       mutate(spread=at-width+row_number()*width*2/length(data)) %>%
       bind_rows()
+    colSelector<-1
+    shapeSelector<-1
+    sizeSelector<-1
+    if(length(col)>1){colSelector<-distData$rowNum}
+    if(length(shape)>1){shapeSelector<-distData$rowNum}
+    if(length(size)>1){sizeSelector<-distData$rowNum}
     if(sidePlot) {
-      points(y=distData$spread,x=distData$data,pch=shape,col=col[distData$rowNum],cex=size)
+      points(y=distData$spread,x=distData$data,pch=shape[shapeSelector],col=col[colSelector],cex=size[sizeSelector])
     } else {
-      points(x=distData$spread,y=distData$data,pch=shape,col=col[distData$rowNum],cex=size)
+      points(x=distData$spread,y=distData$data,pch=shape[shapeSelector],col=col[colSelector],cex=size[sizeSelector])
     }
   } else {
     warning(paste0("drawPoints argument type=",type," is not a recognized option.\nPlease set to either 'jitter', 'linear', 'beeswarm', or 'distribution'"))
@@ -1150,6 +1157,7 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
 #' @param drawPoints logical; draws a dot plot overlay of the data for each box. Setting this to false causes just the outlier points to be ploted. Used in \code{\link{niceBox}}.
 #' @param outliers positive numeric; number of interquartile ranges (IQR) past the Q1 (25\%) and Q3 (75\%) cumulative distribution values. Outliers are often defined as \eqn{1.5 \times IQR}{1.5 * IQR} and extreme outliers are more than \eqn{3 \times IQR}{3 * IQR} away from the inner 50\% data range.
 #' @param dataCols numeric; A number of representing the number of data columns to be plotted. These is a combination of the dimentions of \code{prepedData} and/or the number of primary and secondary grouping factors. Used to determine the maximum ploting width for the points.
+#' @param swarmOverflow character; How to handle beeswarms that would normally overflow the \code{pointLaneWidth} argument. Valid options are "random", "gutter", "wrap", "omit", and "none".
 #'
 #' @importFrom stats sd start
 #' @import tidyverse
@@ -1517,6 +1525,258 @@ prepNiceData<- function(prepedData,by, subGroup=FALSE,outliers=TRUE,filter,group
 }
 
 
+#' @title Process ploting options
+#' @description Integrates theme and user arguments to finalize all options prior to plotting
+#'
+#' @details
+#' This is a private utility function used by NicePlots to integrate user options with theme defaults.
+#' Anything specified by the user is treated literally with no additional optimization.
+#' Colors, point shapes, fills, etc. are optimized to best enhance the relevant factor visualisations selected.
+#' The finalized parameters are returned as a named list.
+#'
+#' @param x Data to be plotted which has been preprocessed by \code{\link{dataFlightCheck}}
+#' @param by factor or dataframe of factors; One or more factors that control how the data is grouped. The first column is the primary grouping factor and the second and thrid columns are used for sub-grouping and highlighting as needed.
+#' @param minorTick numeric; Number of minor tickmarks to be drawn between the major marks
+#' @param pointShape numeric; vector of numbers corresponding to pty options for ploting data overlays.
+#' @param wiskerLineType numeric; number corresponding to lty option for drawing the whiskers and error bars for box plots and bar plots, respectively.
+#' @param lWidth numeric; number creesponding to the lwd option for ploting lines on the graph
+#' @param capWidth; numeric; Width of the cap relative to the bar/box width for box plots and bar plots.
+#' @param pointLaneWidth numeric; This controls how far data point dots can move along the categorical axis when plotting. Used for \code{pointMethod} options 'jitter', 'beeswarm', and 'distribution'.
+#' @param width numeric; A multiplier that controls how wide the ploting elements will be. Setting \code{width=1.1} would result in plot elements being 10\% wider.
+#' @param guides logical; Should guidelines be drawn at the major tick marks.
+#' @param pointSize numeric; vector of numerics controling the size of points on the data overlay
+#' @param subGroup logical; Should the data be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}}.
+#' @param stack logical; Triggers stacked bar analysis for bar plots
+#' @param pointHighlights logical; will use additional factors in \code{by} to highlight points in the dot plot
+#' @param type character; What kind of plot is this for? Case sensitive options are "BP", "DP", "VP", and "Bar" corresponding to box plots, dot plots, violin plots, and bar plots, respectively.
+#' @param theme list object; Themes are are an optional way of storing graphical preset options that are compatible with all nicePlot graphing functions.
+#' @param plotColors list; a named list of vectors of colors that set the color options for all NicePlot functions. Names left unspecified will be added and set to default values automatically.
+#' @param pointMethod character; method to be used for ploting dots. Can be set to "jitter", "linear", "beeswarm" or "distribution".
+#' @param logScale numeric; Should a log scale use used (\code{TRUE}/\code{FALSE})? Otherwise indicates the base for the log transformation.
+#' @param drawPoints logical; draws a dot plot overlay of the data.
+#' @param groupNames character; A character vector for the primary group names
+#' @param swarmOverflow character; Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.
+#' @param errorCap character; Determines the style for the ends of the error bars. Valid options are \code{ball}, \code{bar} or \code{none}.
+#'
+#'
+#' @return Named listed of graphical options
+#' @import tidyverse
+#' @seealso \code{\link{formatPlotColors}}, \code{\link{niceBox}}, \code{\link{niceDots}}, \code{\link{niceVio}}, \code{\link{niceBar}}
+procNiceOptions<-function(x,by,minorTick,pointShape,wiskerLineType,lWidth,capWidth,pointLaneWidth,width,guides,pointSize,subGroup=FALSE,stack=F,pointHighlights=F,type=c("BP","VP","DP","Bar"),theme,plotColors,pointMethod,logScale,drawPoints,groupNames,swarmOverflow,errorCap=NULL){
+  #Here we check to see if the user specified any options so that they are left unaltered if present
+  defaultPoints<-FALSE
+  defaultLines<-FALSE
+  defaultFill<-FALSE
+  defaultShapes<-FALSE
+  if(is.list(plotColors)){
+    pcNames<-names(plotColors)
+    if(!("points" %in% pcNames)){defaultPoints<-TRUE}
+    if(!("lines" %in% pcNames)){defaultLines<-TRUE}
+    if(!("fill" %in% pcNames)){defaultFill<-TRUE}
+  }
+  #Formating all options
+  if(!is.list(theme)) {
+    plotColors<-formatPlotColors(plotColors)
+    if(is.null(minorTick)){minorTick<-FALSE}
+    if(is.null(guides)){guides<-TRUE}
+    if(is.null(pointSize)){pointSize<-1}
+    if(is.null(width)){width<-1}
+    if(is.null(pointShape)){
+      pointShape<-1
+      defaultShapes<-TRUE
+    }
+    if(is.null(pointLaneWidth)){pointLaneWidth<-1}
+    if(is.null(lWidth)){lWidth<-1}
+    if(is.null(capWidth)){capWidth<-.25}
+    if(is.null(errorCap)){errorCap<-"ball"}
+    if(is.null(wiskerLineType)){
+      if(type=="BP"){
+        wiskerLineType<-2
+      } else {
+        wiskerLineType<-1
+      }
+    }
+    if(is.null(pointMethod)){
+      if(drawPoints==FALSE){
+        pointMethod<-"linear"
+      }else {
+        pointMethod<-"jitter"
+      }
+    }
+    if(is.null(swarmOverflow)){
+      swarmOverflow<-"random"
+    }
+  } else {
+    if(is.null(plotColors)){plotColors<-theme$plotColors}
+    else (plotColors<-formatPlotColors(plotColors,theme$plotColors))
+    if(is.null(minorTick)){
+      if(logScale==FALSE){
+        minorTick<-theme$minorTick
+      } else {
+        minorTick<-theme$minorTickLS
+      }
+    }
+    if(is.null(swarmOverflow)){swarmOverflow<-theme$swarmOverflow}
+    if(is.null(guides)){guides<-theme$guides}
+    if(is.null(pointSize)){pointSize<-theme[[paste0("pointSize",type)]]}
+    if(is.null(width)){width<-theme[[paste0("width",type)]]}
+    if(is.null(pointShape)){
+      pointShape<-theme[[paste0("pointShape",type)]]
+      defaultShapes<-TRUE
+    }
+    if(is.null(pointLaneWidth)){pointLaneWidth<-theme[[paste0("pointLaneWidth",type)]]}
+    if(is.null(lWidth)){lWidth<-theme[[paste0("lWidth",type)]]}
+    if(is.null(capWidth)){capWidth<-theme[[paste0("errorBarCapWidth",type)]]}
+    if(is.null(wiskerLineType)){wiskerLineType<-theme[[paste0("errorBarLineType",type)]]}
+    if(is.null(errorCap)){errorCap<-theme$errorCapType}
+    if(is.null(pointMethod)){
+      if(drawPoints==FALSE & type != "DP"){
+        pointMethod<-"linear"
+      }else {
+        pointMethod<-theme[[paste0("pointMethod",type)]]
+      }
+    }
+  }
+  myLevels<-1
+  #Calcuate the relevant factor levels formating the graph.
+  #Note that most of this is for handling empty factor levels
+  if(is.data.frame(x)){
+    if(pointHighlights==TRUE) {
+      if(type=="DP") {
+        plotColors$lines<-plotColors$lines[1]
+      }
+      myLevels<-length(levels(by[,2]))
+    } else {
+      myLevels<-dim(x)[2]
+    }
+    cFilter<-NULL
+    byLength<-1
+    if(is.data.frame(by)){
+      byLength<-length(levels(by[,1]))
+      cFilter<-map(1:dim(x)[2], function(n) map_lgl(levels(by[,1]), function(y) length(x[by[,1]==y,n])>0)) %>% reduce(c)
+    } else {
+      byLength<-length(levels(by))
+      cFilter<-map(1:dim(x)[2], function(n) map_lgl(levels(by), function(y) length(x[by==y,n])>0)) %>% reduce(c)
+    }
+    if(length(plotColors$fill)>1 & defaultFill==FALSE){
+      if(length(plotColors$fill)<length(seq(1,dim(x)[2]))) {
+        warning("Not enough fill colors specified to uniquely cover factor levels!")
+        plotColors$fill<-rep(plotColors$fill,length(plotColors$fill) %% dim(x)[2] +1)
+      }
+      plotColors$fill<-rep(plotColors$fill[1:dim(x)[2]],byLength)[cFilter]
+    }
+    if(length(plotColors$lines)>1 & defaultLines==FALSE){
+      if(length(plotColors$lines)<length(seq(1,dim(x)[2]))) {
+        warning("Not enough line colors specified to uniquely cover factor levels!")
+        plotColors$lines<-rep(plotColors$lines,length(plotColors$lines) %% dim(x)[2] +1)
+      }
+      plotColors$lines<-rep(plotColors$lines[1:dim(x)[2]],byLength)[cFilter]
+    }
+  } else if(subGroup==TRUE) {
+    cFilter<-NULL
+    byLevel<-1
+    byFactor<-1
+    if(is.data.frame(by)){
+      if(pointHighlights==TRUE) {
+        if(type=="DP") {
+          plotColors$lines<-plotColors$lines[1]
+        }
+        myLevels<-length(levels(factor(by[,3])))
+      } else {
+        myLevels<-length(levels(factor(by[,2])))
+      }
+      byLevel<-length(levels(by[,2]))
+      byFactor<-length(levels(by[,1]))
+      cFilter<-map(levels(by[,1]), function(n) map_lgl(levels(by[,2]), function(y) length(x[by[,1]==n & by[,2]==y])>0)) %>% reduce(c)
+    } else {
+      byLevel<-length(levels(by))
+      myLevels<-length(levels(by))
+      byFactor<-1
+      cFilter<-map_lgl(levels(by), function(y) length(x[by==y])>0)
+    }
+    if(length(plotColors$fill)>1 & defaultFill==FALSE){
+      if(length(plotColors$fill)<byLevel) {
+        warning("Not enough fill colors specified to uniquely cover factor levels!")
+        plotColors$fill<-rep(plotColors$fill,length(plotColors$fill) %% byLevel +1)
+      }
+      plotColors$fill<-rep(plotColors$fill[1:byLevel],byFactor)[cFilter]
+    }
+    if(length(plotColors$lines)>1 & defaultLines==FALSE){
+      if(length(plotColors$lines)<byLevel) {
+        warning("Not enough line colors specified to uniquely cover factor levels!")
+        plotColors$lines<-rep(plotColors$lines,length(plotColors$lines) %% byLevel +1)
+      }
+      plotColors$lines<-rep(plotColors$lines[1:byLevel],byFactor)[cFilter]
+    }
+  } else if(is.data.frame(by)){
+    if(pointHighlights==TRUE) {
+      if(type=="DP") {
+        plotColors$lines<-plotColors$lines[1]
+      }
+      myLevels<-length(levels(by[,2]))
+    } else {
+      myLevels<-length(levels(by[,1]))
+    }
+    cFilter<-map_lgl(levels(by[,1]), function(n) length(x[by[,1]==n])>0)
+    if(length(plotColors$fill)>1 & defaultFill==FALSE){
+      if(length(plotColors$fill)<length(levels(by[,1]))) {
+        warning("Not enough fill colors specified to uniquely cover factor levels!")
+        plotColors$fill<-rep(plotColors$fill,length(plotColors$fill) %% length(levels(by[,1])) +1)
+      }
+      plotColors$fill<-plotColors$fill[1:length(levels(by[,1]))][cFilter]
+    }
+    if(length(plotColors$lines)>1 & defaultLines==FALSE){
+      if(length(plotColors$lines)<length(levels(by[,1]))) {
+        warning("Not enough line colors specified to uniquely cover factor levels!")
+        plotColors$lines<-rep(plotColors$lines,length(plotColors$lines) %% length(levels(by[,1])) +1)
+      }
+      plotColors$lines<-plotColors$lines[1:length(levels(by[,1]))][cFilter]
+    }
+  } else {
+    myLevels<-length(levels(by))
+    cFilter<-map_lgl(levels(by), function(n) length(x[by==n])>0)
+    if(length(plotColors$fill)>1 & defaultFill==FALSE){
+      if(length(plotColors$fill)<myLevels) {
+        warning("Not enough fill colors specified to uniquely cover factor levels!")
+        plotColors$fill<-rep(plotColors$fill,length(plotColors$fill) %% myLevels +1)
+      }
+      plotColors$fill<-plotColors$fill[1:myLevels][cFilter]
+    }
+    if(length(plotColors$lines)>1 & defaultLines==FALSE){
+      if(length(plotColors$lines)<myLevels) {
+        warning("Not enough line colors specified to uniquely cover factor levels!")
+        plotColors$lines<-rep(plotColors$lines,length(plotColors$lines) %% myLevels +1)
+      }
+      plotColors$lines<-plotColors$lines[1:myLevels][cFilter]
+    }
+  }
+  #If left blank by the user, colors and shapes are adjust so that the repeat based on factor levels
+  if(length(pointShape)>1 & defaultShapes==FALSE){pointShape<-pointShape[1:myLevels]}
+  if(length(plotColors$points)>1 & defaultPoints==FALSE){plotColors$points<-plotColors$points[1:myLevels]}
+
+  #Capturing default group names
+  if(is.data.frame(by)) {
+    if(is.null(groupNames)){
+      if(is.factor(by[,1])) {
+        groupNames<-levels(by[,1])
+      } else {
+        groupNames<-levels(factor(by[,1]))
+      }
+    }
+  } else {
+    if(is.null(groupNames)) {
+      if(is.factor(by)) {
+        groupNames<-levels(by)
+      } else {
+        groupNames<-levels(factor(by))
+      }
+    }
+  }
+  theme$plotColors<-plotColors
+  list(groupNames=groupNames,minorTick=minorTick,pointShape=pointShape,wiskerLineType=wiskerLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subGroup=subGroup,stack=stack,pointHighlights=pointHighlights,theme=theme,plotColors=plotColors,pointMethod=pointMethod,swarmOverflow=swarmOverflow,errorCap=errorCap)
+}
+
+
 #' @title draw a box plot
 #' @description draws a box plot with optional scatter plot overlays, subgrouping options and log scale support.
 #'
@@ -1590,119 +1850,25 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
   x<-checked$d
   by<-checked$b
   rm(checked)
-  #Here we check to see if the user specified any options so that they are left unaltered if present
-  defaultPoints<-FALSE
-  defaultLines<-FALSE
-  defaultFill<-FALSE
-  defaultShapes<-FALSE
-  if(is.vector(plotColors,mode="list")){
-    pcNames<-names(plotColors)
-    if(!("points" %in% pcNames)){defaultPoints<-TRUE}
-    if(!("lines" %in% pcNames)){defaultLines<-TRUE}
-    if(!("fill" %in% pcNames)){defaultFill<-TRUE}
-  }
-  #Formating all options
-  if(!is.list(theme)) {
-    plotColors<-formatPlotColors(plotColors)
-    if(is.null(minorTick)){minorTick<-FALSE}
-    if(is.null(guides)){guides<-TRUE}
-    if(is.null(pointSize)){pointSize<-1}
-    if(is.null(width)){width<-1}
-    if(is.null(pointShape)){
-      pointShape<-1
-      defaultShapes<-TRUE
-    }
-    if(is.null(pointLaneWidth)){pointLaneWidth<-1}
-    if(is.null(lWidth)){lWidth<-1}
-    if(is.null(capWidth)){capWidth<-.25}
-    if(is.null(wiskerLineType)){wiskerLineType<-2}
-    if(is.null(pointMethod)){
-      if(drawPoints==FALSE){
-        pointMethod<-"linear"
-      }else {
-        pointMethod<-"jitter"
-      }
-    }
-  } else {
-    if(is.null(plotColors)){plotColors<-theme$plotColors}
-    else (plotColors<-formatPlotColors(plotColors,theme$plotColors))
-    if(is.null(minorTick)){
-      if(logScale==FALSE){
-        minorTick<-theme$minorTick
-      } else {
-        minorTick<-theme$minorTickLS
-      }
-    }
-    if(is.null(guides)){guides<-theme$guides}
-    if(is.null(pointSize)){pointSize<-theme$pointSizeBP}
-    if(is.null(width)){width<-theme$widthBP}
-    if(is.null(pointShape)){
-      pointShape<-theme$pointShapeBP
-      defaultShapes<-TRUE
-    }
-    if(is.null(pointLaneWidth)){pointLaneWidth<-theme$pointLaneWidthBP}
-    if(is.null(lWidth)){lWidth<-theme$lWidthBP}
-    if(is.null(capWidth)){capWidth<-theme$errorBarCapWidthBP}
-    if(is.null(wiskerLineType)){wiskerLineType<-theme$errorBarLineTypeBP}
-    if(is.null(pointMethod)){
-      if(drawPoints==FALSE){
-        pointMethod<-"linear"
-      }else {
-        pointMethod<-theme$pointMethodBP
-      }
-    }
-  }
-  myLevels<-1
-  #Calcuate the relevant factor levels formating the graph.
-  if(is.data.frame(x)){
-    if(pointHighlights==TRUE) {
-      myLevels<-length(levels(by[,2]))
-    } else {
-      myLevels<-dim(x)[2]
-    }
-  } else if(subGroup==TRUE) {
-    if(is.data.frame(by)){
-      if(pointHighlights==TRUE) {
-        myLevels<-length(levels(factor(by[,3])))
-      } else {
-        myLevels<-length(levels(factor(by[,2])))
-      }
-    } else {
-      myLevels<-length(levels(by))
-    }
-  } else if(is.data.frame(by)){
-    if(pointHighlights==TRUE) {
-      myLevels<-length(levels(by[,2]))
-    } else {
-      myLevels<-length(levels(by[,1]))
-    }
-  } else {
-    myLevels<-length(levels(by))
-  }
-  #If left blank by the user, colors and shapes are adjust so that the repeat based on factor levels
-  if(length(pointShape)>1 & defaultShapes==FALSE){pointShape<-pointShape[1:myLevels]}
-  if(length(plotColors$points)>1 & defaultPoints==FALSE){plotColors$points<-plotColors$points[1:myLevels]}
-  if(length(plotColors$fill)>1 & defaultFill==FALSE){plotColors$fill<-plotColors$fill[1:myLevels]}
-  if(length(plotColors$lines)>1 & defaultLines==FALSE){plotColors$lines<-plotColors$lines[1:myLevels]}
+  swarmOverflow<-NULL
 
-  #Capturing default group names
-  if(is.data.frame(by)) {
-    if(is.null(groupNames)){
-      if(is.factor(by[,1])) {
-        groupNames<-levels(by[,1])
-      } else {
-        groupNames<-levels(factor(by[,1]))
-      }
-    }
-  } else {
-    if(is.null(groupNames)) {
-      if(is.factor(by)) {
-        groupNames<-levels(by)
-      } else {
-        groupNames<-levels(factor(by))
-      }
-    }
-  }
+  #Here we check to see if the user specified any options so that they are left unaltered if present
+  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=pointShape,wiskerLineType=wiskerLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subGroup=subGroup,stack=F,pointHighlights=pointHighlights,type="BP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=pointMethod,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow = swarmOverflow)
+  minorTick<-finalOptions$minorTick
+  pointShape<-finalOptions$pointShape
+  wiskerLineType<-finalOptions$wiskerLineType
+  lWidth<-finalOptions$lWidth
+  capWidth<-finalOptions$capWidth
+  pointLaneWidth<-finalOptions$pointLaneWidth
+  width<-finalOptions$width
+  guides<-finalOptions$guides
+  pointSize<-finalOptions$pointSize
+  theme<-finalOptions$theme
+  plotColors<-finalOptions$plotColors
+  groupNames<-finalOptions$groupNames
+  pointMethod<-finalOptions$pointMethod
+  swarmOverflow<-finalOptions$swarmOverflow
+
   #if(flipFacts & is.data.frame(x)){subGroup<-TRUE}
   #Handling adding plots to existing graph
   if(add==TRUE) {
@@ -1745,7 +1911,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
       legend<-FALSE
       plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,verbose=verbose)
       plotData %>% drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=F,drawBox=drawBox, lWidth=lWidth,whiskerLty=wiskerLineType,capWidth=capWidth)
-      addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = theme$swarmOverflow)
+      addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
     } else {
       if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[filter,1],calcType[1])}
     #CASE: by is not a factor, data is a numeric vector and subGroup is TRUE
@@ -1756,7 +1922,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
         cLoc<-facetLoc[plotData$facetLevel]
         plotData %>% bind_cols(at=cLoc,width=rep(.25*width/length(levels(by[,2])),length(cLoc))) %>%
           drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=F,drawBox=drawBox,lWidth = lWidth,whiskerLty=wiskerLineType,capWidth=capWidth)
-        addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = theme$swarmOverflow)
+        addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
         if(legend!=FALSE) {
           if(pointHighlights){
             if(legend==TRUE){
@@ -1776,7 +1942,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
         names(plotLoc)<-groupNames
         plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,verbose=verbose)
         plotData %>% drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=F,drawBox=drawBox,lWidth=lWidth,whiskerLty=wiskerLineType,capWidth=capWidth)
-        addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = theme$swarmOverflow)
+        addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
         if(legend!=FALSE) {
           if(pointHighlights==TRUE){
             if(legend==TRUE){
@@ -1797,7 +1963,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
       cLoc<-facetLoc[plotData$facetLevel]
       plotData %>% bind_cols(at=cLoc,width=rep(.25*width/length(x),length(cLoc))) %>%
         drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=F,drawBox=drawBox, lWidth=lWidth,whiskerLty=wiskerLineType,capWidth=capWidth)
-      addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x),swarmOverflow = theme$swarmOverflow)
+      addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x),swarmOverflow = swarmOverflow)
       #Note we are ignoring pointHighlights here as by is a factor
       if(legend!=FALSE) {
         if(flipFacts) {
@@ -1821,7 +1987,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
       cLoc<-facetLoc[plotData$facetLevel]
       plotData %>% bind_cols(at=cLoc,width=rep(.25*width/length(x),length(cLoc))) %>%
         drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=F,drawBox=drawBox,lWidth=lWidth,whiskerLty=wiskerLineType,capWidth=capWidth)
-      addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x),swarmOverflow = theme$swarmOverflow)
+      addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x),swarmOverflow = swarmOverflow)
       if(legend!=FALSE) {
         if(pointHighlights){
           if(legend==TRUE){
@@ -1910,95 +2076,24 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
 niceDots <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=1, pointShape=1, plotColors=list(bg="open"), logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=1, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE, ...) {UseMethod("niceDots",x)}
 
 #' @export
-niceDots.default<-function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=1, pointShape=1, plotColors=list(bg="open"), logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=1, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE, ...) {
+niceDots.default<-function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE, ...) {
   #Here we check to see if the user specified any options so that they are left unaltered if present
-  defaultPoints<-FALSE
-  defaultLines<-FALSE
-  defaultFill<-FALSE
-  defaultShapes<-FALSE
   lWidth<-NULL
-  if(is.vector(plotColors,mode="list")){
-    pcNames<-names(plotColors)
-    if(!("points" %in% pcNames)){defaultPoints<-TRUE}
-    if(!("lines" %in% pcNames)){defaultLines<-TRUE}
-    if(!("fill" %in% pcNames)){defaultFill<-TRUE}
-  }
-  #Formating all options
-  if(!is.list(theme)) {
-    plotColors<-formatPlotColors(plotColors)
-    if(is.null(minorTick)){minorTick<-FALSE}
-    if(is.null(guides)){guides<-TRUE}
-    if(is.null(pointSize)){pointSize<-1}
-    if(is.null(width)){width<-1}
-    if(is.null(pointShape)){
-      pointShape<-1
-      defaultShapes<-TRUE
-    }
-    if(is.null(pointLaneWidth)){pointLaneWidth<-1}
-    if(is.null(lWidth)){lWidth<-1}
-    if(is.null(pointMethod)){pointMethod<-"distribution"}
-  } else {
-    if(is.null(plotColors)){plotColors<-theme$plotColors}
-    else (plotColors<-formatPlotColors(plotColors,theme$plotColors))
-    if(is.null(minorTick)){
-      if(logScale==FALSE){
-        minorTick<-theme$minorTick
-      } else {
-        minorTick<-theme$minorTickLS
-      }
-    }
-    if(is.null(guides)){guides<-theme$guides}
-    if(is.null(pointSize)){theme$pointSizeBP<-theme$pointSizeDP}
-    if(is.null(width)){theme$widthBP<-theme$widthDP}
-    if(is.null(pointShape)){
-      theme$pointShapeBP<-theme$pointShapeDP
-      defaultShapes<-TRUE
-    }
-    if(is.null(pointLaneWidth)){theme$pointLaneWidthBP<-theme$pointLaneWidthDP}
-    if(is.null(lWidth)){theme$lWidthBP<-theme$lWidthDP}
-    if(is.null(pointMethod)){
-      theme$pointMethodBP<-theme$pointMethodDP
-      pointMethod<-theme$pointMethodDP
-    }
-  }
-  myLevels<-1
-  #Calcuate the relevant factor levels formating the graph.
-  if(is.data.frame(x)){
-    if(pointHighlights==TRUE) {
-      myLevels<-length(levels(by[,2]))
-    } else {
-      myLevels<-dim(x)[2]
-    }
-  } else if(subGroup==TRUE) {
-    if(is.data.frame(by)){
-      if(pointHighlights==TRUE) {
-        myLevels<-length(levels(factor(by[,3])))
-      } else {
-        myLevels<-length(levels(factor(by[,2])))
-      }
-    } else {
-      myLevels<-length(levels(by))
-    }
-  } else if(is.data.frame(by)){
-    if(pointHighlights==TRUE) {
-      myLevels<-length(levels(by[,2]))
-    } else {
-      myLevels<-length(levels(by[,1]))
-    }
-  } else {
-    myLevels<-length(levels(by))
-  }
-  #If left blank by the user, colors and shapes are adjust so that the repeat based on factor levels
-  if(length(pointShape)>1 & defaultShapes==FALSE){pointShape<-pointShape[1:myLevels]}
-  if(length(plotColors$points)>1 & defaultPoints==FALSE){plotColors$points<-plotColors$points[1:myLevels]}
-  if(length(plotColors$fill)>1 & defaultFill==FALSE){plotColors$fill<-plotColors$fill[1:myLevels]}
-  if(length(plotColors$lines)>1 & defaultLines==FALSE){plotColors$lines<-plotColors$lines[1:myLevels]}
-  # if(pointMethod=="beeswarm" | pointMethod=="Beeswarm") {
-  #   plotColors$points<-map_chr(plotColors$points,setAlpha,1)
-  #   plotColors$points[length(plotColors$points)]<-"black"
-  # }
-  theme$plotColors<-plotColors
-  niceBox(x=x,by=by,groupNames=groupNames,theme=theme,main=main,ylab=ylab,minorTick=minorTick,guides=guides,outliers=outliers,pointSize=pointSize,width=width,pointShape=pointShape,plotColors=plotColors,logScale=logScale,trim=trim,pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks,subGroup=subGroup,subGroupLabels=subGroupLabels,expLabels=expLabels,sidePlot=sidePlot, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth, drawBox=FALSE, drawPoints=TRUE, drawCenterDot=FALSE,na.rm=na.rm, flipFacts=flipFacts, verbose=verbose, legend=legend)
+  checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = flipFacts)
+  finalOptions<-procNiceOptions(x=checked$d,by=checked$b,minorTick=minorTick,pointShape=pointShape,wiskerLineType=1,lWidth=lWidth,capWidth=1,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subGroup=subGroup,stack=F,pointHighlights=pointHighlights,type="DP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=pointMethod,drawPoints=TRUE,groupNames=groupNames,swarmOverflow=NULL)
+  minorTick<-finalOptions$minorTick
+  pointShape<-finalOptions$pointShape
+  lWidth<-finalOptions$lWidth
+  pointLaneWidth<-finalOptions$pointLaneWidth
+  width<-finalOptions$width
+  guides<-finalOptions$guides
+  pointSize<-finalOptions$pointSize
+  theme<-finalOptions$theme
+  plotColors<-finalOptions$plotColors
+  groupNames<-finalOptions$groupNames
+  pointMethod<-finalOptions$pointMethod
+
+  niceBox(x=x,by=by,groupNames=groupNames,theme=theme,main=main,ylab=ylab,minorTick=minorTick,guides=guides,outliers=outliers,pointSize=pointSize,width=width,pointShape=pointShape,plotColors=plotColors,logScale=logScale,trim=trim,pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks,subGroup=subGroup,subGroupLabels=subGroupLabels,expLabels=expLabels,sidePlot=sidePlot, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth, drawBox=FALSE, drawPoints=TRUE,na.rm=na.rm, flipFacts=flipFacts, verbose=verbose, legend=legend)
 }
 
 #' @title draw a violin plot
@@ -2062,11 +2157,11 @@ niceDots.default<-function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab
 #' @import tidyverse
 #' @export
 #' @seealso \code{\link[vioplot]{vioplot}}, \code{\link{boxplot}}, \code{\link{niceBox}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{prepCategoryWindow}}
-niceVio <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=1.5, pointSize=1, width=1, pointShape=16, plotColors=list(bg="open"), logScale=FALSE, trim=FALSE, pointMethod="jitter", axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=.7,flipFacts=FALSE, na.rm=FALSE, verbose=FALSE, legend=FALSE, ...) {UseMethod("niceVio",x)}
+niceVio <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=1.5, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=.7,flipFacts=FALSE, na.rm=FALSE, verbose=FALSE, legend=FALSE, ...) {UseMethod("niceVio",x)}
 
 #' @import tidyverse
 #' @export
-niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=FALSE, pointSize=.7, width=1, pointShape=16, plotColors=list(bg="open"), logScale=FALSE, trim=FALSE, pointMethod="beeswarm", axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=.7,flipFacts=FALSE,  na.rm=FALSE, verbose=FALSE,legend=FALSE, ...) {
+niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=FALSE, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=NULL,flipFacts=FALSE,  na.rm=FALSE, verbose=FALSE,legend=FALSE, ...) {
   if(any(is.na(x))){warning("Warning: NAs detected in dataset")}
   prepedData<-NULL
   plotData<-NULL
@@ -2074,101 +2169,28 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
   x<-checked$d
   by<-checked$b
   rm(checked)
-  swarmOverflow<-"random"
+  swarmOverflow<-NULL
+  lWidth<-NULL
 
   #Here we check to see if the user specified any options so that they are left unaltered if present
-  defaultPoints<-FALSE
-  defaultLines<-FALSE
-  defaultFill<-FALSE
-  defaultShapes<-FALSE
-  lWidth<-NULL
-  medianMarkerShape<-NULL
-  if(is.vector(plotColors,mode="list")){
-    pcNames<-names(plotColors)
-    if(!("points" %in% pcNames)){defaultPoints<-TRUE}
-    if(!("lines" %in% pcNames)){defaultLines<-TRUE}
-    if(!("fill" %in% pcNames)){defaultFill<-TRUE}
-  }
-  #Formating all options
-  swarmOverflow <- "random"
-  if(!is.list(theme)) {
-    plotColors<-formatPlotColors(plotColors)
-    if(is.null(minorTick)){minorTick<-FALSE}
-    if(is.null(guides)){guides<-TRUE}
-    if(is.null(pointSize)){pointSize<-1}
-    if(is.null(width)){width<-1}
-    if(is.null(pointShape)){
-      pointShape<-1
-      defaultShapes<-TRUE
-    }
-    if(is.null(pointLaneWidth)){pointLaneWidth<-1}
-    if(is.null(lWidth)){lWidth<-1}
-    if(is.null(pointMethod)){pointMethod<-"beeswarm"}
-    if(is.null(medianMarkerShape)){medianMarkerShape<-16}
-  } else {
-    if(is.null(plotColors)){plotColors<-theme$plotColors}
-    else (plotColors<-formatPlotColors(plotColors,theme$plotColors))
-    if(is.null(theme$swarmOverflow)){
-      swarmOverflow<-"random"
-    } else {
-      swarmOverflow<-theme$swarmOverflow
-    }
-    if(is.null(minorTick)){
-      if(logScale==FALSE){
-        minorTick<-theme$minorTick
-      } else {
-        minorTick<-theme$minorTickLS
-      }
-    }
-    if(is.null(guides)){guides<-theme$guides}
-    if(is.null(pointSize)){pointSize<-theme$pointSizeVP}
-    if(is.null(width)){width<-theme$widthVP}
-    if(is.null(pointShape)){
-      pointShape<-theme$pointShapeBP
-      defaultShapes<-TRUE
-    }
-    if(is.null(pointLaneWidth)){pointLaneWidth<-theme$pointLaneWidthVP}
-    if(is.null(lWidth)){lWidth<-theme$lWidthVP}
-    if(is.null(pointMethod)){pointMethod<-theme$pointMethodVP}
-    if(is.null(medianMarkerShape)){medianMarkerShape<-theme$medianMarkerShape}
-  }
-  myLevels<-1
-  #Calcuate the relevant factor levels formating the graph.
-  if(is.data.frame(x)){
-    if(pointHighlights==TRUE) {
-      myLevels<-length(levels(by[,2]))
-    } else {
-      myLevels<-dim(x)[2]
-    }
-  } else if(subGroup==TRUE) {
-    if(is.data.frame(by)){
-      if(pointHighlights==TRUE) {
-        myLevels<-length(levels(factor(by[,3])))
-      } else {
-        myLevels<-length(levels(factor(by[,2])))
-      }
-    } else {
-      myLevels<-length(levels(by))
-    }
-  } else if(is.data.frame(by)){
-    if(pointHighlights==TRUE) {
-      myLevels<-length(levels(by[,2]))
-    } else {
-      myLevels<-length(levels(by[,1]))
-    }
-  } else {
-    myLevels<-length(levels(by))
-  }
-  #If left blank by the user, colors and shapes are adjust so that the repeat based on factor levels
-  if(length(pointShape)>1 & defaultShapes==FALSE){pointShape<-pointShape[1:myLevels]}
-  if(length(plotColors$points)>1 & defaultPoints==FALSE){plotColors$points<-plotColors$points[1:myLevels]}
-  if(length(plotColors$fill)>1 & defaultFill==FALSE){plotColors$fill<-plotColors$fill[1:myLevels]}
-  if(length(plotColors$lines)>1 & defaultLines==FALSE){plotColors$lines<-plotColors$lines[1:myLevels]}
-  # if(pointMethod=="beeswarm" | pointMethod=="Beeswarm") {
-  #   plotColors$points<-map_chr(plotColors$points,setAlpha,1)
-  #   plotColors$points[myLevels]<-"black"
-  # }
+  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=pointShape,wiskerLineType=NULL,lWidth=lWidth,capWidth=NULL,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subGroup=subGroup,stack=F,pointHighlights=pointHighlights,type="VP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=pointMethod,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow=swarmOverflow, errorCap = "bar")
+  minorTick<-finalOptions$minorTick
+  pointShape<-finalOptions$pointShape
+  wiskerLineType<-finalOptions$wiskerLineType
+  lWidth<-finalOptions$lWidth
+  capWidth<-finalOptions$capWidth
+  pointLaneWidth<-finalOptions$pointLaneWidth
+  width<-finalOptions$width
+  guides<-finalOptions$guides
+  pointSize<-finalOptions$pointSize
+  theme<-finalOptions$theme
+  plotColors<-finalOptions$plotColors
+  groupNames<-finalOptions$groupNames
+  pointMethod<-finalOptions$pointMethod
+  swarmOverflow<-finalOptions$swarmOverflow
   theme$plotColors<-plotColors
+  medianMarkerShape<-theme$medianMarkerShape
+
   #Capturing default group names
   if(is.data.frame(by)) {
     if(is.null(groupNames)){

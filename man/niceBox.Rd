@@ -13,8 +13,8 @@ niceBox(x, by = NULL, groupNames = NULL, main = NULL, sub = NULL,
   rotateY = FALSE, add = FALSE, minorGuides = NULL, extendTicks = TRUE,
   subGroup = FALSE, subGroupLabels = NULL, expLabels = TRUE,
   sidePlot = FALSE, drawPoints = TRUE, pointHighlights = FALSE,
-  drawCenterDot = !drawPoints, pointLaneWidth = 0.7, flipFacts = FALSE,
-  na.rm = FALSE, verbose = FALSE, legend = FALSE, ...)
+  pointLaneWidth = 0.7, flipFacts = FALSE, na.rm = FALSE,
+  verbose = FALSE, legend = FALSE, ...)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
@@ -82,8 +82,6 @@ niceBox(x, by = NULL, groupNames = NULL, main = NULL, sub = NULL,
 \item{drawPoints}{logical; draws a dot plot overlay of the data for each box.}
 
 \item{pointHighlights}{logical; will use additional factors in \code{by} to highlight points in the dot plot}
-
-\item{drawCenterDot}{logical; draws a circle at the middle of the median bar. Will be turned off by default of drawPoints is set to \code{\link{TRUE}}.}
 
 \item{pointLaneWidth}{numeric; This controls how far data point dots can move along the categorical axis when plotting. Used for \code{pointMethod} options 'jitter', 'beeswarm', and 'distribution'.}
 
