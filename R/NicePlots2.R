@@ -422,7 +422,11 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
     if(sidePlot) {
       points(y=distData$spread,x=distData$data,pch=shape[shapeSelector],col=col[colSelector],cex=size[sizeSelector])
     } else {
+<<<<<<< HEAD
       points(x=distData$spread,y=distData$data,pch=shape[shapeSelector],col=col[colSelector],cex=size[sizeSelector])
+=======
+      points(x=distData$spread,y=distData$data,pch=shape[distData$rowNum],col=col[distData$rowNum],cex=size)
+>>>>>>> 29e25031d3a5fb318391bfc469dae6042037b03c
     }
   } else {
     warning(paste0("drawPoints argument type=",type," is not a recognized option.\nPlease set to either 'jitter', 'linear', 'beeswarm', or 'distribution'"))
