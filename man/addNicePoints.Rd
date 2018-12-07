@@ -8,7 +8,7 @@ addNicePoints(prepedData, by, filter = TRUE, sidePlot = F, subGroup = F,
   plotAt, pointHighlights = F, pointMethod = "jitter", pointShape = 16,
   pointSize = 1, width = 1, pointLaneWidth = 0.9,
   plotColors = formatPlotColors(list(1)), drawPoints = T, outliers = F,
-  dataCols = 1)
+  dataCols = 1, swarmOverflow = "random")
 }
 \arguments{
 \item{prepedData}{list; a list object returned by \code{\link{prepCategoryWindow}}}
@@ -42,6 +42,8 @@ addNicePoints(prepedData, by, filter = TRUE, sidePlot = F, subGroup = F,
 \item{outliers}{positive numeric; number of interquartile ranges (IQR) past the Q1 (25\%) and Q3 (75\%) cumulative distribution values. Outliers are often defined as \eqn{1.5 \times IQR}{1.5 * IQR} and extreme outliers are more than \eqn{3 \times IQR}{3 * IQR} away from the inner 50\% data range.}
 
 \item{dataCols}{numeric; A number of representing the number of data columns to be plotted. These is a combination of the dimentions of \code{prepedData} and/or the number of primary and secondary grouping factors. Used to determine the maximum ploting width for the points.}
+
+\item{swarmOverflow}{character; How to handle beeswarms that would normally overflow the \code{pointLaneWidth} argument. Valid options are "random", "gutter", "wrap", "omit", and "none".}
 }
 \description{
 This function prepares data based on settings from \code{\link{niceBox}}, \code{\link{niceDots}}, or \code{\link{niceVio}}

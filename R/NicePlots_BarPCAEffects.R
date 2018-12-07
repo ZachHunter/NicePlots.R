@@ -139,6 +139,7 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
 #' @param calcType character; should match one of 'none', 'wilcox', 'Tukey','t.test','anova' which will determine which, if any statistical test should be performed on the data.
 #' @param flipFacts logical; When a dataframe of values is given, column names are used as a secondary grouping factor by default. Setting \code{flipFacts=\link{TRUE}} makes the column names the primary factor and \code{by} the secondary factor.
 #' @param na.rm logical; Should \code{NA}s be removed from the data set? Both data input and the factor input from \code{by} with be checked.
+#' @param legend logical/character; if not equal to \code{\link{FALSE}} with cause a legend to be drawn in the margins. If set to a character string instead of a logical value, the string will be used as the legend title insteas of the factor column name from \code{by}.
 #' @param verbose logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.
 #' @param ... additional options for S3 method variants.
 #' @examples
@@ -149,64 +150,37 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
 #' @import tidyverse
 #' @export
 #' @seealso \code{\link[vioplot]{vioplot}}, \code{\link{boxplot}}, \code{\link{niceBox}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{prepCategoryWindow}}
-niceBar <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), theme=basicTheme, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, outliers=FALSE, width=1, errorMultiple=2, plotColors=list(bg="open",fill=setAlpha("grey",.8)), logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap="ball", errorLineType=1,capSize=1.2, lWidth=1.5, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, ...) {UseMethod("niceBar",x)}
+niceBar <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=list(bg="open",fill=setAlpha("grey",.8)), logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap="ball", errorLineType=1,capWidth=1.2, lWidth=1.5, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, ...) {UseMethod("niceBar",x)}
 
 #' @import tidyverse
 #' @export
-niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), theme=basicTheme, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, outliers=FALSE, width=1, errorMultiple=2, plotColors=list(bg="open",fill=setAlpha("grey",.8)), logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap="ball", errorLineType=1,capSize=1.2, lWidth=1.5, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, ...) {
+niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=NULL, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=NULL, logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, ...) {
   if(any(is.na(x))){warning("Warning: NAs detected in dataset")}
   prepedData<-NULL
   plotData<-NULL
+  lWidth<-NULL
+  wiskerLineType<-NULL
+  capWidth<-NULL
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = flipFacts)
   x<-checked$d
   by<-checked$b
   rm(checked)
-  #Here we check to see if the user specified any options so that they are left unaltered if present
-  defaultFill<-FALSE
-  defaultLines<-FALSE
-  if(is.vector(plotColors,mode="list")){
-    pcNames<-names(plotColors)
-    if(!("lines" %in% pcNames)){defaultLines<-TRUE}
-    if(!("fill" %in% pcNames)){defaultFill<-TRUE}
-  }
-  #Formating all options
-  if(!is.list(theme)) {
-    plotColors<-formatPlotColors(plotColors)
-    if(is.null(minorTick)){minorTick<-FALSE}
-    if(is.null(guides)){guides<-TRUE}
-    if(is.null(width)){width<-1}
-    if(is.null(lWidth)){lWidth<-1}
-  } else {
-    if(is.null(plotColors)){plotColors<-theme$plotColors}
-    else (plotColors<-formatPlotColors(plotColors,theme$plotColors))
-    if(is.null(minorTick)){
-      if(logScale==FALSE){
-        minorTick<-theme$minorTick
-      } else {
-        minorTick<-theme$minorTickLS
-      }
-    }
-    if(is.null(guides)){guides<-theme$guides}
-    if(is.null(width)){width<-theme$widthBar}
-    if(is.null(lWidth)){lWidth<-theme$lWidthBar}
-  }
-  myLevels<-1
-  #Calcuate the relevant factor levels formating the graph.
-  if(is.data.frame(x)){
-    myLevels<-dim(x)[2]
-  } else if(subGroup==TRUE) {
-    if(is.data.frame(by)){
-      myLevels<-length(levels(factor(by[,2])))
-    }
-  } else if(is.data.frame(by)){
-    myLevels<-length(levels(by[,1]))
-  } else {
-    myLevels<-length(levels(by))
-  }
-  #If left blank by the user, colors and shapes are adjust so that the repeat based on factor levels
-  if(length(plotColors$fill)>1 & defaultFill==FALSE){plotColors$fill<-plotColors$fill[1:myLevels]}
-  if(length(plotColors$lines)>1 & defaultLines==FALSE){plotColors$lines<-plotColors$lines[1:myLevels]}
 
+  #Here we check to see if the user specified any options so that they are left unaltered if present
+  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=1,wiskerLineType=errorLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=1,width=width,guides=guides,pointSize=1,subGroup=subGroup,stack=stack,pointHighlights=FALSE,type="Bar",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod="jitter",drawPoints=FALSE,groupNames=groupNames,swarmOverflow="random" ,errorCap=errorCap)
+  minorTick<-finalOptions$minorTick
+  pointShape<-finalOptions$pointShape
+  errorLineType<-finalOptions$wiskerLineType
+  lWidth<-finalOptions$lWidth
+  capWidth<-finalOptions$capWidth
+  width<-finalOptions$width
+  guides<-finalOptions$guides
+  theme<-finalOptions$theme
+  plotColors<-finalOptions$plotColors
+  groupNames<-finalOptions$groupNames
+  errorCap<-finalOptions$errorCap
+
+  #Capturing default group names
   prepedData<-NULL
   if(is.data.frame(by)) {
     if(is.null(groupNames)){
@@ -298,13 +272,18 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       }
     }
     if(min(x)>=0){
-      prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels,strictLimits=T)
+      prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels,strictLimits=T,theme=theme,legend=legend)
     } else {
       prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels,strictLimits=F)
     }
   }
   pvalue<-NULL
   if(subGroup==TRUE){width<-width*2}
+  #Initialize legend variables so we can update based on options
+  legendTitle<-"Legend"
+  legendLabels<-NULL
+  legendColors<-plotColors$fill
+
   filter<-rep(TRUE,length(x))
   if(trim>0){filter<-quantileTrim(x,trim,na.rm=T,returnFilter=T)[[2]]}
   bVal<-0
@@ -315,7 +294,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[filter],calcType[1],verbose=verbose)}
       plotLoc<-seq(1,length(groupNames),by=1)
       names(plotLoc)<-groupNames
-
+      legend<-FALSE
       plotData<-bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
         group_by(fact) %>%
           summarize(Mean=mean(data),Median=median(data),Max=max(data),Min=min(data),SD=sd(data)*errorMultiple,SE=errorMultiple*(sd(data)/(sqrt(length(data)))), N=n(),Q1=quantile(data,.25)) %>%
@@ -330,37 +309,45 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
         if(errFun[1]=="sd"){
           if(verbose){print(select(printData,fact,N,Mean,starts_with("SD")))}
           plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SD,LowerError=SD) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else if (errFun[1]=="se") {
           if(verbose){print(select(printData,fact,N,Mean,starts_with("SE")))}
           plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else if (errFun[1]=="range") {
           if(verbose){print(select(printData,fact,N,Mean,Min,Max))}
           plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=Max-Mean,LowerError=Mean-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else {
           if(verbose){print(select(printData,fact,N,Mean,starts_with("SE")))}
           plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         }
       } else if(aggFun[1]=="median") {
         if(errFun[1]=="sd"){
           if(verbose){print(select(printData,fact,N,Median,starts_with("SD")))}
           plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SD,LowerError=SD) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else if (errFun[1]=="se") {
           if(verbose){print(select(printData,fact,N,Median,starts_with("SE")))}
           plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else if (errFun[1]=="range") {
           if(verbose){print(select(printData,fact,N,Median,Min,Max))}
           plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else {
           if(verbose){print(select(printData,fact,N,Median,Min,Max))}
           plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
+        }
+      }
+      if(legend!=FALSE) {
+        if(stack==TRUE){
+          if(legend==TRUE){
+            legendTitle<-colnames(by)[2]
+          }
+          legendLabels<-levels(by[,2])
         }
       }
     } else {
@@ -403,37 +390,37 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
           if(errFun[1]=="sd"){
             if(verbose){print(select(printData,Group,N,Mean,starts_with("SD")))}
             plotData %>% mutate(yt=Mean,yb=bVal,UpperError=SD,LowerError=SD) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
           } else if (errFun[1]=="se") {
             if(verbose){print(select(printData,Group,N,Mean,starts_with("SE")))}
             plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
           } else if (errFun[1]=="range") {
             if(Verbose){print(select(printData,Group,N,Mean,Min,Max))}
             plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=Max-Mean,LowerError=Mean-Min) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
           } else {
             if(verbose){print(select(printData,Group,N,Mean,starts_with("SE")))}
             plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-              drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+              drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
           }
         } else if(aggFun[1]=="median") {
           if(errFun[1]=="sd"){
             if(verbose){print(select(printData,Group,N,Median,starts_with("SD")))}
             plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SD,LowerError=SD) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
           } else if (errFun[1]=="se") {
             if(Verbose){print(select(printData,Group,N,Median,starts_with("SE")))}
             plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
           } else if (errFun[1]=="range") {
             if(verbose){print(select(printData,Group,N,Median,Min,Max))}
             plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
           } else {
             if(verbose){print(select(printData,Group,N,Median,Min,Max))}
             plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-              drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+              drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
           }
         }
       } else {
@@ -474,38 +461,51 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
           if(errFun[1]=="sd"){
             if(verbose){print(select(printData,Group,N,Mean,starts_with("SD")))}
             plotData %>% mutate(yt=Mean,yb=bVal,UpperError=SD,LowerError=SD) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
           } else if (errFun[1]=="se") {
             if(verbose){print(select(printData,Group,N,Mean,starts_with("SE")))}
             plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
           } else if (errFun[1]=="range") {
             if(verbose){print(select(printData,Group,N,Mean,Min,Max))}
             plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=Max-Mean,LowerError=Mean-Min) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
           } else {
             if(verbose){print(select(printData,Group,N,Mean,starts_with("SE")))}
             plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-              drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+              drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
           }
         } else if(aggFun[1]=="median") {
           if(errFun[1]=="sd"){
             if(verbose){print(select(printData,Group,N,Median,starts_with("SD")))}
             plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SD,LowerError=SD) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
           } else if (errFun[1]=="se") {
             if(verbose){print(select(printData,Group,N,Median,starts_with("SE")))}
             plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
           } else if (errFun[1]=="range") {
             if(verbose){print(select(printData,Group,N,Median,Min,Max))}
             plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
           } else {
             if(verbose){print(select(printData,Group,N,Median,Min,Max))}
             plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-              drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+              drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
           }
+        }
+      }
+      if(legend!=FALSE) {
+        if(stack==TRUE){
+          if(legend==TRUE){
+            legendTitle<-colnames(by)[3]
+          }
+          legendLabels<-levels(by[,3])
+        } else {
+          if(legend==TRUE){
+            legendTitle<-colnames(by)[2]
+          }
+          legendLabels<-levels(by[,2])
         }
       }
     }
@@ -532,37 +532,50 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
         if(errFun[1]=="sd"){
           if(verbose){print(select(printData,Group,N,Mean,starts_with("SD")))}
           plotData %>% mutate(yt=Mean,yb=bVal,UpperError=SD,LowerError=SD) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else if (errFun[1]=="se") {
           if(verbose){print(select(printData,Group,N,Mean,starts_with("SE")))}
           plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else if (errFun[1]=="range") {
           if(verbose){print(select(printData,Group,N,Mean,Min,Max))}
           plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=Max-Mean,LowerError=Mean-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else {
           if(verbose){print(select(printData,Group,N,Mean,starts_with("SE")))}
           plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         }
       } else if(aggFun[1]=="median") {
         if(errFun[1]=="sd"){
           if(verbose){print(select(printData,Group,N,Median,starts_with("SD")))}
           plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SD,LowerError=SD) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else if (errFun[1]=="se") {
           if(verbose){print(select(printData,Group,N,Median,starts_with("SE")))}
           plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else if (errFun[1]=="range") {
           if(verbose){print(select(printData,Group,N,Median,Min,Max))}
           plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else {
           if(verbose){print(select(printData,Group,N,Median,Min,Max))}
           plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
+        }
+      }
+      if(legend!=FALSE) {
+        if(flipFacts) {
+          if(legend==TRUE){
+            legendTitle<-"Legend"
+          }
+          legendLabels<-levels(by)
+        } else {
+          if(legend==TRUE){
+            legendTitle<-"Legend"
+          }
+          legendLabels<-colnames(prepedData[[1]])
         }
       }
     } else {
@@ -605,41 +618,80 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
         if(errFun[1]=="sd"){
           if(verbose){print(select(printData,Group,N,Mean,starts_with("SD")))}
           plotData %>% mutate(yt=Mean,yb=bVal,UpperError=SD,LowerError=SD) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else if (errFun[1]=="se") {
           if(verbose){print(select(printData,Group,N,Mean,starts_with("SE")))}
           plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else if (errFun[1]=="range") {
           if(verbose){print(select(printData,Group,N,Mean,Min,Max))}
           plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=Max-Mean,LowerError=Mean-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else {
           if(verbose){print(select(printData,Group,N,Mean,starts_with("SE")))}
           plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         }
       } else if(aggFun[1]=="median") {
         if(errFun[1]=="sd"){
           if(verbose){print(select(printData,Group,N,Median,starts_with("SD")))}
           plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SD,LowerError=SD) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else if (errFun[1]=="se") {
           if(verbose){print(select(printData,Group,N,Median,starts_with("SE")))}
           plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else if (errFun[1]=="range") {
           if(verbose){print(select(printData,Group,N,Median,Min,Max))}
           plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
         } else {
           if(verbose){print(select(printData,Group,N,Median,Min,Max))}
           plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capSize, lineWidth=lWidth)
+            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
+        }
+      }
+      if(legend!=FALSE) {
+        if(stack){
+          if(legend==TRUE){
+            legendTitle<-colnames(by)[2]
+          }
+          legendLabels<-levels(by[,2])
+        } else {
+          if(flipFacts) {
+            if(legend==TRUE){
+              legendTitle<-"Legend"
+            }
+            legendLabels<-levels(by[,1])
+          } else {
+            if(legend==TRUE){
+              legendTitle<-"Legend"
+            }
+            legendLabels<-colnames(prepedData[[1]])
+          }
         }
       }
     }
   }
+  if(length(legendColors)<length(legendLabels) & legend!=FALSE){
+    legend<-FALSE
+    warning("Not enough point colors to uniquely color subGroups levels\nPlease update plotColors point options to use legend options with this subgroup.")
+  }
+
+  oFont<-par()$family
+  oCexMain<-par()$cex.main
+  oCexlab<-par()$cex.lab
+  oCexSub<-par()$cex.sub
+  if(!is.na(theme[1]) & !is.null(theme[1])){
+    par(cex.main=theme$titleSize, cex.lab=theme$axisLabelSize, cex.sub=theme$subSize, family=theme$fontFamily)
+  }
+  if(legend!=FALSE) {
+    if(is.na(legendTitle) | legendTitle=="factTwo") {
+      legendTitle<="Legend"
+    }
+    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=theme$LegendBorder, lineCol=theme$LegendLineCol, bg=theme$LegendBG, col=legendColors, shape="rect",size=theme$LegendSize,spacing=theme$LegendSpacing)
+  }
+
   if(add==FALSE) {
     if(is.null(sub) & showCalc==T & is.null(pvalue)==FALSE){
       sub<-pvalue
@@ -650,6 +702,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       title(main=main,sub=sub,ylab=ylab)
     }
   }
+  par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)
   dataOut<-list(data=data.frame(prepedData$data,by),summary=plotData,stats=pvalue)
   invisible(dataOut)
 }
