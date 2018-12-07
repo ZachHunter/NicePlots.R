@@ -1540,7 +1540,7 @@ prepNiceData<- function(prepedData,by, subGroup=FALSE,outliers=TRUE,filter,group
 #' @param pointShape numeric; vector of numbers corresponding to pty options for ploting data overlays.
 #' @param wiskerLineType numeric; number corresponding to lty option for drawing the whiskers and error bars for box plots and bar plots, respectively.
 #' @param lWidth numeric; number creesponding to the lwd option for ploting lines on the graph
-#' @param capWidth; numeric; Width of the cap relative to the bar/box width for box plots and bar plots.
+#' @param capWidth numeric; Width of the cap relative to the bar/box width for box plots and bar plots.
 #' @param pointLaneWidth numeric; This controls how far data point dots can move along the categorical axis when plotting. Used for \code{pointMethod} options 'jitter', 'beeswarm', and 'distribution'.
 #' @param width numeric; A multiplier that controls how wide the ploting elements will be. Setting \code{width=1.1} would result in plot elements being 10\% wider.
 #' @param guides logical; Should guidelines be drawn at the major tick marks.

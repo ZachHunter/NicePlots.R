@@ -23,6 +23,8 @@ procNiceOptions(x, by, minorTick, pointShape, wiskerLineType, lWidth, capWidth,
 
 \item{lWidth}{numeric; number creesponding to the lwd option for ploting lines on the graph}
 
+\item{capWidth}{numeric; Width of the cap relative to the bar/box width for box plots and bar plots.}
+
 \item{pointLaneWidth}{numeric; This controls how far data point dots can move along the categorical axis when plotting. Used for \code{pointMethod} options 'jitter', 'beeswarm', and 'distribution'.}
 
 \item{width}{numeric; A multiplier that controls how wide the ploting elements will be. Setting \code{width=1.1} would result in plot elements being 10\% wider.}
@@ -54,8 +56,6 @@ procNiceOptions(x, by, minorTick, pointShape, wiskerLineType, lWidth, capWidth,
 \item{swarmOverflow}{character; Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.}
 
 \item{errorCap}{character; Determines the style for the ends of the error bars. Valid options are \code{ball}, \code{bar} or \code{none}.}
-
-\item{capWidth;}{numeric; Width of the cap relative to the bar/box width for box plots and bar plots.}
 }
 \value{
 Named listed of graphical options
@@ -70,5 +70,5 @@ Colors, point shapes, fills, etc. are optimized to best enhance the relevant fac
 The finalized parameters are returned as a named list.
 }
 \seealso{
-\code{\link{formatPlotColors}}, \code{\link{niceBox}}, \code{\link{niceDots}}, \code{link{niceVio}}, \code{\link{niceBar}}
+\code{\link{formatPlotColors}}, \code{\link{niceBox}}, \code{\link{niceDots}}, \code{\link{niceVio}}, \code{\link{niceBar}}
 }

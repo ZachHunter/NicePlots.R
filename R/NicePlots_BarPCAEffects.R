@@ -128,7 +128,7 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
 #' @param errorBars Logical; Should error bars be drawn. Defaults to true but is ignored if \code{stack=\link{TRUE}}.
 #' @param errorCap character; Determines the style for the ends of the error bars. Valid options are \code{ball}, \code{bar} or \code{none}.
 #' @param errorLineType numeric; Sets \code{lty} line type for drawing the error bars.
-#' @param capSize numeric; Controls the cex like scaling of the ball or width of the cap if they are drawn at the end of the error bars for the bar plot.
+#' @param capWidth numeric; Controls the cex like scaling of the ball or width of the cap if they are drawn at the end of the error bars for the bar plot.
 #' @param lWidth numeric; Line width (lwd) for drawing the bar plot.
 #' @param add logical; causes plotting to be added to the existing plot rather the start a new one.
 #' @param main character; title for the graph which is supplied to the \code{main} argument.
