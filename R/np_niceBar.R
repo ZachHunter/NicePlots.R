@@ -1,112 +1,4 @@
-#' @title drawBar
-#' @description Add a barplot with options error pars to the active ploting enviroment
-#'
-#' @details
-#' This function draws a series of bars based on a dataframe. The expected columns include \code{yt} (locaion top of the bar),
-#' \code{yb} or bottom of the bar, \code{at} indicating where the bar should be drawn, \code{Group} which is a unique ID per row, \code{fact} which contains an optional stacking factor
-#' \code{UpperError} for the top of the error bar and \code{LowerError} for the location of the bottom of the error bar. The construction of the dataframe is handled automatically from input data
-#' by \code{\link{niceBar}}.
-#'
-#' @param x dataframe; number of interquartile ranges (IQR) past the Q1 (25\%) and Q3 (75\%) cumulative distribution values. Outliers are often defined as \eqn{1.5 \times IQR}{1.5 * IQR} and extreme outliers are more than \eqn{3 \times IQR}{3 * IQR} away from the inner 50\% data range.
-#' @param plotColors list; a named list of vectors of colors that set the color options for all NicePlot functions. Names left unspecified will be added and set to default values automatically.
-#' @param errorBars Logical; Should error bars be drawn. Defaults to true but is ignored if \code{stack=\link{TRUE}}.
-#' @param errorCap character; Determines the style for the ends of the error bars. Valid options are \code{ball}, \code{bar} or \code{none}.
-#' @param errorLineType numeric; Sets \code{lty} line type for drawing the error bars.
-#' @param width numeric; cex like scaling factor controlling the width of the bars.
-#' @param sidePlot logical; Plots bar hight on the x axis if set to \code{\link{TRUE}}.
-#' @param stacked logical; draws a stacked barplot if set to \code{\link{TRUE}}.
-#' @param capSize numeric; cex like scaling value the controls the size of the caps on the error bars.
-#' @param lineWidth numeric; Sets the \code{lwd} options for controling line plotting thickness for the bar plot.
-#'
-#' @examples
-#' data(iris)
-#' data<-iris  %>% group_by(Species) %>%
-#'     summarize(yt=mean(Sepal.Length),yb=0,UpperError=sd(Sepal.Length),
-#'     LowerError=sd(Sepal.Length)) %>%
-#'     ungroup() %>% select(yt,yb,UpperError,LowerError,Group=Species) %>%
-#'     bind_cols(at=1:3,fact=1:3)
-#' plot(type="n",xlim=c(0,4),ylim=c(0,max(iris$Sepal.Length)),-1,xaxt="n")
-#' \donttest{drawBar(data,plotColors=list())}
-#'
-#' @import dplyr
-#' @importFrom graphics rect
-#' @seealso \code{\link[graphics]{barplot}}, \code{\link{niceBar}}, \code{\link{errorBars}}
-drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineType=1, width=.5, sidePlot=FALSE, stacked=FALSE,capSize=2,lineWidth=1) {
-  colorOrder<-plotColors$fill
-  #This section builds out the color list to match the number of factors for stacted barplots
-  if(stacked){
-    if(length(colorOrder)<length(levels(x$fact))) {
-      warning("There are fewer colors in plotColors$fill than factor levels for stacking. Stacks will have repeated colors. Use plotColors=list(fill=c(...)) to make a custom color vector.")
-      colorOrder<-as.character(rep(colorOrder,1+trunc(length(levels(x$fact))/length(colorOrder)))[1:length(levels(x$fact))])
-    } else {
-      colorOrder<-as.character(colorOrder[1:length(levels(x$fact))])
-    }
-    names(colorOrder)<-levels(x$fact)
-  }
-  if(sidePlot) {
-    #IE plot with xy axis fliped
-    if(stacked){
-      #Build stacks by position using factor levels. Missing factor levels are skipped.
-      for (at in unique(x$at)) {
-        temp<-x[x$at==at,]
-        hAdjust<-0
-        for(i in unique(factor(temp$fact))) {
-          rect(temp[temp$fact==i,"yb"]+hAdjust,at-width,temp[temp$fact==i,"yt"]+hAdjust,at+width,col=colorOrder[as.character(i)],border=plotColors$lines[1], lwd=lineWidth)
-          hAdjust<-temp[temp$fact==i,"yt"]+hAdjust
-        }
-      }
-    } else {
-      rect(x$yb,x$at-width,x$yt,x$at+width,col=plotColors$fill,border=plotColors$lines, lwd=lineWidth)
-      if(errorBars==TRUE){
-        if(errorCap[1]=="bar") {
-          x %>% mutate(stop=.data$yt + .data$UpperError,start=.data$yt) %>% errorBars(capType="bar",capSize=width*.25,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-          x %>% mutate(stop=.data$yt - .data$LowerError,start=.data$yt) %>% errorBars(capType="bar",capSize=width*.25,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-        } else if(errorCap[1]=="ball"){
-          x %>% mutate(stop=.data$yt + .data$UpperError,start=.data$yt) %>% errorBars(capType="ball",capSize=capSize,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-          x %>% mutate(stop=.data$yt - .data$LowerError,start=.data$yt) %>% errorBars(capType="ball",capSize=capSize,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-        } else {
-          x %>% mutate(stop=.data$yt + .data$UpperError,start=.data$yt) %>% errorBars(capType="none",capSize=width*.25,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-          x %>% mutate(stop=.data$yt - .data$LowerError,start=.data$yt) %>% errorBars(capType="none",capSize=width*.25,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-        }
-      }
-    }
-  }else {
-    #IE plot xy normally
-    if(stacked){
-      #Build stacks by position using factor levels. Missing factor levels are skipped.
-      for (at in unique(x$at)) {
-        temp<-x[x$at==at,]
-        hAdjust<-0
-        for(i in unique(factor(temp$fact))) {
-          rect(at-width, temp[temp$fact==i,"yb"]+hAdjust,at+width,temp[temp$fact==i,"yt"]+hAdjust,col=colorOrder[as.character(i)],border=plotColors$lines[1], lwd=lineWidth)
-          hAdjust<-temp[temp$fact==i,"yt"]+hAdjust
-        }
-      }
-    } else {
-      rect(x$at-width,x$yb,x$at+width,x$yt,col=plotColors$fill,border=plotColors$lines, lwd=lineWidth)
-      if(errorBars==TRUE){
-        if(errorCap[1]=="bar") {
-          x %>% mutate(stop=.data$yt + .data$UpperError,start=.data$yt) %>%
-            errorBars(capType="bar",capSize=width*.25,side=FALSE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-          x %>% mutate(stop=.data$yt - .data$LowerError,start=.data$yt) %>% errorBars(capType="bar",capSize=width*.25,side=FALSE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-        } else if(errorCap[1]=="ball"){
-            x %>% mutate(stop=.data$yt + .data$UpperError,start=.data$yt) %>%
-            select(.data$at,.data$stop,.data$start) %>%
-            errorBars(capType="ball",capSize=capSize,side=FALSE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-          x %>% mutate(stop=.data$yt - .data$LowerError,start=.data$yt) %>%
-            select(.data$at,.data$stop,.data$start) %>%
-            errorBars(capType="ball",capSize=capSize,side=FALSE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-        } else {
-          x %>% mutate(stop=.data$yt + .data$UpperError,start=.data$yt) %>% errorBars(capType="none",capSize=width*.25,side=FALSE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-          x %>% mutate(stop=.data$yt - .data$LowerError,start=.data$yt) %>% errorBars(capType="none",capSize=width*.25,side=FALSE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-        }
-      }
-    }
-  }
-}
-
-
-
+#' @include np_options_processing.R niceThemes.R np_categorical_plot_setup.R np_plotting_functions.R np_utility.R np_data_processing.R
 #' @title draw a bar plot
 #' @description Aggregates data from a numeric vector or dataframe using up to three factors to draw a barplot with optional error bars.
 #'
@@ -248,7 +140,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
           Stats[1]<-min(Stats[1],unlist(cStats[1,1]))
           Stats[2]<-max(Stats[2],unlist(cStats[1,2]))
         } else if(ncol(by)>1 & subGroup==F) {
-           cStats<-data.frame(cDat=x,fact=by[,1],Stack=by[,2]) %>%
+          cStats<-data.frame(cDat=x,fact=by[,1],Stack=by[,2]) %>%
             group_by(fact,Stack) %>%
             summarize(Mean=mean(cDat),Median=median(cDat)) %>%
             ungroup() %>% group_by(fact) %>%
@@ -300,8 +192,8 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       legend<-FALSE
       plotData<-bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
         group_by(fact) %>%
-          summarize(Mean=mean(data),Median=median(data),Max=max(data),Min=min(data),SD=sd(data)*errorMultiple,SE=errorMultiple*(sd(data)/(sqrt(length(data)))), N=n(),Q1=quantile(data,.25)) %>%
-          bind_cols(at=plotLoc)
+        summarize(Mean=mean(data),Median=median(data),Max=max(data),Min=min(data),SD=sd(data)*errorMultiple,SE=errorMultiple*(sd(data)/(sqrt(length(data)))), N=n(),Q1=quantile(data,.25)) %>%
+        bind_cols(at=plotLoc)
       printData<-plotData
       if(errorMultiple!=1){
         colnames(printData)[6]<-paste0("SDx",errorMultiple)
