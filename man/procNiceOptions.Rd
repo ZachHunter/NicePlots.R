@@ -4,11 +4,11 @@
 \alias{procNiceOptions}
 \title{Process ploting options}
 \usage{
-procNiceOptions(x, by, minorTick, pointShape, wiskerLineType, lWidth, capWidth,
-  pointLaneWidth, width, guides, pointSize, subGroup = FALSE, stack = F,
-  pointHighlights = F, type = c("BP", "VP", "DP", "Bar"), theme, plotColors,
-  pointMethod, logScale, drawPoints, groupNames, swarmOverflow,
-  errorCap = NULL)
+procNiceOptions(x, by, minorTick, pointShape, whiskerLineType, lWidth,
+  capWidth, pointLaneWidth, width, guides, pointSize, subGroup = FALSE,
+  stack = F, pointHighlights = F, type = c("BP", "VP", "DP", "Bar"),
+  theme, plotColors, pointMethod, logScale, drawPoints, groupNames,
+  swarmOverflow, errorCap = NULL)
 }
 \arguments{
 \item{x}{Data to be plotted which has been preprocessed by \code{\link{dataFlightCheck}}}
@@ -19,7 +19,7 @@ procNiceOptions(x, by, minorTick, pointShape, wiskerLineType, lWidth, capWidth,
 
 \item{pointShape}{numeric; vector of numbers corresponding to pty options for ploting data overlays.}
 
-\item{wiskerLineType}{numeric; number corresponding to lty option for drawing the whiskers and error bars for box plots and bar plots, respectively.}
+\item{whiskerLineType}{numeric; number corresponding to lty option for drawing the whiskers and error bars for box plots and bar plots, respectively.}
 
 \item{lWidth}{numeric; number creesponding to the lwd option for ploting lines on the graph}
 

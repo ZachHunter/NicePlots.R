@@ -4,11 +4,11 @@
 \alias{addNicePoints}
 \title{Add a datapoint overlay to a box or violin plot}
 \usage{
-addNicePoints(prepedData, by, filter = TRUE, sidePlot = F, subGroup = F,
-  plotAt, pointHighlights = F, pointMethod = "jitter", pointShape = 16,
-  pointSize = 1, width = 1, pointLaneWidth = 0.9,
-  plotColors = formatPlotColors(list(1)), drawPoints = T, outliers = F,
-  dataCols = 1, swarmOverflow = "random")
+addNicePoints(prepedData, by, filter = TRUE, sidePlot = F,
+  subGroup = F, plotAt, pointHighlights = F, pointMethod = "jitter",
+  pointShape = 16, pointSize = 1, width = 1, pointLaneWidth = 0.9,
+  plotColors = formatPlotColors(list(1)), drawPoints = T,
+  outliers = F, dataCols = 1, swarmOverflow = "random")
 }
 \arguments{
 \item{prepedData}{list; a list object returned by \code{\link{prepCategoryWindow}}}

@@ -4,9 +4,9 @@
 \alias{makeNiceLegend}
 \title{Draw a nice plot legened}
 \usage{
-makeNiceLegend(labels, title = "Legend", fontCol = "black", border = NULL,
-  lineCol = NA, bg = NA, col = makeColorMatrix()[, 3], shape = "rect",
-  size = 0.66, spacing = 0.2)
+makeNiceLegend(labels, title = "Legend", fontCol = "black",
+  border = NULL, lineCol = NA, bg = NA, col = makeColorMatrix()[,
+  3], shape = "rect", size = 0.66, spacing = 0.2)
 }
 \arguments{
 \item{labels}{character vector; The names of the levels decribed in the legend. Typically factor levels.}

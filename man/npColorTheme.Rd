@@ -4,7 +4,7 @@
 \name{npColorTheme}
 \alias{npColorTheme}
 \title{Nice Plots Theme: Colors}
-\format{An object of class \code{npTheme} (inherits from \code{list}) of length 43.}
+\format{An object of class \code{npTheme} (inherits from \code{list}) of length 46.}
 \usage{
 npColorTheme
 }

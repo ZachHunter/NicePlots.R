@@ -28,7 +28,8 @@
 #' plot(type="n",xlim=c(0,4),ylim=c(0,max(iris$Sepal.Length)),-1,xaxt="n")
 #' \donttest{drawBar(data,plotColors=list())}
 #'
-#' @import tidyverse
+#' @import dplyr
+#' @importFrom graphics rect
 #' @seealso \code{\link[graphics]{barplot}}, \code{\link{niceBar}}, \code{\link{errorBars}}
 drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineType=1, width=.5, sidePlot=FALSE, stacked=FALSE,capSize=2,lineWidth=1) {
   colorOrder<-plotColors$fill
@@ -58,14 +59,14 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
       rect(x$yb,x$at-width,x$yt,x$at+width,col=plotColors$fill,border=plotColors$lines, lwd=lineWidth)
       if(errorBars==TRUE){
         if(errorCap[1]=="bar") {
-          x %>% mutate(stop=yt + UpperError,start=yt) %>% errorBars(capType="bar",capSize=width*.25,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-          x %>% mutate(stop=yt - LowerError,start=yt) %>% errorBars(capType="bar",capSize=width*.25,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
+          x %>% mutate(stop=.data$yt + .data$UpperError,start=.data$yt) %>% errorBars(capType="bar",capSize=width*.25,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
+          x %>% mutate(stop=.data$yt - .data$LowerError,start=.data$yt) %>% errorBars(capType="bar",capSize=width*.25,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
         } else if(errorCap[1]=="ball"){
-          x %>% mutate(stop=yt + UpperError,start=yt) %>% errorBars(capType="ball",capSize=capSize,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-          x %>% mutate(stop=yt - LowerError,start=yt) %>% errorBars(capType="ball",capSize=capSize,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
+          x %>% mutate(stop=.data$yt + .data$UpperError,start=.data$yt) %>% errorBars(capType="ball",capSize=capSize,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
+          x %>% mutate(stop=.data$yt - .data$LowerError,start=.data$yt) %>% errorBars(capType="ball",capSize=capSize,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
         } else {
-          x %>% mutate(stop=yt + UpperError,start=yt) %>% errorBars(capType="none",capSize=width*.25,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-          x %>% mutate(stop=yt - LowerError,start=yt) %>% errorBars(capType="none",capSize=width*.25,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
+          x %>% mutate(stop=.data$yt + .data$UpperError,start=.data$yt) %>% errorBars(capType="none",capSize=width*.25,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
+          x %>% mutate(stop=.data$yt - .data$LowerError,start=.data$yt) %>% errorBars(capType="none",capSize=width*.25,side=TRUE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
         }
       }
     }
@@ -85,19 +86,19 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
       rect(x$at-width,x$yb,x$at+width,x$yt,col=plotColors$fill,border=plotColors$lines, lwd=lineWidth)
       if(errorBars==TRUE){
         if(errorCap[1]=="bar") {
-          x %>% mutate(stop=yt + UpperError,start=yt) %>%
+          x %>% mutate(stop=.data$yt + .data$UpperError,start=.data$yt) %>%
             errorBars(capType="bar",capSize=width*.25,side=FALSE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-          x %>% mutate(stop=yt - LowerError,start=yt) %>% errorBars(capType="bar",capSize=width*.25,side=FALSE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
+          x %>% mutate(stop=.data$yt - .data$LowerError,start=.data$yt) %>% errorBars(capType="bar",capSize=width*.25,side=FALSE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
         } else if(errorCap[1]=="ball"){
-            x %>% mutate(stop=yt + UpperError,start=yt) %>%
-            select(at,stop,start) %>%
+            x %>% mutate(stop=.data$yt + .data$UpperError,start=.data$yt) %>%
+            select(.data$at,.data$stop,.data$start) %>%
             errorBars(capType="ball",capSize=capSize,side=FALSE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-          x %>% mutate(stop=yt - LowerError,start=yt) %>%
-            select(at,stop,start) %>%
+          x %>% mutate(stop=.data$yt - .data$LowerError,start=.data$yt) %>%
+            select(.data$at,.data$stop,.data$start) %>%
             errorBars(capType="ball",capSize=capSize,side=FALSE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
         } else {
-          x %>% mutate(stop=yt + UpperError,start=yt) %>% errorBars(capType="none",capSize=width*.25,side=FALSE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
-          x %>% mutate(stop=yt - LowerError,start=yt) %>% errorBars(capType="none",capSize=width*.25,side=FALSE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
+          x %>% mutate(stop=.data$yt + .data$UpperError,start=.data$yt) %>% errorBars(capType="none",capSize=width*.25,side=FALSE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
+          x %>% mutate(stop=.data$yt - .data$LowerError,start=.data$yt) %>% errorBars(capType="none",capSize=width*.25,side=FALSE,col=plotColors$lines,width=lineWidth,lType=errorLineType)
         }
       }
     }
@@ -147,19 +148,21 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
 #' Groups<-data.frame(Cyl=factor(mtcars$cyl),Gear=factor(mtcars$gear))
 #' niceBar(mtcars$mpg,by=Groups,subGroup=TRUE,yLim=c(0,45),main="MpG by Cylinders and Gear")
 #'
-#' @import tidyverse
+#' @import dplyr
+#' @import tidyr
 #' @export
 #' @seealso \code{\link[vioplot]{vioplot}}, \code{\link{boxplot}}, \code{\link{niceBox}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{prepCategoryWindow}}
 niceBar <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=list(bg="open",fill=setAlpha("grey",.8)), logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap="ball", errorLineType=1,capWidth=1.2, lWidth=1.5, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, ...) {UseMethod("niceBar",x)}
 
-#' @import tidyverse
+#' @import dplyr
+#' @import tidyr
 #' @export
 niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=NULL, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=NULL, logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, ...) {
   if(any(is.na(x))){warning("Warning: NAs detected in dataset")}
   prepedData<-NULL
   plotData<-NULL
   lWidth<-NULL
-  wiskerLineType<-NULL
+  whiskerLineType<-NULL
   capWidth<-NULL
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = flipFacts)
   x<-checked$d
@@ -167,10 +170,10 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   rm(checked)
 
   #Here we check to see if the user specified any options so that they are left unaltered if present
-  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=1,wiskerLineType=errorLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=1,width=width,guides=guides,pointSize=1,subGroup=subGroup,stack=stack,pointHighlights=FALSE,type="Bar",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod="jitter",drawPoints=FALSE,groupNames=groupNames,swarmOverflow="random" ,errorCap=errorCap)
+  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=1,whiskerLineType=errorLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=1,width=width,guides=guides,pointSize=1,subGroup=subGroup,stack=stack,pointHighlights=FALSE,type="Bar",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod="jitter",drawPoints=FALSE,groupNames=groupNames,swarmOverflow="random" ,errorCap=errorCap)
   minorTick<-finalOptions$minorTick
   pointShape<-finalOptions$pointShape
-  errorLineType<-finalOptions$wiskerLineType
+  errorLineType<-finalOptions$whiskerLineType
   lWidth<-finalOptions$lWidth
   capWidth<-finalOptions$capWidth
   width<-finalOptions$width

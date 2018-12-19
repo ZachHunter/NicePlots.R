@@ -5,16 +5,17 @@
 \title{draw a box plot}
 \usage{
 niceBox(x, by = NULL, groupNames = NULL, main = NULL, sub = NULL,
-  ylab = NULL, theme = basicTheme, minorTick = FALSE, guides = TRUE,
-  outliers = 1.5, pointSize = 1, width = 1, pointShape = 16,
-  plotColors = list(bg = "open"), logScale = FALSE, trim = FALSE,
-  pointMethod = "jitter", axisText = c(NULL, NULL), showCalc = FALSE,
-  calcType = "none", drawBox = TRUE, yLim = NULL, rotateLabels = FALSE,
-  rotateY = FALSE, add = FALSE, minorGuides = NULL, extendTicks = TRUE,
-  subGroup = FALSE, subGroupLabels = NULL, expLabels = TRUE,
-  sidePlot = FALSE, drawPoints = TRUE, pointHighlights = FALSE,
-  pointLaneWidth = 0.7, flipFacts = FALSE, na.rm = FALSE,
-  verbose = FALSE, legend = FALSE, ...)
+  ylab = NULL, theme = basicTheme, minorTick = FALSE,
+  guides = TRUE, outliers = 1.5, pointSize = 1, width = 1,
+  pointShape = 16, plotColors = list(bg = "open"), logScale = FALSE,
+  trim = FALSE, pointMethod = "jitter", axisText = c(NULL, NULL),
+  showCalc = FALSE, calcType = "none", drawBox = TRUE, yLim = NULL,
+  rotateLabels = FALSE, rotateY = FALSE, add = FALSE,
+  minorGuides = NULL, extendTicks = TRUE, subGroup = FALSE,
+  subGroupLabels = NULL, expLabels = TRUE, sidePlot = FALSE,
+  drawPoints = TRUE, pointHighlights = FALSE, pointLaneWidth = 0.7,
+  flipFacts = FALSE, na.rm = FALSE, verbose = FALSE,
+  legend = FALSE, ...)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}

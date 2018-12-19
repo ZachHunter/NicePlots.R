@@ -5,12 +5,13 @@
 \title{draw a dot plot}
 \usage{
 niceDots(x, by = NULL, groupNames = NULL, main = NULL, sub = NULL,
-  ylab = NULL, minorTick = FALSE, theme = basicTheme, guides = TRUE,
-  outliers = 1.5, pointSize = 1, width = 1, pointShape = 1,
-  plotColors = list(bg = "open"), logScale = FALSE, trim = FALSE,
-  pointMethod = NULL, axisText = c(NULL, NULL), showCalc = FALSE,
-  calcType = "none", yLim = NULL, rotateLabels = FALSE, rotateY = FALSE,
-  add = FALSE, minorGuides = NULL, extendTicks = TRUE, subGroup = FALSE,
+  ylab = NULL, minorTick = FALSE, theme = basicTheme,
+  guides = TRUE, outliers = 1.5, pointSize = 1, width = 1,
+  pointShape = 1, plotColors = list(bg = "open"), logScale = FALSE,
+  trim = FALSE, pointMethod = NULL, axisText = c(NULL, NULL),
+  showCalc = FALSE, calcType = "none", yLim = NULL,
+  rotateLabels = FALSE, rotateY = FALSE, add = FALSE,
+  minorGuides = NULL, extendTicks = TRUE, subGroup = FALSE,
   subGroupLabels = NULL, expLabels = TRUE, sidePlot = FALSE,
   pointHighlights = FALSE, pointLaneWidth = 1, na.rm = FALSE,
   flipFacts = FALSE, verbose = FALSE, legend = FALSE, ...)

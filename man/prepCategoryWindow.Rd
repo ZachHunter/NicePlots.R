@@ -5,10 +5,11 @@
 \title{prepare a plotting environment for categorical data such as bar plots or box plots}
 \usage{
 prepCategoryWindow(x, by = NULL, groupNames = levels(by),
-  minorTick = FALSE, guides = TRUE, yLim = NULL, rotateLabels = FALSE,
-  rotateY = TRUE, theme = NA, plotColors = if (is.na(theme)) {     list(bg
-  = "open", guides = "black", lines = "gray22", points = "darkgrey", fill =
-  "white") } else {     theme$plotColors }, trim = FALSE, logScale = FALSE,
+  minorTick = FALSE, guides = TRUE, yLim = NULL,
+  rotateLabels = FALSE, rotateY = TRUE, theme = NA, plotColors = if
+  (is.na(theme)) {     list(bg = "open", guides = "black", lines =
+  "gray22", points = "darkgrey", fill = "white") } else {    
+  theme$plotColors }, trim = FALSE, logScale = FALSE,
   axisText = c(NULL, NULL), minorGuides = FALSE, extendTicks = F,
   subGroup = FALSE, expLabels = TRUE, sidePlot = FALSE,
   subGroupLabels = NULL, strictLimits = F, legend = FALSE,

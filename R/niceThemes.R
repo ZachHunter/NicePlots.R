@@ -18,6 +18,7 @@ basicTheme<- list(
   minorTick=FALSE, #Numeric; number of minor tick marks to draw between major marks. Set to FALSE to disable
   minorTickLS=4, #Numeric; number of minor tick marks to draw between major marks if logScale is active. Set to FALSE to disable
   swarmOverflow="wrap", #Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.
+  curvePoints=500, #Number of points to sample for drawing density curves
 
   #Legend Settings
   LegendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
@@ -30,9 +31,9 @@ basicTheme<- list(
   pointSizeBP=.7, #cex-like Numeric; size of points in overlay for boxplots
   pointSizeVP=.6, #cex-like Numeric; size of points in overlay for violin plots
   pointSizeDP=.5, #cex-like Numeric; size of points in overlay for dot plots
-  widthBP=1, #Relative box width of each category for box plots
-  widthVP=1, #Relative violin width of each category for violin plots
-  widthDP=1, #Relative category width of each category for dot plots
+  widthBP=.85, #Relative box width of each category for box plots
+  widthVP=.85, #Relative violin width of each category for violin plots
+  widthDP=.9, #Relative category width of each category for dot plots
   widthBar=1, #Relative bar width of each category for bar plots
   pointShapeBP=16, #Numeric vector; point shapes for box plots
   pointShapeVP=16, #Numeric vector; point shapes for vioin plots
@@ -49,10 +50,12 @@ basicTheme<- list(
   lWidthBar=1, #Line width (lwd) for violin plots
   errorBarLineTypeBP=2, #Line type (lty) for boxplot wiskers
   errorBarLineTypeBar=1, #Line type (lty) for bar plot error bars
+  errorBarLineTypeVP=1, #Whisker line type (lty) for box plot overlay in violin plots
   errorBarCapWidthBP=.25, #relative width of cap on box plot wiskers
   errorBarCapWidthBar=1, #relative width of cap on bar plot error bars
+  errorBarCapWidthVP=0, #Whisker cap width for box plot overlay in violin plots
   errorCapType="ball", #Error bar cap type for bar plots.
-  medianMarkerShape=16, #Numeric; pch shape for median marker for violin plots
+  vioBoxWidth=.25, #Factor by which the box plot width should shrick relative to the violins (note: this should be inverted to be more intuitive)
 
   #PlotColor Options
   plotColors=formatPlotColors(list(
@@ -68,8 +71,8 @@ basicTheme<- list(
     minorTick="black", #Minor tick mark color
     labels="black", #label color
     subGroupLabels="black", #color of subgroups
-    rectCol=setAlpha("black",.8), #Color of interquartile box for violin plots
-    medianMarkerCol=setAlpha("white",.8) #Median marker color for violin plots
+    vioBoxFill=setAlpha("black",.8), #Color of interquartile box for violin plots
+    vioBoxLineCol="black" #Line color for boxplot overlay in violin plots
   ))
 )
 class(basicTheme)<-c("npTheme","list")
@@ -91,6 +94,7 @@ npColorTheme<- list(
   minorTick=FALSE, #Numeric; number of minor tick marks to draw between major marks. Set to FALSE to disable
   minorTickLS=FALSE, #Numeric; number of minor tick marks to draw between major marks if logScale is active. Set to FALSE to disable
   swarmOverflow="random", #Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.
+  curvePoints=500, #Number of points to sample for drawing density curves
 
   #Legend Settings
   LegendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
@@ -104,8 +108,8 @@ npColorTheme<- list(
   pointSizeVP=.6, #cex-like Numeric; size of points in overlay for violin plots
   pointSizeDP=.5, #cex-like Numeric; size of points in overlay for dot plots
   widthBP=.8, #Relative box width of each category for box plots
-  widthVP=1, #Relative violin width of each category for violin plots
-  widthDP=1, #Relative category width of each category for dot plots
+  widthVP=.8, #Relative violin width of each category for violin plots
+  widthDP=.75, #Relative category width of each category for dot plots
   widthBar=.9, #Relative bar width of each category for bar plots
   pointShapeBP=1:10, #Numeric vector; point shapes for box plots
   pointShapeVP=1:10, #Numeric vector; point shapes for vioin plots
@@ -122,10 +126,12 @@ npColorTheme<- list(
   lWidthBar=1.5, #Line width (lwd) for violin plots
   errorBarLineTypeBP=2, #Line type (lty) for boxplot wiskers
   errorBarLineTypeBar=1, #Line type (lty) for bar plot error bars
+  errorBarLineTypeVP=2, #Whisker line type (lty) for box plot overlay in violin plots
   errorBarCapWidthBP=.25, #relative width of cap on box plot wiskers
   errorBarCapWidthBar=1, #relative width of cap on bar plot error bars
+  errorBarCapWidthVP=.25, #Whisker cap width for box plot overlay in violin plots
   errorCapType="bar", #Error bar cap type for bar plots.
-  medianMarkerShape=16, #Numeric; pch shape for median marker for violin plots
+  vioBoxWidth=.5, #Factor by which the box plot width should shrick relative to the violins (note: this should be inverted to be more intuitive)
 
   #PlotColor Options
   plotColors=formatPlotColors(list(
@@ -141,8 +147,8 @@ npColorTheme<- list(
     minorTick="black", #Minor tick mark color
     labels="black", #label color
     subGroupLabels="black", #color of subgroups
-    rectCol=setAlpha("black",.8), #Color of interquartile box for violin plots
-    medianMarkerCol=setAlpha("white",.8) #Median marker color for violin plots
+    vioBoxFill=map_chr(brewer.pal(9,"Set1"),function(x) setAlpha(x,.3)), #Color of interquartile box for violin plots
+    vioBoxLineCol=brewer.pal(9,"Set1") #Line color for boxplot overlay in violin plots
   ))
 )
 class(npColorTheme)<-c("npTheme","list")
@@ -164,6 +170,7 @@ npStataTheme<- list(
   minorTick=FALSE, #Numeric; number of minor tick marks to draw between major marks. Set to FALSE to disable
   minorTickLS=FALSE, #Numeric; number of minor tick marks to draw between major marks if logScale is active. Set to FALSE to disable
   swarmOverflow="gutter", #Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.
+  curvePoints=500, #Number of points to sample for drawing density curves
 
   #Legend Settings
   LegendBorder="black", #Color of the border box around legend. Set to NULL to turn off
@@ -177,8 +184,8 @@ npStataTheme<- list(
   pointSizeVP=.6, #cex-like Numeric; size of points in overlay for violin plots
   pointSizeDP=.5, #cex-like Numeric; size of points in overlay for dot plots
   widthBP=.05, #Relative box width of each category for box plots
-  widthVP=1, #Relative violin width of each category for violin plots
-  widthDP=1, #Relative category width of each category for dot plots
+  widthVP=.85, #Relative violin width of each category for violin plots
+  widthDP=.5, #Relative category width of each category for dot plots
   widthBar=1, #Relative bar width of each category for bar plots
   pointShapeBP=1:10, #Numeric vector; point shapes for box plots
   pointShapeVP=1:10, #Numeric vector; point shapes for vioin plots
@@ -195,10 +202,12 @@ npStataTheme<- list(
   lWidthBar=1.5, #Line width (lwd) for violin plots
   errorBarLineTypeBP=1, #Line type (lty) for boxplot wiskers
   errorBarLineTypeBar=1, #Line type (lty) for bar plot error bars
+  errorBarLineTypeVP=1, #Whisker line type (lty) for box plot overlay in violin plots
   errorBarCapWidthBP=10, #relative width of cap on box plot wiskers
   errorBarCapWidthBar=1, #relative width of cap on bar plot error bars
+  errorBarCapWidthVP=0, #Whisker cap width for box plot overlay in violin plots
   errorCapType="none", #Error bar cap type for bar plots.
-  medianMarkerShape=16, #Numeric; pch shape for median marker for violin plots
+  vioBoxWidth=.25, #Factor by which the box plot width should shrick relative to the violins (note: this should be inverted to be more intuitive)
 
   #PlotColor Options
   plotColors=formatPlotColors(list(
@@ -214,8 +223,8 @@ npStataTheme<- list(
     minorTick="black", #Minor tick mark color
     labels="black", #label color
     subGroupLabels="black", #color of subgroups
-    rectCol=setAlpha("black",.8), #Color of interquartile box for violin plots
-    medianMarkerCol=setAlpha("white",.8) #Median marker color for violin plots
+    vioBoxFill=setAlpha("black",.8), #Color of interquartile box for violin plots
+    vioBoxLineCol="black" #Line color for boxplot overlay in violin plots
   ))
 )
 class(npStataTheme)<-c("npTheme","list")
@@ -237,6 +246,7 @@ npGGTheme<- list(
   minorTick=FALSE, #Numeric; number of minor tick marks to draw between major marks. Set to FALSE to disable
   minorTickLS=4, #Numeric; number of minor tick marks to draw between major marks if logScale is active. Set to FALSE to disable
   swarmOverflow="random", #Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.
+  curvePoints=500, #Number of points to sample for drawing density curves
 
   #Legend Settings
   LegendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
@@ -250,8 +260,8 @@ npGGTheme<- list(
   pointSizeVP=.6, #cex-like Numeric; size of points in overlay for violin plots
   pointSizeDP=.5, #cex-like Numeric; size of points in overlay for dot plots
   widthBP=.85, #Relative box width of each category for box plots
-  widthVP=1, #Relative violin width of each category for violin plots
-  widthDP=1, #Relative category width of each category for dot plots
+  widthVP=.85, #Relative violin width of each category for violin plots
+  widthDP=.9, #Relative category width of each category for dot plots
   widthBar=1, #Relative bar width of each category for bar plots
   pointShapeBP=15:25, #Numeric vector; point shapes for box plots
   pointShapeVP=15:25, #Numeric vector; point shapes for vioin plots
@@ -268,10 +278,12 @@ npGGTheme<- list(
   lWidthBar=1.5, #Line width (lwd) for violin plots
   errorBarLineTypeBP=1, #Line type (lty) for boxplot wiskers
   errorBarLineTypeBar=1, #Line type (lty) for bar plot error bars
+  errorBarLineTypeVP=1, #Whisker line type (lty) for box plot overlay in violin plots
   errorBarCapWidthBP=0, #relative width of cap on box plot wiskers
   errorBarCapWidthBar=0, #relative width of cap on bar plot error bars
+  errorBarCapWidthVP=0, #Whisker cap width for box plot overlay in violin plots
   errorCapType="none", #Error bar cap type for bar plots.
-  medianMarkerShape=16, #Numeric; pch shape for median marker for violin plots
+  vioBoxWidth=.20, #Factor by which the box plot width should shrick relative to the violins (note: this should be inverted to be more intuitive)
 
   #PlotColor Options
   plotColors=formatPlotColors(list(
@@ -287,8 +299,8 @@ npGGTheme<- list(
     minorTick="darkgrey", #Minor tick mark color
     labels="black", #label color
     subGroupLabels="black", #color of subgroups
-    rectCol=setAlpha("black",.8), #Color of interquartile box for violin plots
-    medianMarkerCol=setAlpha("white",.8) #Median marker color for violin plots
+    vioBoxFill=setAlpha("black",.8), #Color of interquartile box for violin plots
+    vioBoxLineCol="black" #Line color for boxplot overlay in violin plots
   ))
 )
-class(npStataTheme)<-c("npGGTheme","list")
+class(npGGTheme)<-c("npTheme","list")
