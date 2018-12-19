@@ -1,5 +1,5 @@
 #Themes
-
+#' @include np_options_processing.R np_utility.R
 #' @title Nice Plots Theme: Basic
 #' @description This is the default theme for nicePlots
 #' @details This default theme has uses transparent solid circles for point overlays with up to 8 colors.

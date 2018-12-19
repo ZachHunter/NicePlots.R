@@ -11,3 +11,14 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
 Depends: dplyr,tidyr,purrr,tibble,beeswarm,KernSmooth,RColorBrewer
+Collate: 
+    'np_utility.R'
+    'np_options_processing.R'
+    'niceThemes.R'
+    'np_categorical_plot_setup.R'
+    'np_data_processing.R'
+    'np_plotting_functions.R'
+    'np_niceBar.R'
+    'np_niceBox.R'
+    'np_niceDots.R'
+    'np_niceVio.R'
