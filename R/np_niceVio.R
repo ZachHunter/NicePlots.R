@@ -276,7 +276,11 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
       cData<-bind_cols(data=x[filter,],by) %>%
         gather(key=subGroup,value=data,seq(1,length(x[1,])))
       cData<-mutate(cData, groupingFactor=paste0(cData[,1],subGroup,sep="."))
+<<<<<<< HEAD
       drawViolinPlot(x=cData$data,groups=factor(cData$groupingFactor),at=cLoc,h=h, plotColors=plotColors, sidePlot=sidePlot,
+=======
+      drawViolinPlot(x=cData$data,groups=cData$groupingFactor,at=cLoc,h=h, plotColors=plotColors, sidePlot=sidePlot,
+>>>>>>> 9d3b1fb8b7abf035b1f3d31cdab8e9932ef68f34
                      borderCol=plotColors$lines, borderWidth=lWidth, fill=plotColors$fill, width=width, trimViolins=trimViolins, samplePoints=curvePoints)
       if(drawBox) {
         plotData %>% bind_cols(at=cLoc,width=rep(.25*width*vioBoxWidth,length(cLoc))) %>%
