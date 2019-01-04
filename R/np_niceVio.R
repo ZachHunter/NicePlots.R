@@ -154,16 +154,21 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
   pvalue<-NULL
   filter<-rep(TRUE,length(x))
   if(trim>0){filter<-quantileTrim(x,trim,na.rm=T,returnFilter=T)[[2]]}
+  if(is.data.frame(by)){
+    by<-by[filter,]
+  } else {
+    by<-by[filter]
+  }
   if(is.numeric(prepedData[[1]])){
     #CASE: by is a factor data is a numeric vector
     if(is.factor(by)) {
-      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[filter],calcType[1],verbose=verbose)}
+      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by,calcType[1],verbose=verbose)}
       plotLoc<-seq(1,length(groupNames),by=1)
       names(plotLoc)<-groupNames
       plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width*vioBoxWidth,verbose=verbose)
       #cLevels<-levels(factor(by[filter]))
       legend<-FALSE
-      drawViolinPlot(x[filter],groups=by[filter],at=plotLoc,h=h, plotColors=plotColors, sidePlot=sidePlot,borderCol=plotColors$lines,
+      drawViolinPlot(x[filter],groups=by,at=plotLoc,h=h, plotColors=plotColors, sidePlot=sidePlot,borderCol=plotColors$lines,
                      borderWidth=lWidth, fill=plotColors$fill, width=width, trimViolins=trimViolins, samplePoints=curvePoints)
       if(drawBox) {
         plotData %>% drawBoxPlot(side=sidePlot,col=plotColors$vioBoxLineCol,fill=plotColors$vioBoxFill,drawDot=F,drawBox=drawBox, lWidth=lWidth,whiskerLty=whiskerLineType,capWidth=capWidth)
@@ -172,14 +177,14 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
         addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
       }
     } else {
-      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[filter,1],calcType[1],verbose=verbose)}
+      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[,1],calcType[1],verbose=verbose)}
       #CASE: by is not a factor data is a numeric vector and subGroup is TRUE
       if(subGroup) {
         facetLoc<-facetSpacing(length(levels(by[,2])),length(groupNames))
         width<-width/(length(levels(by[,2]))+1)
         names(facetLoc)<-unlist(lapply(levels(by[,1]),FUN=function(x) paste0(x,levels(by[,2]),sep=".")))
         plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,verbose=verbose)
-        gFactor<-paste0(by[filter,1],by[filter,2],sep=".")
+        gFactor<-paste0(by[,1],by[,2],sep=".")
         cLoc<-facetLoc[plotData$facetLevel]
         drawViolinPlot(x=x[filter],groups=factor(gFactor), at=cLoc, h=h, plotColors=plotColors, sidePlot=sidePlot,
                        borderCol=plotColors$lines, borderWidth=lWidth, fill=plotColors$fill, width=width, trimViolins=trimViolins, samplePoints=curvePoints)
@@ -210,7 +215,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
         names(plotLoc)<-groupNames
         plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width*vioBoxWidth,verbose=verbose)
         #cLevels<-groupNames
-        gFactor<-by[filter,1]
+        gFactor<-by[,1]
         drawViolinPlot(x=x[filter],groups=factor(gFactor),at=plotLoc, h=h, plotColors=plotColors, sidePlot=sidePlot,
                        borderCol=plotColors$lines, borderWidth=lWidth, fill=plotColors$fill, width=width, trimViolins=trimViolins, samplePoints=curvePoints)
         if(drawBox) {

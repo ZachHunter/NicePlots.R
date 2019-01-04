@@ -115,7 +115,11 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
   pvalue<-NULL
   filter<-rep(TRUE,length(x))
   if(trim>0){filter<-quantileTrim(x,trim,na.rm=T,returnFilter=T)[[2]]}
-
+  if(is.data.frame(by)) {
+    by<-by[filter,]
+  } else {
+    by<-by[filter]
+  }
   #Initialize legend variables so we can update based on options
   legendTitle<-"Legend"
   legendLabels<-NULL
@@ -129,7 +133,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
   if(is.numeric(prepedData[[1]])){
     #CASE: by is a factor and data is a numeric vector
     if(is.factor(by)) {
-      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[filter],calcType[1],verbose=verbose)}
+      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by,calcType[1],verbose=verbose)}
       plotLoc<-seq(1,length(groupNames),by=1)
       names(plotLoc)<-groupNames
       legend<-FALSE
@@ -137,7 +141,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
       plotData %>% drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=F,drawBox=drawBox, lWidth=lWidth,whiskerLty=whiskerLineType,capWidth=capWidth)
       addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
     } else {
-      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[filter,1],calcType[1])}
+      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[,1],calcType[1])}
       #CASE: by is not a factor, data is a numeric vector and subGroup is TRUE
       if(subGroup) {
         facetLoc<-facetSpacing(length(levels(by[,2])),length(groupNames))
