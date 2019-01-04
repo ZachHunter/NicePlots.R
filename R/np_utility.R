@@ -233,3 +233,98 @@ facetSpacing<-function(subGroup,labels) {
   }
   subLabLoc
 }
+
+#' @title Calculate the standard error of the mean
+#' @description
+#' \code{se} takes a numeric vector and returns the corresponding standard error of the mean
+#'
+#'@details
+#' This is a convenience function internal to \code{NicePlots} and is not exported. If \code{x} is a numeric vector, \code{SD} is the standard
+#' deviation of \code{x} and  \code{N} is the length of \code{x} then the standard error (se) of the mean may be caclulated as:
+#' \deqn{se = \frac{SD}{\sqrt{N}}}
+#'
+#' @param x numeric vector
+#'
+#' @return a double corresponding to the standard error of the mean
+#' @examples
+#' data(iris)
+#' #se(iris$Sepal.Length)
+#' @seealso \code{\link[stats]{sd}}
+#'@importFrom stats sd
+se<-function(x) {
+  sd(x)/sqrt(length(x))
+}
+
+#' @title Calculate a 95\% confidence interval from the t-distribution
+#' @description
+#' \code{se} Calculates the 95\% confidence interval of the mean for a vector of data based on the t-distribution
+#'
+#'@details
+#' This is a convenience function internal to \code{NicePlots} and is not exported. If \code{x} is a numeric vector, \code{SD} is the standard
+#' deviation of \code{x}, \code{N} is the length of \code{x} and \code{TQ} is the t-distrubition quantile for \code{0.975} with \code{N-1}
+#' degrees for freedom  then the 95\% confidence interval of the mean may be caclulated as:
+#' \deqn{95\%ci = \frac{QT*SD}{\sqrt{N}}}
+#'
+#' @param x numeric vector
+#'
+#' @return a double corresponding to the length of one arm ofthe 95\% confidence interval
+#' @examples
+#' data(iris)
+#' #t95ci(iris$Sepal.Length)
+#' @seealso \code{\link[stats]{sd}}
+#'@importFrom stats qt
+t95ci<-function(x) {
+  qt(0.975,df=length(x)-1)*sd(x)/sqrt(length(x))
+}
+
+#' @title Confidence interval helper function
+#' @description
+#' Designed to be used by \code{\link{boot95ci}} to calculate a bootstrap model of an aggregator function given by \code{agg}.
+#'
+#'@details
+#' This is a convenience function internal to \code{NicePlots} and is not exported. The variable \code{agg} should be a string corresponding
+#' an aggregator function such as \code{\link[base]{mean}} or \code{\link[stats]{median}}. The indicies designed to passed from the \code{\link[boot]{boot}} function
+#' from the package \code{boot} and are used to determine calculated the different bootstrap iterations of the \code{agg} functions on \code{x}.
+#'
+#' @param x numeric vector
+#' @param agg character: A string corresponding to the aggregator function to be modeled (eg. \code{\link[stats]{median}}, \code{\link[base]{mean}}, etc.)
+#' @param indices numeric vector: Indicies are passed to calculated individual bootstaps of \code{x}
+#'
+#' @return a number corresponding to a bootstrap iteration of the aggregator function given by \code{agg}
+#' @examples
+#' #Calculates the median of Sepal.Length from the iris data set
+#' data(iris)
+#' #ci(iris$Sepal.Length,"median",seq(1,length(iris$Sepal.Length)))
+#' @seealso \code{\link[boot]{boot}}, \code{\link{boot95ci}}
+#' @importFrom purrr invoke
+ci<-function(x,agg,indices) {
+  invoke(agg,x[indices])
+}
+
+#' @title Calculate a basic bootstrap 95\% confidence interval
+#' @description
+#' Calculates a basic 95\% boostrap confidence interval for an aggregator function
+#'
+#'@details
+#' This function calculates a bootstrap 95\% confidence interval for a aggregator function determined by the \code{agg} variable.
+#' The number of iterations is hard coded at 1000. The variable \code{upper} will cause to return the upper bound of the 95\%
+#' confidence interval if set to \code{\link{TRUE}} or the lower bound if set to \code{\link{FALSE}}.
+#'
+#' @param x numeric vector
+#' @param agg character: A string corresponding to the aggregator function to be modeled (eg. \code{\link[stats]{median}}, \code{\link[base]{mean}}, etc.)
+#' @param upper logical:
+#'
+#' @return a number corresponding to the upper or lower bootrap 95\% confidence interval of the aggregator function given by \code{agg}.
+#' @examples
+#' library(boot)
+#' data(iris)
+#' median(iris$Sepal.Width)
+#' #boot95ci(iris$Sepal.Width,agg="median",upper=FALSE)
+#' #boot95ci(iris$Sepal.Width,agg="median",upper=TRUE)
+#' @seealso \code{\link{prepBarData}}, \code{\link{niceBar}}, \code{\link[boot]{boot}}, \code{\link[boot]{boot.ci}}
+# @importFrom boot boot boot.ci
+boot95ci<-function(x,agg="mean",upper=FALSE) {
+  boot::boot.ci(boot::boot(x,ci,agg=agg,R=1000),type="basic")$basic[4+upper]
+}
+
+

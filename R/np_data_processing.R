@@ -247,3 +247,164 @@ prepNiceData<- function(prepedData,by, subGroup=FALSE,outliers=TRUE,filter,group
     }
   }
 }
+
+
+
+#' @title Prepare and print basic statistics for niceBar
+#' @description Processess the input data, factors, and options to produce summary data for drawing bar plots
+#'
+#' @details
+#' todo<-1
+#'
+#' @examples
+#' todo<-1
+#'
+#' @param x list; a list object returned by \code{\link{prepCategoryWindow}}
+#' @param by factor or dataframe of factors; One or more factors that control how the data is grouped. The first column is the primary grouping factor and the second and thrid columns are used for sub-grouping and/or stacking as needed.
+#' @param subGroup logical; If \code{\link{TRUE}} the data will be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}} or \code{x} is a \code{\link[base]{data.frame}}.
+#' @param errorMultiple numeric; How many standard errors/deviations should be represented by the error bars.
+#' @param upperErrorFun character string; Determines how the error barse are calculated. Options are \code{\link[stats]{sd}} (standard deviation), \code{\link{se}} (standard error), \code{\link[base]{min}}, \code{\link[base]{max}} and \code{\link{boot95ci}} (bootstrap 95\% confidence interval).
+#' @param lowerErrorFun character; A character vector for the primary group names
+#' @param aggFunction character string; An string naming the function to be used to aggregate the grouped data. Typically should be either \code{\link[stats]{median}} or \code{\link[base]{mean}}.
+#' @param stack logical; Should one of the factors in \code{by} be used make a stacked bar plot. Note that this sort of analysis is nonsensical for many data sets.
+#'
+#' @import dplyr
+#' @import tidyr
+#' @importFrom purrr invoke
+#' @seealso \code{\link{niceBar}}, \code{\link{boot95ci}}, \code{\link{drawBar}}
+prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=upperErrorFun,aggFunction="mean",stack=FALSE,subGroup=FALSE){
+  optsU<-NULL
+  optsL<-NULL
+  if(upperErrorFun=="boot95ci") {
+    optsU<-list(agg=aggFunction,upper=TRUE)
+    optsL<-list(agg=aggFunction,upper=FALSE)
+  }
+
+  plotData<-NULL
+  #vars will be used to select out just the columns needed from plotData
+  vars<-c("fact","N",aggFunction,upperErrorFun,lowerErrorFun)
+
+  #x is a vector and by is a factor
+  if(is.numeric(x) & is.factor(by)) {
+    plotData<-bind_cols(data=x,fact=by) %>%
+      group_by(.data$fact) %>%
+      summarize(AData=invoke(aggFunction, list(data)),upperError=invoke(upperErrorFun,append(list(data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(data),optsL))*errorMultiple,N=n()) %>%
+      bind_cols(at=seq(1,length(levels(by))))
+
+  #x is a vector and by is a dataframe
+  } else if (is.numeric(x) & is.data.frame(by)) {
+    if(subGroup){
+      facetLoc<-facetSpacing(length(levels(by[,2])),length(levels(by[,1])))
+      names(facetLoc)<-unlist(lapply(levels(by[,1]),FUN=function(y) paste(y,levels(by[,2]),sep=".")))
+      #Stack is TRUE and subGroup is TRUE
+      if(stack==T & ncol(by)>2) {
+        plotData<-bind_cols(data=x,fact=by[,1],subGroup=by[,2],Stack=by[,3]) %>%
+          group_by(.data$fact,.data$subGroup,.data$Stack) %>%
+          summarize(AData=invoke(aggFunction, list(data)),upperError=invoke(upperErrorFun,append(list(data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(data),optsL))*errorMultiple,N=n()) %>%
+          mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+          ungroup()
+        vars<-c("fact","subGroup","Stack","N",aggFunction,upperErrorFun,lowerErrorFun)
+      #Stack is FALSE and subGroup is TRUE
+      } else {
+        plotData<-bind_cols(data=x,fact=by[,1],subGroup=by[,2]) %>%
+          group_by(.data$fact,.data$subGroup) %>%
+          summarize(AData=invoke(aggFunction, list(data)),upperError=invoke(upperErrorFun,append(list(data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(data),optsL))*errorMultiple,N=n()) %>%
+          mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+          ungroup()
+        vars<-c("fact","subGroup","N",aggFunction,upperErrorFun,lowerErrorFun)
+      }
+    } else {
+      facetLoc<-seq(1,length(levels(by[,1])))
+      names(facetLoc)<-levels(by[,1])
+      #Stack is TRUE and subGroup is FALSE
+      if(stack==T & ncol(by)>1) {
+        plotData<-bind_cols(data=x,fact=by[,1],Stack=by[,2]) %>%
+          group_by(.data$fact,.data$Stack) %>%
+          summarize(AData=invoke(aggFunction, list(data)),upperError=invoke(upperErrorFun,append(list(data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(data),optsL))*errorMultiple,N=n()) %>%
+          mutate(facetLevel=.data$fact,at=facetLoc[.data$facetLevel]) %>%
+          ungroup()
+        vars<-c("fact","Stack","N",aggFunction,upperErrorFun,lowerErrorFun)
+      #Stack is FALSE and subGroup is FALSE
+      } else {
+        plotData<-bind_cols(data=x,fact=by[,1]) %>%
+          group_by(.data$fact) %>%
+          summarize(AData=invoke(aggFunction, list(data)),upperError=invoke(upperErrorFun,append(list(data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(data),optsL))*errorMultiple,N=n()) %>%
+          mutate(facetLevel=.data$fact,at=facetLoc[.data$facetLevel]) %>%
+          ungroup()
+      }
+    }
+
+  #x is a dataframe and by is a factor (subGroup and stack are ignored)
+  } else if(is.data.frame(x) & is.factor(by)){
+    facetLoc<-facetSpacing(length(x),length(levels(by)))
+    names(facetLoc)<-unlist(lapply(levels(by),FUN=function(y) paste(y,colnames(x),sep=".")))
+    plotData<-bind_cols(data=x,fact=by) %>%
+      gather(key=subGroup,value=data,-.data$fact) %>%
+      group_by(.data$fact,.data$subGroup) %>%
+      summarize(AData=invoke(aggFunction, list(data)),upperError=invoke(upperErrorFun,append(list(data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(data),optsL))*errorMultiple,N=n()) %>%
+      mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+      ungroup()
+    vars<-c("fact","subGroup","N",aggFunction,upperErrorFun,lowerErrorFun)
+
+  #x is a dataframe and by is a dataframe (subGroup is ignored)
+  } else if(is.data.frame(x) & is.data.frame(by)) {
+    facetLoc<-facetSpacing(length(x),length(levels(by[,1])))
+    names(facetLoc)<-unlist(lapply(levels(by[,1]),FUN=function(y) paste(y,colnames(x),sep=".")))
+    #Stack is TRUE
+    if(stack==T & ncol(by)>1) {
+      plotData<-bind_cols(data=x,fact=by[,1],Stack=by[,2]) %>%
+        gather(key=subGroup,value=data,-.data$fact,-.data$Stack) %>%
+        group_by(.data$fact,.data$subGroup,.data$Stack) %>%
+        summarize(AData=invoke(aggFunction, list(data)),upperError=invoke(upperErrorFun,append(list(data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(data),optsL))*errorMultiple,N=n()) %>%
+        mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+        ungroup()
+      vars<-c("fact","subGroup","Stack","N",aggFunction,upperErrorFun,lowerErrorFun)
+    #Stack is FALSE
+    } else {
+      plotData<-bind_cols(data=x,fact=by[,1]) %>%
+        gather(key=subGroup,value=data,-.data$fact) %>%
+        group_by(.data$fact,.data$subGroup) %>%
+        summarize(AData=invoke(aggFunction, list(data)),upperError=invoke(upperErrorFun,append(list(data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(data),optsL))*errorMultiple,N=n()) %>%
+        mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+        ungroup()
+      vars<-c("fact","subGroup","N",aggFunction,upperErrorFun,lowerErrorFun)
+    }
+  } else {
+    stop("Error in prepBarData: x and by are misformated... this appears to be a bug.\nThey should be factors and/or dataframes.\n")
+  }
+
+  #Data for displaying a summary table is separated from plotData and formated accordingly
+  printData<-plotData
+  if(upperErrorFun!=lowerErrorFun) {
+    plotData$upperError<- plotData$upperError - plotData$AData
+    plotData$lowerError<- plotData$AData - plotData$lowerError
+  }
+  #based on options, the column position of AData can vary
+  ADataLoc<-grep("AData",colnames(printData))
+  if(upperErrorFun==lowerErrorFun & upperErrorFun != "boot95ci") {
+    vars<-vars[-length(vars)]
+    colnames(printData)[c(ADataLoc,ADataLoc+1)]<-c(aggFunction,upperErrorFun)
+  } else {
+    if(upperErrorFun == "boot95ci") {
+      vars[c(length(vars)-1,length(vars))]<-c("95ci_Upper","95ci_Lower")
+      colnames(printData)[ADataLoc:(ADataLoc+2)]<-c(aggFunction,vars[c(length(vars)-1,length(vars))])
+    } else {
+      colnames(printData)[ADataLoc:(ADataLoc+2)]<-c(aggFunction,upperErrorFun,lowerErrorFun)
+    }
+  }
+
+  #select out just the columns we want to print
+  printData <- printData %>% select(!!vars)
+  #based on options, the column position of aggFunction values can vary
+  ADataLoc<-grep(aggFunction,colnames(printData))
+  if(errorMultiple!=1){
+    colnames(printData)[ADataLoc+1]<-c(paste0(colnames(printData)[ADataLoc+1],"_",errorMultiple,"x"))
+    if(upperErrorFun!=lowerErrorFun) {
+      colnames(printData)[ADataLoc+2]<-paste0(colnames(printData)[ADataLoc+1],"_",errorMultiple,"x")
+    }
+  }
+  #plotData<-plotData %>% mutate(yt=AData,at=at,yb=bVal,UpperError=upperError,LowerError=lowerError)
+  list(plot=plotData,print=printData)
+}
+
+

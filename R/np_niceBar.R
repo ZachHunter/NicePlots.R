@@ -49,7 +49,7 @@ niceBar <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median","none"
 #' @import dplyr
 #' @import tidyr
 #' @export
-niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=NULL, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=NULL, logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, ...) {
+niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median"),errFun=c("sd","se","range", "t95ci", "boot95ci"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=NULL, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=NULL, logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, ...) {
   if(any(is.na(x))){warning("Warning: NAs detected in dataset")}
   prepedData<-NULL
   plotData<-NULL
@@ -75,6 +75,23 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   groupNames<-finalOptions$groupNames
   errorCap<-finalOptions$errorCap
 
+  #To handle the fact the range is actually two different functions, upper and lower error bars are assined separately
+  upperErrorFun<-errFun[1]
+  lowerErrorFun<-errFun[1]
+  aggFun<-aggFun[1]
+  if(upperErrorFun[1]=="range"){
+    upperErrorFun<-"max"
+    lowerErrorFun<-"min"
+  }
+
+  #Checking to make sure that the error and aggregator functions are valid
+  if(!(aggFun[1] %in% c("mean", "median"))) {
+    stop(paste0("The aggFun option needs to be equal to either 'mean' or 'median'.\nCurrently aggFun = ",aggFun,"."))
+  }
+  if(!(errFun[1] %in% c("sd", "se", "range", "t95ci", "boot95ci"))) {
+    stop(paste0("The errFun option needs to be equal to either 'se', 'se', 'range' or 'boot95ci'.\nCurrently errFun = ",aggFun,".\nSee documentation for details."))
+  }
+
   #Capturing default group names
   prepedData<-NULL
   if(is.data.frame(by)) {
@@ -94,6 +111,8 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       }
     }
   }
+
+  #If we are adding this to an existing plot then we can't count on prepCategoryWindow to log transform the data
   if(add) {
     if(logScale>0) {
       prepedData<-list(data=log(x+1,logScale))
@@ -101,64 +120,22 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       prepedData<-list(data=x)
     }
   } else {
-    if(stack==T & is.null(yLim) & is.data.frame(by)){
-      Stats<-c(0,0)
-      if(is.data.frame(x)){
-        if(ncol(by)>2 & subGroup==T){
-          for(i in ncol(x)){
-            cDat<-x[,i]
-            cStats<-data.frame(cDat=cDat,fact=by[,1],subGroup=by[,2],Stack=by[,3]) %>%
-              group_by(fact,subGroup,Stack) %>%
-              summarize(Mean=mean(cDat),Median=median(cDat)) %>%
-              ungroup() %>% group_by(fact, subGroup) %>%
-              summarize(sumMean=sum(Mean),sumMedian=sum(Median)) %>%
-              ungroup() %>% summarize(Min=min(sumMean,sumMedian),Max=max(sumMean,sumMedian))
-            Stats[1]<-min(Stats[1],unlist(cStats[1,1]))
-            Stats[2]<-max(Stats[2],unlist(cStats[1,2]))
-          }
-        } else if(ncol(by)>1 & subGroup==F) {
-          for(i in ncol(x)){
-            cDat<-x[,i]
-            cStats<-data.frame(cDat=cDat,fact=by[,1],Stack=by[,2]) %>%
-              group_by(fact,Stack) %>%
-              summarize(Mean=mean(cDat),Median=median(cDat)) %>%
-              ungroup() %>% group_by(fact) %>%
-              summarize(sumMean=sum(Mean),sumMedian=sum(Median)) %>%
-              ungroup() %>% summarize(Min=min(sumMean,sumMedian),Max=max(sumMean,sumMedian))
-            Stats[1]<-min(Stats[1],unlist(cStats[1,1]))
-            Stats[2]<-max(Stats[2],unlist(cStats[1,2]))
-          }
-        }
-      } else {
-        if(ncol(by)>2 & subGroup==T){
-          cStats<-data.frame(cDat=x,fact=by[,1],subGroup=by[,2],Stack=by[,3]) %>%
-            group_by(fact,subGroup,Stack) %>%
-            summarize(Mean=mean(cDat),Median=median(cDat)) %>%
-            ungroup() %>% group_by(fact, subGroup) %>%
-            summarize(sumMean=sum(Mean),sumMedian=sum(Median)) %>%
-            ungroup() %>% summarize(Min=min(c(sumMean,sumMedian)),Max=max(c(sumMean,sumMedian)))
-          Stats[1]<-min(Stats[1],unlist(cStats[1,1]))
-          Stats[2]<-max(Stats[2],unlist(cStats[1,2]))
-        } else if(ncol(by)>1 & subGroup==F) {
-          cStats<-data.frame(cDat=x,fact=by[,1],Stack=by[,2]) %>%
-            group_by(fact,Stack) %>%
-            summarize(Mean=mean(cDat),Median=median(cDat)) %>%
-            ungroup() %>% group_by(fact) %>%
-            summarize(sumMean=sum(Mean),sumMedian=sum(Median)) %>%
-            ungroup() %>% summarize(Min=min(sumMean,sumMedian),Max=max(sumMean,sumMedian))
-          Stats[1]<-min(Stats[1],unlist(cStats[1,1]))
-          Stats[2]<-max(Stats[2],unlist(cStats[1,2]))
-        }
-      }
-      #if(verbose){print(Stats)}
-      if(Stats[1] != 0 | Stats[2] != 0) {
-        if(logScale!=FALSE){
-          if(Stats[1]>0){Stats[1]<-log(Stats[1]+1,logScale)}
-          if(Stats[2]>0){Stats[2]<-log(Stats[2]+1,logScale)}
-        }
-        yLim<-c(Stats[1]*1.05,Stats[2]*1.05)
+    prepedData<-x
+    #in order to know how to set the window size, we need to preprocess the data
+    if(logScale>0) {prepedData<-log(prepedData+1,logScale)}
+    pData<-prepBarData(x=prepedData,by=by,errorMultiple=errorMultiple,upperErrorFun=upperErrorFun,lowerErrorFun=lowerErrorFun,aggFunction=aggFun,stack=stack,subGroup=subGroup)
+
+    #If all aggregated values are >= 0 then we want to interect the y-axis exactly at zero
+    dmin<-min(pData$plot$AData)
+    dRange<-c(min(pData$plot$AData-pData$plot$lowerError),max(pData$plot$AData+pData$plot$upperError))
+    if(!is.null(yLim)){
+      dRange<-yLim
+    } else {
+      if(dmin >=0){
+        dRange[2]<-dRange[2]*1.04 #this is to give a little padding on the top
       }
     }
+
     if(is.null(minorGuides)){
       if(guides!=FALSE & logScale > 0) {
         minorGuides<-TRUE
@@ -166,241 +143,78 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
         minorGuides<-FALSE
       }
     }
-    if(min(x)>=0){
-      prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels,strictLimits=T,theme=theme,legend=legend)
+
+    #bVal is the base of the rectangles
+    bVal<-0
+    if(!is.null(yLim)){bVal<-yLim[1]}
+
+    #Again, if all aggregated values are above 0 we want to intersect the y-axis at zero with no padding
+    if(dmin>=0){
+      prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels,strictLimits=T,theme=theme,legend=legend)
     } else {
-      prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels,strictLimits=F)
+      prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels,strictLimits=F)
     }
   }
   pvalue<-NULL
   if(subGroup==TRUE){width<-width*2}
+
   #Initialize legend variables so we can update based on options
   legendTitle<-"Legend"
   legendLabels<-NULL
   legendColors<-plotColors$fill
 
   filter<-rep(TRUE,length(x))
-  if(trim>0){filter<-quantileTrim(x,trim,na.rm=T,returnFilter=T)[[2]]}
-  bVal<-0
-  if(!is.null(yLim)){bVal<-yLim[1]}
+  if(trim>0){
+    filter<-quantileTrim(x,trim,na.rm=T,returnFilter=T)[[2]]
+    if(is.data.frame(by)) {
+      by<-by[filter,]
+    } else {
+      by<-by[filter]
+    }
+  }
+
+  #Here we calculated all the data to print
+  pData<-prepBarData(x=prepedData[[1]],by=by,errorMultiple=errorMultiple,upperErrorFun=upperErrorFun,lowerErrorFun=lowerErrorFun,aggFunction=aggFun,stack=stack,subGroup=subGroup)
+
+  #Now we just need to perform some slight customizations to legend and width options based on inputs.
   if(is.numeric(prepedData[[1]])){
     #CASE: by is a factor data is a numeric vector
     if(is.factor(by)) {
-      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[filter],calcType[1],verbose=verbose)}
-      plotLoc<-seq(1,length(groupNames),by=1)
-      names(plotLoc)<-groupNames
+      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by,calcType[1],verbose=verbose)}
       legend<-FALSE
-      plotData<-bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
-        group_by(fact) %>%
-        summarize(Mean=mean(data),Median=median(data),Max=max(data),Min=min(data),SD=sd(data)*errorMultiple,SE=errorMultiple*(sd(data)/(sqrt(length(data)))), N=n(),Q1=quantile(data,.25)) %>%
-        bind_cols(at=plotLoc)
-      printData<-plotData
-      if(errorMultiple!=1){
-        colnames(printData)[6]<-paste0("SDx",errorMultiple)
-        colnames(printData)[7]<-paste0("SEx",errorMultiple)
-      }
       width<-.25*width
-      if(aggFun[1]=="mean") {
-        if(errFun[1]=="sd"){
-          if(verbose){print(select(printData,fact,N,Mean,starts_with("SD")))}
-          plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SD,LowerError=SD) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else if (errFun[1]=="se") {
-          if(verbose){print(select(printData,fact,N,Mean,starts_with("SE")))}
-          plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else if (errFun[1]=="range") {
-          if(verbose){print(select(printData,fact,N,Mean,Min,Max))}
-          plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=Max-Mean,LowerError=Mean-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else {
-          if(verbose){print(select(printData,fact,N,Mean,starts_with("SE")))}
-          plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        }
-      } else if(aggFun[1]=="median") {
-        if(errFun[1]=="sd"){
-          if(verbose){print(select(printData,fact,N,Median,starts_with("SD")))}
-          plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SD,LowerError=SD) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else if (errFun[1]=="se") {
-          if(verbose){print(select(printData,fact,N,Median,starts_with("SE")))}
-          plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else if (errFun[1]=="range") {
-          if(verbose){print(select(printData,fact,N,Median,Min,Max))}
-          plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else {
-          if(verbose){print(select(printData,fact,N,Median,Min,Max))}
-          plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        }
-      }
-      if(legend!=FALSE) {
-        if(stack==TRUE){
-          if(legend==TRUE){
-            legendTitle<-colnames(by)[2]
-          }
-          legendLabels<-levels(by[,2])
-        }
-      }
     } else {
-      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[filter,1],calcType[1],verbose=verbose)}
+      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[,1],calcType[1],verbose=verbose)}
       #CASE: by is not a factor data is a numeric vector and subGroup is TRUE
       if(subGroup) {
         facetLoc<-facetSpacing(length(levels(by[,2])),length(groupNames))
-        names(facetLoc)<-unlist(lapply(levels(by[,1]),FUN=function(x) paste(x,levels(by[,2]),sep=".")))
-        if(stack==T & ncol(by)>2) {
-          plotData<-bind_cols(data=prepedData[[1]],fact=by[filter,1],subGroup=by[filter,2],Stack=by[filter,3]) %>%
-            group_by(fact,subGroup,Stack) %>%
-            summarize(Mean=mean(data),Median=median(data),Max=max(data),Min=min(data),SD=sd(data)*errorMultiple,SE=errorMultiple*(sd(data)/(sqrt(length(data)))), N=n(),Q1=quantile(data,.25)) %>%
-            mutate(facetLevel=paste(fact,subGroup,sep="."),at=facetLoc[facetLevel]) %>%
-            ungroup()
-        } else {
-          plotData<-bind_cols(data=prepedData[[1]],fact=by[filter,1],subGroup=by[filter,2]) %>%
-            group_by(fact,subGroup) %>%
-            summarize(Mean=mean(data),Median=median(data),Max=max(data),Min=min(data),SD=sd(data)*errorMultiple,SE=errorMultiple*(sd(data)/(sqrt(length(data)))), N=n(),Q1=quantile(data,.25)) %>%
-            mutate(facetLevel=paste(fact,subGroup,sep="."),at=facetLoc[facetLevel]) %>%
-            ungroup()
-        }
-        printData<-plotData
-        if(errorMultiple!=1){
-          if(stack & ncol(by)>2) {
-            colnames(printData)[8]<-paste0("SDx",errorMultiple)
-            colnames(printData)[9]<-paste0("SEx",errorMultiple)
-          } else {
-            colnames(printData)[7]<-paste0("SDx",errorMultiple)
-            colnames(printData)[8]<-paste0("SEx",errorMultiple)
-          }
-        }
         width<-width*(facetLoc[2]-facetLoc[1])/4
-        if(stack==T & ncol(by)>2){
-          plotData<-plotData %>% mutate(fact=Stack)
-          printData<-printData %>% mutate(Group=paste(fact,subGroup,Stack,sep="."))
-        } else {
-          printData<-printData %>% mutate(Group=facetLevel)
-        }
-        if(aggFun[1]=="mean") {
-          if(errFun[1]=="sd"){
-            if(verbose){print(select(printData,Group,N,Mean,starts_with("SD")))}
-            plotData %>% mutate(yt=Mean,yb=bVal,UpperError=SD,LowerError=SD) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-          } else if (errFun[1]=="se") {
-            if(verbose){print(select(printData,Group,N,Mean,starts_with("SE")))}
-            plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-          } else if (errFun[1]=="range") {
-            if(Verbose){print(select(printData,Group,N,Mean,Min,Max))}
-            plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=Max-Mean,LowerError=Mean-Min) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-          } else {
-            if(verbose){print(select(printData,Group,N,Mean,starts_with("SE")))}
-            plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-              drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-          }
-        } else if(aggFun[1]=="median") {
-          if(errFun[1]=="sd"){
-            if(verbose){print(select(printData,Group,N,Median,starts_with("SD")))}
-            plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SD,LowerError=SD) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-          } else if (errFun[1]=="se") {
-            if(Verbose){print(select(printData,Group,N,Median,starts_with("SE")))}
-            plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-          } else if (errFun[1]=="range") {
-            if(verbose){print(select(printData,Group,N,Median,Min,Max))}
-            plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-          } else {
-            if(verbose){print(select(printData,Group,N,Median,Min,Max))}
-            plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-              drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-          }
-        }
       } else {
         #CASE: by is not a factor, data is a numeric vector and subGroup is FALSE
         facetLoc<-seq(1,length(groupNames))
-        names(facetLoc)<-groupNames
-        if(stack==T & ncol(by)>1) {
-          plotData<-bind_cols(data=prepedData[[1]],fact=by[filter,1],Stack=by[filter,2]) %>%
-            group_by(fact,Stack) %>%
-            summarize(Mean=mean(data),Median=median(data),Max=max(data),Min=min(data),SD=sd(data)*errorMultiple,SE=errorMultiple*(sd(data)/(sqrt(length(data)))),N=n(),Q1=quantile(data,.25)) %>%
-            mutate(facetLevel=fact,at=facetLoc[facetLevel]) %>%
-            ungroup()
-        } else {
-          plotData<-bind_cols(data=prepedData[[1]],fact=by[filter,1]) %>%
-            group_by(fact) %>%
-            summarize(Mean=mean(data),Median=median(data),Max=max(data),Min=min(data),SD=sd(data)*errorMultiple,SE=errorMultiple*(sd(data)/(sqrt(length(data)))),N=n(),Q1=quantile(data,.25)) %>%
-            mutate(facetLevel=fact,at=facetLoc[facetLevel]) %>%
-            ungroup()
-        }
-        printData<-plotData
-        if(errorMultiple!=1){
-          if(stack & ncol(by)>1) {
-            colnames(printData)[7]<-paste0("SDx",errorMultiple)
-            colnames(printData)[8]<-paste0("SEx",errorMultiple)
-          } else {
-            colnames(printData)[6]<-paste0("SDx",errorMultiple)
-            colnames(printData)[7]<-paste0("SEx",errorMultiple)
-          }
-        }
         width<-width*(facetLoc[2]-facetLoc[1])/4
-        if(stack==T & ncol(by)>1){
-          plotData<-plotData %>% mutate(fact=Stack)
-          printData<-printData %>% mutate(Group=paste(fact,Stack,sep="."))
-        } else {
-          printData<-printData %>% mutate(Group=facetLevel)
-        }
-        if(aggFun[1]=="mean") {
-          if(errFun[1]=="sd"){
-            if(verbose){print(select(printData,Group,N,Mean,starts_with("SD")))}
-            plotData %>% mutate(yt=Mean,yb=bVal,UpperError=SD,LowerError=SD) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-          } else if (errFun[1]=="se") {
-            if(verbose){print(select(printData,Group,N,Mean,starts_with("SE")))}
-            plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-          } else if (errFun[1]=="range") {
-            if(verbose){print(select(printData,Group,N,Mean,Min,Max))}
-            plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=Max-Mean,LowerError=Mean-Min) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-          } else {
-            if(verbose){print(select(printData,Group,N,Mean,starts_with("SE")))}
-            plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-              drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-          }
-        } else if(aggFun[1]=="median") {
-          if(errFun[1]=="sd"){
-            if(verbose){print(select(printData,Group,N,Median,starts_with("SD")))}
-            plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SD,LowerError=SD) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-          } else if (errFun[1]=="se") {
-            if(verbose){print(select(printData,Group,N,Median,starts_with("SE")))}
-            plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-          } else if (errFun[1]=="range") {
-            if(verbose){print(select(printData,Group,N,Median,Min,Max))}
-            plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-              drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-          } else {
-            if(verbose){print(select(printData,Group,N,Median,Min,Max))}
-            plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-              drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-          }
-        }
       }
       if(legend!=FALSE) {
         if(stack==TRUE){
           if(legend==TRUE){
-            legendTitle<-colnames(by)[3]
+            if(subGroup==TRUE) {
+              legendTitle<-colnames(by)[3]
+            } else {
+              legendTitle<-colnames(by)[2]
+            }
           }
-          legendLabels<-levels(by[,3])
-        } else {
+          if(subGroup==TRUE) {
+            legendLabels<-levels(by[,3])
+          } else {
+            legendLabels<-levels(by[,2])
+          }
+        } else if (subGroup==TRUE) {
           if(legend==TRUE){
             legendTitle<-colnames(by)[2]
           }
           legendLabels<-levels(by[,2])
+        } else {
+          legend<-FALSE
         }
       }
     }
@@ -408,58 +222,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
     #CASE: data is a dataframe, by is a factor, subGroup is ignored, Stack is ignored
     if(is.factor(by)) {
       facetLoc<-facetSpacing(length(prepedData[[1]]),length(levels(by)))
-      names(facetLoc)<-unlist(lapply(levels(by),FUN=function(x) paste(x,colnames(prepedData[[1]]),sep=".")))
-      plotData<-bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
-        gather(key=subGroup,value=data,-fact) %>%
-        group_by(fact,subGroup) %>%
-        summarize(Mean=mean(data),Median=median(data),Max=max(data),Min=min(data),SD=sd(data)*errorMultiple,SE=errorMultiple*(sd(data)/(sqrt(length(data)))), N=n(),Q1=quantile(data,.25)) %>%
-        mutate(facetLevel=paste(fact,subGroup,sep="."),at=facetLoc[facetLevel]) %>%
-        ungroup()
-      printData<-plotData
-      if(errorMultiple!=1){
-        colnames(printData)[7]<-paste0("SDx",errorMultiple)
-        colnames(printData)[8]<-paste0("SEx",errorMultiple)
-      }
       width<-width*(facetLoc[2]-facetLoc[1])/4
-      printData<-printData %>% mutate(Group=facetLevel)
-      #print(plotData)
-      if(aggFun[1]=="mean") {
-        if(errFun[1]=="sd"){
-          if(verbose){print(select(printData,Group,N,Mean,starts_with("SD")))}
-          plotData %>% mutate(yt=Mean,yb=bVal,UpperError=SD,LowerError=SD) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else if (errFun[1]=="se") {
-          if(verbose){print(select(printData,Group,N,Mean,starts_with("SE")))}
-          plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else if (errFun[1]=="range") {
-          if(verbose){print(select(printData,Group,N,Mean,Min,Max))}
-          plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=Max-Mean,LowerError=Mean-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else {
-          if(verbose){print(select(printData,Group,N,Mean,starts_with("SE")))}
-          plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        }
-      } else if(aggFun[1]=="median") {
-        if(errFun[1]=="sd"){
-          if(verbose){print(select(printData,Group,N,Median,starts_with("SD")))}
-          plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SD,LowerError=SD) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else if (errFun[1]=="se") {
-          if(verbose){print(select(printData,Group,N,Median,starts_with("SE")))}
-          plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else if (errFun[1]=="range") {
-          if(verbose){print(select(printData,Group,N,Median,Min,Max))}
-          plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else {
-          if(verbose){print(select(printData,Group,N,Median,Min,Max))}
-          plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        }
-      }
       if(legend!=FALSE) {
         if(flipFacts) {
           if(legend==TRUE){
@@ -476,76 +239,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
     } else {
       #CASE: data is a dataframe, by is a dataframe, subGroup is ignored
       facetLoc<-facetSpacing(length(prepedData[[1]]),length(levels(by[,1])))
-      names(facetLoc)<-unlist(lapply(levels(by[,1]),FUN=function(x) paste(x,colnames(prepedData[[1]]),sep=".")))
-      if(stack==T & ncol(by)>1) {
-        plotData<-bind_cols(data=prepedData[[1]],fact=by[filter,1],Stack=by[filter,2]) %>%
-          gather(key=subGroup,value=data,-fact,-Stack) %>%
-          group_by(fact,subGroup,Stack) %>%
-          summarize(Mean=mean(data),Median=median(data),Max=max(data),Min=min(data),SD=sd(data)*errorMultiple,SE=errorMultiple*(sd(data)/(sqrt(length(data)))), N=n(),Q1=quantile(data,.25)) %>%
-          mutate(facetLevel=paste(fact,subGroup,sep="."),at=facetLoc[facetLevel]) %>%
-          ungroup()
-      } else {
-        plotData<-bind_cols(data=prepedData[[1]],fact=by[filter,1]) %>%
-          gather(key=subGroup,value=data,-fact) %>%
-          group_by(fact,subGroup) %>%
-          summarize(Mean=mean(data),Median=median(data),Max=max(data),Min=min(data),SD=sd(data)*errorMultiple,SE=errorMultiple*(sd(data)/(sqrt(length(data)))), N=n(),Q1=quantile(data,.25)) %>%
-          mutate(facetLevel=paste(fact,subGroup,sep="."),at=facetLoc[facetLevel]) %>%
-          ungroup()
-      }
-      printData<-plotData
-      if(errorMultiple!=1){
-        if(stack & ncol(by)>1) {
-          colnames(printData)[8]<-paste0("SDx",errorMultiple)
-          colnames(printData)[9]<-paste0("SEx",errorMultiple)
-        } else {
-          colnames(printData)[7]<-paste0("SDx",errorMultiple)
-          colnames(printData)[8]<-paste0("SEx",errorMultiple)
-        }
-      }
       width<-width*(facetLoc[2]-facetLoc[1])/4
-      if(stack==T & ncol(by)>1){
-        plotData<-plotData %>% mutate(fact=Stack)
-        printData<-printData %>% mutate(Group=paste(fact,subGroup,Stack,sep="."))
-      } else {
-        printData<-printData %>% mutate(Group=facetLevel)
-      }
-      if(aggFun[1]=="mean") {
-        if(errFun[1]=="sd"){
-          if(verbose){print(select(printData,Group,N,Mean,starts_with("SD")))}
-          plotData %>% mutate(yt=Mean,yb=bVal,UpperError=SD,LowerError=SD) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else if (errFun[1]=="se") {
-          if(verbose){print(select(printData,Group,N,Mean,starts_with("SE")))}
-          plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else if (errFun[1]=="range") {
-          if(verbose){print(select(printData,Group,N,Mean,Min,Max))}
-          plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=Max-Mean,LowerError=Mean-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else {
-          if(verbose){print(select(printData,Group,N,Mean,starts_with("SE")))}
-          plotData %>% mutate(yt=Mean,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        }
-      } else if(aggFun[1]=="median") {
-        if(errFun[1]=="sd"){
-          if(verbose){print(select(printData,Group,N,Median,starts_with("SD")))}
-          plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SD,LowerError=SD) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else if (errFun[1]=="se") {
-          if(verbose){print(select(printData,Group,N,Median,starts_with("SE")))}
-          plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=SE,LowerError=SE) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else if (errFun[1]=="range") {
-          if(verbose){print(select(printData,Group,N,Median,Min,Max))}
-          plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=TRUE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        } else {
-          if(verbose){print(select(printData,Group,N,Median,Min,Max))}
-          plotData %>% mutate(yt=Median,at=at,yb=bVal,UpperError=Max-Median,LowerError=Median-Min) %>%
-            drawBar(plotColors=plotColors, errorBars=FALSE, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
-        }
-      }
       if(legend!=FALSE) {
         if(stack){
           if(legend==TRUE){
@@ -568,11 +262,20 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       }
     }
   }
+  #Print summary data if indicated
+  if(verbose){
+    print(pData[[2]])
+  }
+  #updating preping the plot data fromp pData to be compatible with drawBar
+  pData[[1]] %>%
+    mutate(yb=bVal,UpperError=.data$upperError, LowerError=.data$lowerError,yt=.data$AData) %>%
+    drawBar(plotColors=plotColors, errorBars=errorBars, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
+
+  #Draw legend and set associated options if indicated
   if(length(legendColors)<length(legendLabels) & legend!=FALSE){
     legend<-FALSE
     warning("Not enough point colors to uniquely color subGroups levels\nPlease update plotColors point options to use legend options with this subgroup.")
   }
-
   oFont<-par()$family
   oCexMain<-par()$cex.main
   oCexlab<-par()$cex.lab
@@ -587,6 +290,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
     makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=theme$LegendBorder, lineCol=theme$LegendLineCol, bg=theme$LegendBG, col=legendColors, shape="rect",size=theme$LegendSize,spacing=theme$LegendSpacing)
   }
 
+  #Add titles, sub and ylab
   if(add==FALSE) {
     if(is.null(sub) & showCalc==T & is.null(pvalue)==FALSE){
       sub<-pvalue
@@ -598,6 +302,6 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
     }
   }
   par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)
-  dataOut<-list(data=data.frame(prepedData$data,by),summary=plotData,stats=pvalue)
+  dataOut<-list(data=data.frame(prepedData$data,by),summary=pData[[2]],stats=pvalue)
   invisible(dataOut)
 }
