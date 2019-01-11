@@ -220,10 +220,10 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
     byLength<-1
     if(is.data.frame(by)){
       byLength<-length(levels(by[,1]))
-      cFilter<-map(1:dim(x)[2], function(n) map_lgl(levels(by[,1]), function(y) length(x[by[,1]==y,n])>0)) %>% purrr::reduce(c)
+      cFilter<-purrr::map(1:dim(x)[2], function(n) purrr::map_lgl(levels(by[,1]), function(y) length(x[by[,1]==y,n])>0)) %>% purrr::reduce(c)
     } else {
       byLength<-length(levels(by))
-      cFilter<-map(1:dim(x)[2], function(n) map_lgl(levels(by), function(y) length(x[by==y,n])>0)) %>% purrr::reduce(c)
+      cFilter<-purrr::map(1:dim(x)[2], function(n) purrr::map_lgl(levels(by), function(y) length(x[by==y,n])>0)) %>% purrr::reduce(c)
     }
     if(length(plotColors$fill)>1 & defaultFill==FALSE){
       if(length(plotColors$fill)<length(seq(1,dim(x)[2]))) {
@@ -268,12 +268,12 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
       }
       byLevel<-length(levels(by[,2]))
       byFactor<-length(levels(by[,1]))
-      cFilter<-map(levels(by[,1]), function(n) map_lgl(levels(by[,2]), function(y) length(x[by[,1]==n & by[,2]==y])>0)) %>% purrr::reduce(c)
+      cFilter<-purrr::map(levels(by[,1]), function(n) purrr::map_lgl(levels(by[,2]), function(y) length(x[by[,1]==n & by[,2]==y])>0)) %>% purrr::reduce(c)
     } else {
       byLevel<-length(levels(by))
       myLevels<-length(levels(by))
       byFactor<-1
-      cFilter<-map_lgl(levels(by), function(y) length(x[by==y])>0)
+      cFilter<-purrr::map_lgl(levels(by), function(y) length(x[by==y])>0)
     }
     if(length(plotColors$fill)>1 & defaultFill==FALSE){
       if(length(plotColors$fill)<byLevel) {
@@ -312,7 +312,7 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
     } else {
       myLevels<-length(levels(by[,1]))
     }
-    cFilter<-map_lgl(levels(by[,1]), function(n) length(x[by[,1]==n])>0)
+    cFilter<-purrr::map_lgl(levels(by[,1]), function(n) length(x[by[,1]==n])>0)
     if(length(plotColors$fill)>1 & defaultFill==FALSE){
       if(length(plotColors$fill)<length(levels(by[,1]))) {
         warning("Not enough fill colors specified to uniquely cover factor levels!")
@@ -343,7 +343,7 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
     }
   } else {
     myLevels<-length(levels(by))
-    cFilter<-map_lgl(levels(by), function(n) length(x[by==n])>0)
+    cFilter<-purrr::map_lgl(levels(by), function(n) length(x[by==n])>0)
     if(length(plotColors$fill)>1 & defaultFill==FALSE){
       if(length(plotColors$fill)<myLevels) {
         warning("Not enough fill colors specified to uniquely cover factor levels!")

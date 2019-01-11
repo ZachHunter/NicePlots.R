@@ -47,11 +47,8 @@ niceBar <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median","none"
 
 #' @import dplyr
 #' @export
-<<<<<<< HEAD
+
 niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median"),errFun=c("sd","se","range", "t95ci", "boot95ci"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=NULL, outliers=FALSE, width=NULL, errorMultiple=1, plotColors=NULL, logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1, ...) {
-=======
-niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median"),errFun=c("sd","se","range", "t95ci", "boot95ci"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=NULL, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=NULL, logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, ...) {
->>>>>>> 96896e4861970f3c470a31a64a8a4625b1323c47
   if(any(is.na(x))){warning("Warning: NAs detected in dataset")}
   prepedData<-NULL
   plotData<-NULL
@@ -130,7 +127,6 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
     #If all aggregated values are >= 0 then we want to interect the y-axis exactly at zero
     dmin<-min(pData$plot$AData)
     dRange<-c(min(pData$plot$AData-pData$plot$lowerError),max(pData$plot$AData+pData$plot$upperError))
-<<<<<<< HEAD
     bVal<-0
     if(!is.null(yLim)){
       dRange<-yLim
@@ -139,13 +135,6 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       if(dmin >=0){
         dRange[2]<-dRange[2]*1.04 #this is to give a little padding on the top
         dRange[1]<-bVal
-=======
-    if(!is.null(yLim)){
-      dRange<-yLim
-    } else {
-      if(dmin >=0){
-        dRange[2]<-dRange[2]*1.04 #this is to give a little padding on the top
->>>>>>> 96896e4861970f3c470a31a64a8a4625b1323c47
       }
     }
 
@@ -158,24 +147,12 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
     }
 
     #bVal is the base of the rectangles
-<<<<<<< HEAD
-
     if(!is.null(yLim)){bVal<-yLim[1]}
 
     #Again, if all aggregated values are above 0 we want to intersect the y-axis at zero with no padding
     strictBase<-TRUE
     if(dmin<0){
       strictBase<-FALSE
-=======
-    bVal<-0
-    if(!is.null(yLim)){bVal<-yLim[1]}
-
-    #Again, if all aggregated values are above 0 we want to intersect the y-axis at zero with no padding
-    if(dmin>=0){
-      prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels,strictLimits=T,theme=theme,legend=legend)
-    } else {
-      prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels,strictLimits=F)
->>>>>>> 96896e4861970f3c470a31a64a8a4625b1323c47
     }
     prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels,strictLimits=strictBase,theme=theme,legend=legend,logAdjustment=logAdjustment)
   }

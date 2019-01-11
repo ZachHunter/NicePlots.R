@@ -64,7 +64,7 @@ basicTheme<- list(
     guides="lightgrey", #Color of guide lines
     minorGuides="lightgrey", #Color of minor guide lines
     lines="darkred", #Line color(s)
-    points=map_chr(brewer.pal(9,"Set1"),function(x) setAlpha(x,.5)), #Point color(s)
+    points=purrr::map_chr(RColorBrewer::brewer.pal(9,"Set1"),function(x) setAlpha(x,.5)), #Point color(s)
     fill=setAlpha("grey",.4), #Object fill color(s) (eg box/violin/bar interiors)
     axis="black", #Axis color
     majorTick="black", #Major tick mark color
@@ -139,16 +139,16 @@ npColorTheme<- list(
     marginBg="transparent", #plot margin background
     guides="lightgrey", #Color of guide lines
     minorGuides="lightgrey", #Color of minor guide lines
-    lines=brewer.pal(9,"Set1"), #Line color(s)
-    points=brewer.pal(9,"Set1"), #Point color(s)
-    fill=map_chr(brewer.pal(9,"Set1"),function(x) setAlpha(x,.3)), #Object fill color(s) (eg box/violin/bar interiors)
+    lines=RColorBrewer::brewer.pal(9,"Set1"), #Line color(s)
+    points=RColorBrewer::brewer.pal(9,"Set1"), #Point color(s)
+    fill=purrr::map_chr(RColorBrewer::brewer.pal(9,"Set1"),function(x) setAlpha(x,.3)), #Object fill color(s) (eg box/violin/bar interiors)
     axis="black", #Axis color
     majorTick="black", #Major tick mark color
     minorTick="black", #Minor tick mark color
     labels="black", #label color
     subGroupLabels="black", #color of subgroups
-    vioBoxFill=map_chr(brewer.pal(9,"Set1"),function(x) setAlpha(x,.3)), #Color of interquartile box for violin plots
-    vioBoxLineCol=brewer.pal(9,"Set1") #Line color for boxplot overlay in violin plots
+    vioBoxFill=purrr::map_chr(RColorBrewer::brewer.pal(9,"Set1"),function(x) setAlpha(x,.3)), #Color of interquartile box for violin plots
+    vioBoxLineCol=RColorBrewer::brewer.pal(9,"Set1") #Line color for boxplot overlay in violin plots
   ))
 )
 class(npColorTheme)<-c("npTheme","list")
@@ -216,7 +216,7 @@ npStataTheme<- list(
     guides="lightgrey", #Color of guide lines
     minorGuides="lightgrey", #Color of minor guide lines
     lines="black", #Line color(s)
-    points=map_chr(brewer.pal(8,"Dark2"),function(x) setAlpha(x,.5)), #Point color(s)
+    points=purrr::map_chr(RColorBrewer::brewer.pal(8,"Dark2"),function(x) setAlpha(x,.5)), #Point color(s)
     fill="white", #Object fill color(s) (eg box/violin/bar interiors)
     axis="black", #Axis color
     majorTick="black", #Major tick mark color
@@ -291,9 +291,9 @@ npGGTheme<- list(
     marginBg="transparent", #plot margin background
     guides="white", #Color of guide lines
     minorGuides="white", #Color of minor guide lines
-    lines=map_chr(brewer.pal(8,"Dark2"),function(x) setAlpha(x,.7)), #Line color(s)
-    points=map_chr(brewer.pal(8,"Dark2"),function(x) setAlpha(x,.5)), #Point color(s)
-    fill=map_chr(brewer.pal(8,"Dark2"),function(x) setAlpha(x,.2)), #Object fill color(s) (eg box/violin/bar interiors)
+    lines=purrr::map_chr(RColorBrewer::brewer.pal(8,"Dark2"),function(x) setAlpha(x,.7)), #Line color(s)
+    points=purrr::map_chr(RColorBrewer::brewer.pal(8,"Dark2"),function(x) setAlpha(x,.5)), #Point color(s)
+    fill=purrr::map_chr(RColorBrewer::brewer.pal(8,"Dark2"),function(x) setAlpha(x,.2)), #Object fill color(s) (eg box/violin/bar interiors)
     axis="darkgrey", #Axis color
     majorTick="darkgrey", #Major tick mark color
     minorTick="darkgrey", #Minor tick mark color

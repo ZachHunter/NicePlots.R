@@ -10,12 +10,8 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
-<<<<<<< HEAD
-Depends: dplyr,purrr,beeswarm,KernSmooth,RColorBrewer
-Imports: boot,tidyr,tibble
-=======
-Depends: dplyr,tidyr,purrr,tibble,beeswarm,KernSmooth,RColorBrewer,boot
->>>>>>> 96896e4861970f3c470a31a64a8a4625b1323c47
+Depends: dplyr,beeswarm,KernSmooth
+Imports: boot,tidyr,tibble,RColorBrewer,purrr
 Suggests: shiny,rgl
 Collate: 
     'np_utility.R'

@@ -288,11 +288,7 @@ prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=uppe
   if(is.numeric(x) & is.factor(by)) {
     plotData<-bind_cols(data=x,fact=by) %>%
       group_by(.data$fact) %>%
-<<<<<<< HEAD
       summarize(AData=invoke(aggFunction, list(x=.data$data)),upperError=invoke(upperErrorFun,append(list(x=.data$data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(x=.data$data),optsL))*errorMultiple,N=n()) %>%
-=======
-      summarize(AData=invoke(aggFunction, list(data)),upperError=invoke(upperErrorFun,append(list(data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(data),optsL))*errorMultiple,N=n()) %>%
->>>>>>> 96896e4861970f3c470a31a64a8a4625b1323c47
       bind_cols(at=seq(1,length(levels(by))))
 
   #x is a vector and by is a dataframe
@@ -304,11 +300,7 @@ prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=uppe
       if(stack==T & ncol(by)>2) {
         plotData<-bind_cols(data=x,fact=by[,1],subGroup=by[,2],Stack=by[,3]) %>%
           group_by(.data$fact,.data$subGroup,.data$Stack) %>%
-<<<<<<< HEAD
           summarize(AData=invoke(aggFunction, list(x=.data$data)),upperError=invoke(upperErrorFun,append(list(x=.data$data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(x=.data$data),optsL))*errorMultiple,N=n()) %>%
-=======
-          summarize(AData=invoke(aggFunction, list(data)),upperError=invoke(upperErrorFun,append(list(data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(data),optsL))*errorMultiple,N=n()) %>%
->>>>>>> 96896e4861970f3c470a31a64a8a4625b1323c47
           mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
           ungroup()
         vars<-c("fact","subGroup","Stack","N",aggFunction,upperErrorFun,lowerErrorFun)
@@ -316,11 +308,7 @@ prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=uppe
       } else {
         plotData<-bind_cols(data=x,fact=by[,1],subGroup=by[,2]) %>%
           group_by(.data$fact,.data$subGroup) %>%
-<<<<<<< HEAD
           summarize(AData=invoke(aggFunction, list(x=.data$data)),upperError=invoke(upperErrorFun,append(list(x=.data$data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(x=.data$data),optsL))*errorMultiple,N=n()) %>%
-=======
-          summarize(AData=invoke(aggFunction, list(data)),upperError=invoke(upperErrorFun,append(list(data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(data),optsL))*errorMultiple,N=n()) %>%
->>>>>>> 96896e4861970f3c470a31a64a8a4625b1323c47
           mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
           ungroup()
         vars<-c("fact","subGroup","N",aggFunction,upperErrorFun,lowerErrorFun)
@@ -332,11 +320,7 @@ prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=uppe
       if(stack==T & ncol(by)>1) {
         plotData<-bind_cols(data=x,fact=by[,1],Stack=by[,2]) %>%
           group_by(.data$fact,.data$Stack) %>%
-<<<<<<< HEAD
           summarize(AData=invoke(aggFunction, list(x=.data$data)),upperError=invoke(upperErrorFun,append(list(x=.data$data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(x=.data$data),optsL))*errorMultiple,N=n()) %>%
-=======
-          summarize(AData=invoke(aggFunction, list(data)),upperError=invoke(upperErrorFun,append(list(data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(data),optsL))*errorMultiple,N=n()) %>%
->>>>>>> 96896e4861970f3c470a31a64a8a4625b1323c47
           mutate(facetLevel=.data$fact,at=facetLoc[.data$facetLevel]) %>%
           ungroup()
         vars<-c("fact","Stack","N",aggFunction,upperErrorFun,lowerErrorFun)
@@ -344,11 +328,7 @@ prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=uppe
       } else {
         plotData<-bind_cols(data=x,fact=by[,1]) %>%
           group_by(.data$fact) %>%
-<<<<<<< HEAD
           summarize(AData=invoke(aggFunction, list(x=.data$data)),upperError=invoke(upperErrorFun,append(list(x=.data$data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(x=.data$data),optsL))*errorMultiple,N=n()) %>%
-=======
-          summarize(AData=invoke(aggFunction, list(data)),upperError=invoke(upperErrorFun,append(list(data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(data),optsL))*errorMultiple,N=n()) %>%
->>>>>>> 96896e4861970f3c470a31a64a8a4625b1323c47
           mutate(facetLevel=.data$fact,at=facetLoc[.data$facetLevel]) %>%
           ungroup()
       }
@@ -359,15 +339,9 @@ prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=uppe
     facetLoc<-facetSpacing(length(x),length(levels(by)))
     names(facetLoc)<-unlist(lapply(levels(by),FUN=function(y) paste(y,colnames(x),sep=".")))
     plotData<-bind_cols(data=x,fact=by) %>%
-<<<<<<< HEAD
       tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
       group_by(.data$fact,.data$subGroup) %>%
       summarize(AData=invoke(aggFunction, list(x=.data$data)),upperError=invoke(upperErrorFun,append(list(x=.data$data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(x=.data$data),optsL))*errorMultiple,N=n()) %>%
-=======
-      gather(key=subGroup,value=data,-.data$fact) %>%
-      group_by(.data$fact,.data$subGroup) %>%
-      summarize(AData=invoke(aggFunction, list(data)),upperError=invoke(upperErrorFun,append(list(data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(data),optsL))*errorMultiple,N=n()) %>%
->>>>>>> 96896e4861970f3c470a31a64a8a4625b1323c47
       mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
       ungroup()
     vars<-c("fact","subGroup","N",aggFunction,upperErrorFun,lowerErrorFun)
@@ -379,30 +353,18 @@ prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=uppe
     #Stack is TRUE
     if(stack==T & ncol(by)>1) {
       plotData<-bind_cols(data=x,fact=by[,1],Stack=by[,2]) %>%
-<<<<<<< HEAD
         tidyr::gather(key=subGroup,value=data,-.data$fact,-.data$Stack) %>%
         group_by(.data$fact,.data$subGroup,.data$Stack) %>%
         summarize(AData=invoke(aggFunction, list(x=.data$data)),upperError=invoke(upperErrorFun,append(list(x=.data$data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(x=.data$data),optsL))*errorMultiple,N=n()) %>%
-=======
-        gather(key=subGroup,value=data,-.data$fact,-.data$Stack) %>%
-        group_by(.data$fact,.data$subGroup,.data$Stack) %>%
-        summarize(AData=invoke(aggFunction, list(data)),upperError=invoke(upperErrorFun,append(list(data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(data),optsL))*errorMultiple,N=n()) %>%
->>>>>>> 96896e4861970f3c470a31a64a8a4625b1323c47
         mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
         ungroup()
       vars<-c("fact","subGroup","Stack","N",aggFunction,upperErrorFun,lowerErrorFun)
     #Stack is FALSE
     } else {
       plotData<-bind_cols(data=x,fact=by[,1]) %>%
-<<<<<<< HEAD
         tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
         group_by(.data$fact,.data$subGroup) %>%
         summarize(AData=invoke(aggFunction, list(x=.data$data)),upperError=invoke(upperErrorFun,append(list(x=.data$data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(x=.data$data),optsL))*errorMultiple,N=n()) %>%
-=======
-        gather(key=subGroup,value=data,-.data$fact) %>%
-        group_by(.data$fact,.data$subGroup) %>%
-        summarize(AData=invoke(aggFunction, list(data)),upperError=invoke(upperErrorFun,append(list(data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(data),optsL))*errorMultiple,N=n()) %>%
->>>>>>> 96896e4861970f3c470a31a64a8a4625b1323c47
         mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
         ungroup()
       vars<-c("fact","subGroup","N",aggFunction,upperErrorFun,lowerErrorFun)
@@ -414,13 +376,8 @@ prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=uppe
   #Data for displaying a summary table is separated from plotData and formated accordingly
   printData<-plotData
   if(upperErrorFun!=lowerErrorFun) {
-<<<<<<< HEAD
     plotData$upperError<- (plotData$upperError/errorMultiple - plotData$AData)*errorMultiple
     plotData$lowerError<- (plotData$AData - plotData$lowerError/errorMultiple)*errorMultiple
-=======
-    plotData$upperError<- plotData$upperError - plotData$AData
-    plotData$lowerError<- plotData$AData - plotData$lowerError
->>>>>>> 96896e4861970f3c470a31a64a8a4625b1323c47
   }
   #based on options, the column position of AData can vary
   ADataLoc<-grep("AData",colnames(printData))

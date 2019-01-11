@@ -141,10 +141,10 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
     if(!(is.na(legend) | is.null(legend) | legend==TRUE)) {
       legendTitle<-legend
     }
-    maxLabelW<-map_dbl(legendLevels,strwidth,cex=legendSize,units="in") %>% max()
+    maxLabelW<-purrr::map_dbl(legendLevels,strwidth,cex=legendSize,units="in") %>% max()
     titleW<-strwidth(legendTitle,font=2,cex=legendSize,units="in")
     if(titleW>maxLabelW){maxLabelW<-titleW}
-    maxLabelH<-map_dbl(legendLevels, strheight,cex=legendSize,units="in") %>% max()
+    maxLabelH<-purrr::map_dbl(legendLevels, strheight,cex=legendSize,units="in") %>% max()
     titleH<-strheight(legendTitle,font=2,cex=legendSize,units="in")
     nMai<-oMai
     nMai[4]<-nMai[4]+maxLabelW
@@ -323,7 +323,7 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
     myLabels<-majorTicks[[2]]
     myMajorTicks<-majorTicks[[1]]
   }
-  maxLabelLength<-map_dbl(myLabels,strwidth,units="in",cex=labelCex) %>% max()
+  maxLabelLength<-purrr::map_dbl(myLabels,strwidth,units="in",cex=labelCex) %>% max()
   if(par("mai")[whichSide]*.6< maxLabelLength){
     if(par("mai")[whichSide]*.6/maxLabelLength<.666){
       if(logScale>0){

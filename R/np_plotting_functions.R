@@ -302,7 +302,7 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
 #' @examples
 #' todo<-1
 #' @importFrom KernSmooth bkde
-#' @importFrom purrr map
+#' @importFrom purrr map map_dbl
 #' @importFrom graphics polygon
 #' @seealso \code{\link{niceVio}}, \code{\link[KernSmooth]{bkde}}, \code{\link[KernSmooth]{dpik}}
 drawViolinPlot <- function(x,groups,at=seq(1,length(levels(groups))),h=NULL, plotColors=basicTheme$plotColors, sidePlot=FALSE,
@@ -317,11 +317,10 @@ drawViolinPlot <- function(x,groups,at=seq(1,length(levels(groups))),h=NULL, plo
   #Make an list of kernal desinsity estimates. Each list element as x and y components for plotting
   kernals<-NULL
   if(is.null(h)){
-    #kernals<-map(myLevels, function(y) bkde(x[groups==y],gridsize=points,bandwidth = dpik(x[groups==y],gridsize = points)))
     if(trimViolins) {
-      kernals<-map(myLevels, function(y) bkde(x[groups==y],gridsize = points,range.x = c(min(x[groups==y]),max(x[groups==y]))))
+      kernals<-purrr::map(myLevels, function(y) bkde(x[groups==y],gridsize = points,range.x = c(min(x[groups==y]),max(x[groups==y]))))
     } else {
-      kernals<-map(myLevels, function(y) bkde(x[groups==y],gridsize = points))
+      kernals<-purrr::map(myLevels, function(y) bkde(x[groups==y],gridsize = points))
     }
 
   } else {
@@ -335,7 +334,7 @@ drawViolinPlot <- function(x,groups,at=seq(1,length(levels(groups))),h=NULL, plo
   }
 
   #Use polygon to plot symetrical kernal densities by category to draw violins
-  vioWidth<-map_dbl(kernals, function(z) max(z$y)*2/width)
+  vioWidth<-purrr::map_dbl(kernals, function(z) max(z$y)*2/width)
   for(i in 1:length(myLevels)){
     if(sidePlot){
       polygon(c(kernals[[i]]$x,rev(kernals[[i]]$x)),c(at[i]+kernals[[i]]$y/vioWidth[i],rev(at[i]-kernals[[i]]$y/vioWidth[i])),col=fill[(i-1) %% length(fill) + 1],border=borderCol[(i-1) %% length(borderCol) + 1],lwd=borderWidth)
