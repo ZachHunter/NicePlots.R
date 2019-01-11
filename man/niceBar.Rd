@@ -16,7 +16,7 @@ niceBar(x, by = NULL, groupNames = NULL, aggFun = c("mean", "median",
   subGroupLabels = NULL, expLabels = FALSE, sidePlot = FALSE,
   errorBars = TRUE, errorCap = "ball", errorLineType = 1,
   capWidth = 1.2, lWidth = 1.5, na.rm = FALSE, flipFacts = FALSE,
-  verbose = FALSE, ...)
+  verbose = FALSE, logAdjustment = 1, ...)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
@@ -98,6 +98,8 @@ niceBar(x, by = NULL, groupNames = NULL, aggFun = c("mean", "median",
 \item{flipFacts}{logical; When a dataframe of values is given, column names are used as a secondary grouping factor by default. Setting \code{flipFacts=\link{TRUE}} makes the column names the primary factor and \code{by} the secondary factor.}
 
 \item{verbose}{logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.}
+
+\item{logAdjustment}{= numeric; This number is added to the input data prior to log transformation. Default value is 1.}
 
 \item{...}{additional options for S3 method variants.}
 }

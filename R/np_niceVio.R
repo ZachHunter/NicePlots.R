@@ -59,15 +59,15 @@
 #' niceVio(iris$Sepal.Length, by=factorFrame, minorTick=4,subGroup=TRUE,
 #'     ylab=Lab,main=Title,plotColors=myCols)
 #' @import dplyr
-#' @import tidyr
+#' @importFrom tidyr gather
 #' @export
 #' @seealso \code{\link[vioplot]{vioplot}}, \code{\link{boxplot}}, \code{\link{niceBox}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{prepCategoryWindow}}
-niceVio <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=1.5, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=.7,flipFacts=FALSE, na.rm=FALSE, verbose=FALSE, legend=FALSE, trimViolins=TRUE, ...) {UseMethod("niceVio",x)}
+niceVio <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=1.5, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=.7,flipFacts=FALSE, na.rm=FALSE, verbose=FALSE, legend=FALSE, trimViolins=TRUE, logAdjustment=1,...) {UseMethod("niceVio",x)}
 
 #' @import dplyr
-#' @import tidyr
+#' @importFrom tidyr gather
 #' @export
-niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=FALSE, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=NULL,flipFacts=FALSE,  na.rm=FALSE, verbose=FALSE,legend=FALSE, trimViolins=TRUE, ...) {
+niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=FALSE, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=NULL,flipFacts=FALSE,  na.rm=FALSE, verbose=FALSE,legend=FALSE, trimViolins=TRUE,logAdjustment=1, ...) {
   if(any(is.na(x))){warning("Warning: NAs detected in dataset")}
   prepedData<-NULL
   plotData<-NULL
@@ -126,7 +126,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
   #Handling adding plots to existing graph
   if(add) {
     if(logScale>0) {
-      prepedData<-list(data=log(x+1,logScale))
+      prepedData<-list(data=log(x+logAdjustment,logScale))
     } else {
       prepedData<-list(data=x)
     }
@@ -139,7 +139,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
         minorGuides<-FALSE
       }
     }
-    prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels, theme=theme, legend=legend, pointHighlights=pointHighlights)
+    prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels, theme=theme, legend=legend, pointHighlights=pointHighlights,logAdjustment=logAdjustment)
   }
 
   #Initialize legend variables so we can update based on options
@@ -245,7 +245,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
       cLoc<-facetLoc[plotData$facetLevel]
       #cLevels<-names(facetLoc)
       cData<-bind_cols(data=x[filter,],fact=by) %>%
-        gather(key=subGroup,value=data,-.data$fact) %>%
+        tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
         mutate(groupingFactor=paste0(.data$fact,subGroup,sep="."))
       drawViolinPlot(x=cData$data,groups=factor(cData$groupingFactor),at=cLoc,h=h, plotColors=plotColors, sidePlot=sidePlot,
                      borderCol=plotColors$lines, borderWidth=lWidth, fill=plotColors$fill, width=width, trimViolins=trimViolins, samplePoints=curvePoints)
@@ -279,7 +279,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
       cLoc<-facetLoc[plotData$facetLevel]
       #cLevels<-names(facetLoc)
       cData<-bind_cols(data=x[filter,],by) %>%
-        gather(key=subGroup,value=data,seq(1,length(x[1,])))
+        tidyr::gather(key=subGroup,value=data,seq(1,length(x[1,])))
       cData<-mutate(cData, groupingFactor=paste0(cData[,1],subGroup,sep="."))
       drawViolinPlot(x=cData$data,groups=factor(cData$groupingFactor),at=cLoc,h=h, plotColors=plotColors, sidePlot=sidePlot,
                      borderCol=plotColors$lines, borderWidth=lWidth, fill=plotColors$fill, width=width, trimViolins=trimViolins, samplePoints=curvePoints)

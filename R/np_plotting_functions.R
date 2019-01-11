@@ -491,7 +491,7 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
 #'
 #' @importFrom stats sd start
 #' @import dplyr
-#' @import tidyr
+#' @importFrom tidyr gather
 #'
 #' @export
 #' @seealso \code{\link{drawPoints}}, \code{\link{niceBox}}, \code{\link{niceVio}}, \code{\link{niceDots}}, \code{\link[beeswarm]{beeswarm}}, \code{\link[base]{jitter}}, \code{\link{drawPoints}}
@@ -598,20 +598,20 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
       if(outliers==FALSE) {
         if(drawPoints){
           bind_cols(prepedData[[1]],fact=by[filter]) %>%
-            gather(key=subGroup,value=data,-.data$fact) %>%
+            tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
             mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
             drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
         }
       } else {
         if(drawPoints) {
           bind_cols(prepedData[[1]],fact=by[filter]) %>%
-            gather(key=subGroup,value=data,-.data$fact) %>%
+            tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
             mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
             drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
         } else {
           #draws outliers if drawPoints is off
           bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
-            gather(key=subGroup,value=data,-.data$fact) %>%
+            tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
             mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
             group_by(.data$facetLevel) %>%
             mutate(tFilter=quantileTrim(data,threshold=outliers,returnFilter = TRUE)[[2]]==FALSE) %>%
@@ -625,12 +625,12 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
         if(drawPoints){
           if(pointHighlights) {
             bind_cols(prepedData[[1]],fact=by[filter,1],pfact=by[filter,2]) %>%
-              gather(key=subGroup,value=data,-.data$fact,-.data$pfact) %>%
+              tidyr::gather(key=subGroup,value=data,-.data$fact,-.data$pfact) %>%
               mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
               drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
           } else {
             bind_cols(prepedData[[1]],fact=by[filter,1]) %>%
-              gather(key=subGroup,value=data,-.data$fact) %>%
+              tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
               mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
               drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
           }
@@ -639,19 +639,19 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
         if(drawPoints) {
           if(pointHighlights) {
             bind_cols(prepedData[[1]],fact=by[filter,1],pfact=by[filter,2]) %>%
-              gather(key=subGroup,value=data,-.data$fact,-.data$pfact) %>%
+              tidyr::gather(key=subGroup,value=data,-.data$fact,-.data$pfact) %>%
               mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
               drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
           } else {
             bind_cols(prepedData[[1]],fact=by[filter,1]) %>%
-              gather(key=subGroup,value=data,-.data$fact) %>%
+              tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
               mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
               drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
           }
         } else {
           #draws outliers if drawPoints is off
           bind_cols(data=prepedData[[1]],fact=by[filter,1]) %>%
-            gather(key=subGroup,value=data,-.data$fact) %>%
+            tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
             mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
             group_by(.data$facetLevel) %>%
             mutate(tFilter=quantileTrim(data,threshold=outliers,returnFilter = TRUE)[[2]]==FALSE) %>%

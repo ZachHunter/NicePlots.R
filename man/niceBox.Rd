@@ -15,7 +15,7 @@ niceBox(x, by = NULL, groupNames = NULL, main = NULL, sub = NULL,
   subGroupLabels = NULL, expLabels = TRUE, sidePlot = FALSE,
   drawPoints = TRUE, pointHighlights = FALSE, pointLaneWidth = 0.7,
   flipFacts = FALSE, na.rm = FALSE, verbose = FALSE,
-  legend = FALSE, ...)
+  legend = FALSE, logAdjustment = 1, ...)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
@@ -93,6 +93,8 @@ niceBox(x, by = NULL, groupNames = NULL, main = NULL, sub = NULL,
 \item{verbose}{logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.}
 
 \item{legend}{logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.}
+
+\item{logAdjustment}{= numeric; This number is added to the input data prior to log transformation. Default value is 1.}
 
 \item{...}{additional options for S3 method variants}
 }

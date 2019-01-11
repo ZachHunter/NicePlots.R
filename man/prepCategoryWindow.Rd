@@ -13,7 +13,7 @@ prepCategoryWindow(x, by = NULL, groupNames = levels(by),
   axisText = c(NULL, NULL), minorGuides = FALSE, extendTicks = F,
   subGroup = FALSE, expLabels = TRUE, sidePlot = FALSE,
   subGroupLabels = NULL, strictLimits = F, legend = FALSE,
-  pointHighlights = FALSE)
+  pointHighlights = FALSE, logAdjustment = 1)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
@@ -59,6 +59,8 @@ prepCategoryWindow(x, by = NULL, groupNames = levels(by),
 \item{legend}{logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.}
 
 \item{pointHighlights}{logical; Is pointHightlights turned on? This is used to determin with column of \code{by} should be used for legend factor levels.}
+
+\item{logAdjustment}{= numeric; This number is added to the input data prior to log transformation. Default value is 1.}
 }
 \value{
 formats the plotting area and returns a named list with 'data' and 'labels' corresponding to the trimmed and/or transformed data and the labels for the primary factors, respectively.

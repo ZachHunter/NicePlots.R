@@ -14,7 +14,8 @@ niceDots(x, by = NULL, groupNames = NULL, main = NULL, sub = NULL,
   minorGuides = NULL, extendTicks = TRUE, subGroup = FALSE,
   subGroupLabels = NULL, expLabels = TRUE, sidePlot = FALSE,
   pointHighlights = FALSE, pointLaneWidth = 1, na.rm = FALSE,
-  flipFacts = FALSE, verbose = FALSE, legend = FALSE, ...)
+  flipFacts = FALSE, verbose = FALSE, legend = FALSE,
+  logAdjustment = 1, ...)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
@@ -88,6 +89,8 @@ niceDots(x, by = NULL, groupNames = NULL, main = NULL, sub = NULL,
 \item{verbose}{logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.}
 
 \item{legend}{logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.}
+
+\item{logAdjustment}{= numeric; This number is added to the input data prior to log transformation. Default value is 1.}
 
 \item{...}{additional options for S3 method variants}
 }

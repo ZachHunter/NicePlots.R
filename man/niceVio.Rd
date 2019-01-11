@@ -16,7 +16,7 @@ niceVio(x, by = NULL, h = NULL, groupNames = NULL, main = NULL,
   expLabels = TRUE, sidePlot = FALSE, drawPoints = TRUE,
   pointHighlights = FALSE, pointLaneWidth = 0.7, flipFacts = FALSE,
   na.rm = FALSE, verbose = FALSE, legend = FALSE,
-  trimViolins = TRUE, ...)
+  trimViolins = TRUE, logAdjustment = 1, ...)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
@@ -98,6 +98,8 @@ niceVio(x, by = NULL, h = NULL, groupNames = NULL, main = NULL,
 \item{legend}{logical/character; if not equal to \code{\link{FALSE}} with cause a legend to be drawn in the margins. If set to a character string instead of a logical value, the string will be used as the legend title insteas of the factor column name from \code{by}.}
 
 \item{trimViolins}{logical; Should the violins be truncated at the edges of the data range.}
+
+\item{logAdjustment}{= numeric; This number is added to the input data prior to log transformation. Default value is 1.}
 
 \item{...}{additional options for S3 method variants}
 }

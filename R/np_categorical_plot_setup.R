@@ -73,6 +73,7 @@ makeLogTicks<-function(dataRange,minorCount=10,logScale=2,axisText=c(NULL,NULL),
 #' @param strictLimits logical; eliminates padding on the value axis so 0 can be flush with the x-axis. Defaults to \code{\link{FALSE}}.
 #' @param legend logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.
 #' @param pointHighlights logical; Is pointHightlights turned on? This is used to determin with column of \code{by} should be used for legend factor levels.
+#' @param logAdjustment = numeric; This number is added to the input data prior to log transformation. Default value is 1.
 #'
 #' @return formats the plotting area and returns a named list with 'data' and 'labels' corresponding to the trimmed and/or transformed data and the labels for the primary factors, respectively.
 #' @examples
@@ -85,7 +86,7 @@ makeLogTicks<-function(dataRange,minorCount=10,logScale=2,axisText=c(NULL,NULL),
 #' @importFrom utils data str
 #'
 #' @seealso \code{\link[grDevices]{axisTicks}}, \code{\link[graphics]{axis}}, \code{\link{makeLogTicks}}, \code{\link{facetSpacing}}
-prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, guides=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, theme=NA, plotColors=if(is.na(theme)){list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white")}else{theme$plotColors}, trim=FALSE, logScale=FALSE, axisText=c(NULL,NULL), minorGuides=FALSE, extendTicks=F,subGroup=FALSE, expLabels=TRUE,sidePlot=FALSE,subGroupLabels=NULL,strictLimits=F, legend=FALSE, pointHighlights=FALSE) {
+prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, guides=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, theme=NA, plotColors=if(is.na(theme)){list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white")}else{theme$plotColors}, trim=FALSE, logScale=FALSE, axisText=c(NULL,NULL), minorGuides=FALSE, extendTicks=F,subGroup=FALSE, expLabels=TRUE,sidePlot=FALSE,subGroupLabels=NULL,strictLimits=F, legend=FALSE, pointHighlights=FALSE, logAdjustment=1) {
   levelCount<-1
   tData<-x
   tBy<-by
@@ -185,9 +186,9 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
       stop(paste0("Error: you can not log scale numbers less than or equal to zero\nLowest number detected: ",dataRange[1]))
     }
     majorTicks<-makeLogTicks(dataRange,minorCount= minorTick,logScale=logScale, axisText=axisText, expLabels=expLabels)
-    tData <-log(x +1,logScale)
+    tData <-log(x +logAdjustment,logScale)
     if(is.null(yLim)==FALSE) {
-      dataRange<-log(yLim+1,logScale)
+      dataRange<-log(yLim+logAdjustment,logScale)
     } else {
       dataRange<-range(tData)
       if(strictLimits){
@@ -198,13 +199,13 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
 
     if(trim>0) {
       if(is.numeric(x)){
-        tData<-log(quantileTrim(x,threshold=trim,na.rm=T)+1,logScale)
+        tData<-log(quantileTrim(x,threshold=trim,na.rm=T)+logAdjustment,logScale)
       } else if(is.data.frame(x)){
-        tData<-apply(x,2,function(y) {log(quantileTrim(y,threshold=trim,na.rm=T)+1,logScale)})
+        tData<-apply(x,2,function(y) {log(quantileTrim(y,threshold=trim,na.rm=T)+logAdjustment,logScale)})
       } else {
         stop(paste0("Non-numeric input passed to function.\nData structure:\n",str(x)))
       }
-      if(is.null(yLim)==FALSE) {dataRange<-log(yLim+1,logScale)}
+      if(is.null(yLim)==FALSE) {dataRange<-log(yLim+logAdjustment,logScale)}
       else {
         dataRange<-range(tData)
         if(strictLimits){
