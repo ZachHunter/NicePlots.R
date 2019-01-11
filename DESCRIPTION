@@ -4,8 +4,8 @@ Title: Nice Plots for Data Exploration
 Version: 0.1.2
 Author: Zachary Hunter
 Maintainer: Zachary Hunter <zhunter7@gmail.com>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: A series of S3 generic plotting functions to aid in data exploration and visualization for those just getting started in R
+    One of the fundamental problems in biomedical research is how interdependent bioinformatics specialists and wet lab biologist are and yet they have very few ways of effectively collaborating or sharing insights with each other. For a rigorous analysis or custom visualization, a lot of background knowledge is necessary. Not only does one need to learn R but the relevant statistics, specialized tools, then ggplot’s grammar of graphics and Bioconductor’s datatypes as well. With this project I hope to encourage biologists, physicians and other non-computational researchers to learn enough R to be able to interact with and visualize large datasets for the purposes of hypothesis generation. These plotting functions are S3 generics so that they can be easily adapted for use with complex next generation sequencing datasets from Bioconductor or any large dataset with a complex structure and make it invisible to the end user. The functions work like standard R functions allowing users to practice their basic R skills while being able to perform some basic exploratory analysis of their data.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
