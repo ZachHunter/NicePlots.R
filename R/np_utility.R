@@ -324,6 +324,7 @@ ci<-function(x,agg,indices) {
 #' @seealso \code{\link{prepBarData}}, \code{\link{niceBar}}, \code{\link[boot]{boot}}, \code{\link[boot]{boot.ci}}
 # @importFrom boot boot boot.ci
 boot95ci<-function(x,agg="mean",upper=FALSE) {
+<<<<<<< HEAD
   errVal<-boot::boot.ci(boot::boot(x,ci,agg=agg,R=1000),type="perc")$percent[4+upper]
   if(upper){
     errVal<-errVal-invoke(agg,list(x=x))
@@ -331,6 +332,9 @@ boot95ci<-function(x,agg="mean",upper=FALSE) {
     errVal<-invoke(agg,list(x=x))-errVal
   }
   errVal
+=======
+  boot::boot.ci(boot::boot(x,ci,agg=agg,R=1000),type="basic")$basic[4+upper]
+>>>>>>> 96896e4861970f3c470a31a64a8a4625b1323c47
 }
 
 
