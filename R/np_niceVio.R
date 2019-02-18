@@ -168,7 +168,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
       plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width*vioBoxWidth,verbose=verbose)
       #cLevels<-levels(factor(by[filter]))
       legend<-FALSE
-      drawViolinPlot(x[filter],groups=by,at=plotLoc,h=h, plotColors=plotColors, sidePlot=sidePlot,borderCol=plotColors$lines,
+      drawViolinPlot(prepedData[[1]][filter],groups=by,at=plotLoc,h=h, plotColors=plotColors, sidePlot=sidePlot,borderCol=plotColors$lines,
                      borderWidth=lWidth, fill=plotColors$fill, width=width, trimViolins=trimViolins, samplePoints=curvePoints)
       if(drawBox) {
         plotData %>% drawBoxPlot(side=sidePlot,col=plotColors$vioBoxLineCol,fill=plotColors$vioBoxFill,drawDot=F,drawBox=drawBox, lWidth=lWidth,whiskerLty=whiskerLineType,capWidth=capWidth)
@@ -186,7 +186,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
         plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,verbose=verbose)
         gFactor<-paste0(by[,1],by[,2],sep=".")
         cLoc<-facetLoc[plotData$facetLevel]
-        drawViolinPlot(x=x[filter],groups=factor(gFactor), at=cLoc, h=h, plotColors=plotColors, sidePlot=sidePlot,
+        drawViolinPlot(x=prepedData[[1]][filter],groups=factor(gFactor), at=cLoc, h=h, plotColors=plotColors, sidePlot=sidePlot,
                        borderCol=plotColors$lines, borderWidth=lWidth, fill=plotColors$fill, width=width, trimViolins=trimViolins, samplePoints=curvePoints)
         if(drawBox) {
           plotData %>%
@@ -216,7 +216,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
         plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width*vioBoxWidth,verbose=verbose)
         #cLevels<-groupNames
         gFactor<-by[,1]
-        drawViolinPlot(x=x[filter],groups=factor(gFactor),at=plotLoc, h=h, plotColors=plotColors, sidePlot=sidePlot,
+        drawViolinPlot(x=prepedData[[1]][filter],groups=factor(gFactor),at=plotLoc, h=h, plotColors=plotColors, sidePlot=sidePlot,
                        borderCol=plotColors$lines, borderWidth=lWidth, fill=plotColors$fill, width=width, trimViolins=trimViolins, samplePoints=curvePoints)
         if(drawBox) {
           plotData %>% drawBoxPlot(side=sidePlot,col=plotColors$vioBoxLineCol,fill=plotColors$vioBoxFill,drawDot=F,drawBox=drawBox,lWidth=lWidth,whiskerLty=whiskerLineType,capWidth=capWidth)
@@ -244,7 +244,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
       plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,verbose=verbose)
       cLoc<-facetLoc[plotData$facetLevel]
       #cLevels<-names(facetLoc)
-      cData<-bind_cols(data=x[filter,],fact=by) %>%
+      cData<-bind_cols(data=prepedData[[1]][filter,],fact=by) %>%
         tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
         mutate(groupingFactor=paste0(.data$fact,subGroup,sep="."))
       drawViolinPlot(x=cData$data,groups=factor(cData$groupingFactor),at=cLoc,h=h, plotColors=plotColors, sidePlot=sidePlot,
@@ -278,7 +278,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
       plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,flipFacts=flipFacts,verbose=verbose)
       cLoc<-facetLoc[plotData$facetLevel]
       #cLevels<-names(facetLoc)
-      cData<-bind_cols(data=x[filter,],by) %>%
+      cData<-bind_cols(data=prepedData[[1]][filter,],by) %>%
         tidyr::gather(key=subGroup,value=data,seq(1,length(x[1,])))
       cData<-mutate(cData, groupingFactor=paste0(cData[,1],subGroup,sep="."))
       drawViolinPlot(x=cData$data,groups=factor(cData$groupingFactor),at=cLoc,h=h, plotColors=plotColors, sidePlot=sidePlot,

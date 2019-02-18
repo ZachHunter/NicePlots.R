@@ -112,8 +112,8 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   }
 
   #If we are adding this to an existing plot then we can't count on prepCategoryWindow to log transform the data
-  if(add) {
-    if(logScale>0) {
+  if(add==TRUE) {
+    if(logScale>1) {
       prepedData<-list(data=log(x+logAdjustment,logScale))
     } else {
       prepedData<-list(data=x)
@@ -121,7 +121,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   } else {
     prepedData<-x
     #in order to know how to set the window size, we need to preprocess the data
-    if(logScale>0) {prepedData<-log(prepedData+1,logScale)}
+    if(logScale>1) {prepedData<-log(prepedData+logAdjustment,logScale)}
     pData<-prepBarData(x=prepedData,by=by,errorMultiple=errorMultiple,upperErrorFun=upperErrorFun,lowerErrorFun=lowerErrorFun,aggFunction=aggFun,stack=stack,subGroup=subGroup)
 
     #If all aggregated values are >= 0 then we want to interect the y-axis exactly at zero

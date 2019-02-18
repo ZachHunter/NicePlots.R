@@ -21,8 +21,8 @@
 #' \donttest{axis(side = 2, at = majorTicks[[3]], labels = FALSE, tcl = -0.2)}
 #' @importFrom grDevices axisTicks
 #' @seealso \code{\link[grDevices]{axisTicks}}, \code{\link[graphics]{axis}}, \code{\link{prepCategoryWindow}}
-makeLogTicks<-function(dataRange,minorCount=10,logScale=2,axisText=c(NULL,NULL), expLabels=TRUE) {
-  majorLoc<-axisTicks(log(dataRange+1, logScale),log=F,nint=5)
+makeLogTicks<-function(dataRange,minorCount=10,logScale=2,axisText=c(NULL,NULL), expLabels=TRUE, logAdjustment=1) {
+  majorLoc<-axisTicks(log(dataRange+logAdjustment, logScale),log=F,nint=5)
   preText<-axisText[1]
   postText<-axisText[2]
   transformed<-format(vapply(majorLoc,FUN=function(x) logScale^x,FUN.VALUE=numeric(1)), scientific=F, digits=2)
@@ -181,11 +181,11 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
     }
   }
   majorTicks<-NULL
-  if(logScale>0){
+  if(logScale>1){
     if(dataRange[1]<0){
       stop(paste0("Error: you can not log scale numbers less than or equal to zero\nLowest number detected: ",dataRange[1]))
     }
-    majorTicks<-makeLogTicks(dataRange,minorCount= minorTick,logScale=logScale, axisText=axisText, expLabels=expLabels)
+    majorTicks<-makeLogTicks(dataRange,minorCount= minorTick,logScale=logScale, axisText=axisText, expLabels=expLabels, logAdjustment=logAdjustment)
     tData <-log(x +logAdjustment,logScale)
     if(is.null(yLim)==FALSE) {
       dataRange<-log(yLim+logAdjustment,logScale)
@@ -212,7 +212,7 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
           dataRange[1]<-0
           dataRange[2]<-dataRange[2]*1.05
         }
-        majorTicks<-makeLogTicks(c(logScale^dataRange[1] -1,logScale^dataRange[2] -1),minorCount= minorTick,logScale=logScale, axisText=axisText, expLabels=expLabels)
+        majorTicks<-makeLogTicks(c(logScale^dataRange[1] -1,logScale^dataRange[2] -1),minorCount= minorTick,logScale=logScale, axisText=axisText, expLabels=expLabels, logAdjustment=logAdjustment)
       }
     }
   }
