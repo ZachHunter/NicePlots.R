@@ -66,7 +66,7 @@ prepCategoryWindow(x, by = NULL, groupNames = levels(by),
 formats the plotting area and returns a named list with 'data' and 'labels' corresponding to the trimmed and/or transformed data and the labels for the primary factors, respectively.
 }
 \description{
-takes untransformed data and draws the x and y axis with support of subgrouping data within factors, log transformation and outlier trimming.
+takes untransformed data and draws the x and y axis with support for subgrouping data within factors, log transformation and outlier trimming.
 }
 \details{
 This function does all the hard work of setting up the x and y axis for plotting as well as optionally log transforming and/or trimming the data of outliers. In particular, it adds much more robust support for plotting of log transformed data and subgrouping of primary vectors. Other features include the addition of both major and minor guidelines, support for horizontal plotting and improved label formatting options.

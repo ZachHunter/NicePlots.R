@@ -230,14 +230,14 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
           cFilter<-(x$fact==levels(factor(x$fact))[i] & x$subGroup==levels(factor(x$subGroup))[n])
           #this is here to avoid running subset calculations for subgroups with no samples
           if(any(cFilter)){
-            filter[[length(filter)+1]]<-data.frame(x=beeswarm(x$data[cFilter],pch=shape[cFilter][1],at=x[cFilter,"at"][1],do.plot=F,corralWidth=width*2,corral=swarmOverflow,cex=size[cFilter][1])$x,y=x$data[cFilter],color=col[cFilter],size=size[cFilter],shape=shape[cFilter])
+            filter[[length(filter)+1]]<-data.frame(x=beeswarm::beeswarm(x$data[cFilter],pch=shape[cFilter][1],at=x[cFilter,"at"][1],do.plot=F,corralWidth=width*2,corral=swarmOverflow,cex=size[cFilter][1])$x,y=x$data[cFilter],color=col[cFilter],size=size[cFilter],shape=shape[cFilter])
             #print(filter[[length(filter)]]$color)
           }
         }
       } else {
         cFilter<-x$fact==levels(factor(x$fact))[i]
         if(any(cFilter)){
-          filter[[i]]<-data.frame(x=beeswarm(x$data[cFilter],pch=shape[cFilter][1],do.plot=F,at=x[cFilter,"at"][1],corralWidth=width*2,corral=swarmOverflow,cex=size[cFilter][1])$x,y=x$data[cFilter],color=col[cFilter],size=size[cFilter],shape=shape[cFilter])
+          filter[[i]]<-data.frame(x=beeswarm::beeswarm(x$data[cFilter],pch=shape[cFilter][1],do.plot=F,at=x[cFilter,"at"][1],corralWidth=width*2,corral=swarmOverflow,cex=size[cFilter][1])$x,y=x$data[cFilter],color=col[cFilter],size=size[cFilter],shape=shape[cFilter])
         }
       }
     }
@@ -318,17 +318,17 @@ drawViolinPlot <- function(x,groups,at=seq(1,length(levels(groups))),h=NULL, plo
   kernals<-NULL
   if(is.null(h)){
     if(trimViolins) {
-      kernals<-purrr::map(myLevels, function(y) bkde(x[groups==y],gridsize = points,range.x = c(min(x[groups==y]),max(x[groups==y]))))
+      kernals<-purrr::map(myLevels, function(y) KernSmooth::bkde(x[groups==y],gridsize = points,range.x = c(min(x[groups==y]),max(x[groups==y]))))
     } else {
-      kernals<-purrr::map(myLevels, function(y) bkde(x[groups==y],gridsize = points))
+      kernals<-purrr::map(myLevels, function(y) KernSmooth::bkde(x[groups==y],gridsize = points))
     }
 
   } else {
     for(i in 1:length(myLevels)){
       if(trimViolins) {
-        kernals<-bkde(x[groups==myLevels[i]],gridsize=points,bandwidth = h[(i-1) %% length(h) + 1],range.x = c(min(x[groups==myLevels[i]]),max(x[x[groups==myLevels[i]]])))
+        kernals<-KernSmooth::bkde(x[groups==myLevels[i]],gridsize=points,bandwidth = h[(i-1) %% length(h) + 1],range.x = c(min(x[groups==myLevels[i]]),max(x[x[groups==myLevels[i]]])))
       } else {
-        kernals<-bkde(x[groups==myLevels[i]],gridsize=points,bandwidth = h[(i-1) %% length(h) + 1])
+        kernals<-KernSmooth::bkde(x[groups==myLevels[i]],gridsize=points,bandwidth = h[(i-1) %% length(h) + 1])
       }
     }
   }

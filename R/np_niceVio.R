@@ -68,7 +68,7 @@ niceVio <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
 #' @importFrom tidyr gather
 #' @export
 niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=FALSE, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=NULL,flipFacts=FALSE,  na.rm=FALSE, verbose=FALSE,legend=FALSE, trimViolins=TRUE,logAdjustment=1, ...) {
-  if(any(is.na(x))){warning("Warning: NAs detected in dataset")}
+  if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset")}
   prepedData<-NULL
   plotData<-NULL
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = flipFacts)

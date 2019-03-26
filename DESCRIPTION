@@ -11,8 +11,8 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
-Depends: dplyr,beeswarm,KernSmooth
-Imports: boot,tidyr,tibble,RColorBrewer,purrr
+Depends: dplyr
+Imports: boot,tidyr,tibble,RColorBrewer,purrr,KernSmooth,beeswarm,ggplot2
 Suggests: shiny,rgl
 Collate: 
     'np_utility.R'
@@ -23,5 +23,6 @@ Collate:
     'np_plotting_functions.R'
     'np_niceBar.R'
     'np_niceBox.R'
+    'np_niceDensity.R'
     'np_niceDots.R'
     'np_niceVio.R'

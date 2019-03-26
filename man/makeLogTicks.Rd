@@ -17,6 +17,8 @@ makeLogTicks(dataRange, minorCount = 10, logScale = 2,
 \item{axisText}{character; a length two character vector containing text to be prepend or append to the major tick labels, respectively.}
 
 \item{expLabels}{logical; if set to \code{\link{TRUE}}, the major labels will written as \eqn{logbase^{x}}{logbase^x}. Otherwise the labels will correspond to the non-transformed values at that point.}
+
+\item{logAdjustment}{numeric; a number added to each value prior to log trasformation. Defaults value is 1.}
 }
 \value{
 a list with the following elements: major tick marks locations [[1]], major tick labels [[2]], minor tick mark locations [[3]].

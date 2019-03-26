@@ -67,6 +67,12 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
       } else {
         by<-factor(by[,1])
       }
+    } else if (is.null(by)) {
+      if(is.data.frame(data)) {
+        by<-factor(rep("Group",length(data[,1])))
+      } else {
+        by<-factor(rep("Group",length(data)))
+      }
     } else {
       warning(paste0("By factor input type not recognized.\nClasses observered: ",class(by)))
     }

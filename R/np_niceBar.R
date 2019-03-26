@@ -49,7 +49,7 @@ niceBar <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median","none"
 #' @export
 
 niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median"),errFun=c("sd","se","range", "t95ci", "boot95ci"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=NULL, outliers=FALSE, width=NULL, errorMultiple=1, plotColors=NULL, logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1, ...) {
-  if(any(is.na(x))){warning("Warning: NAs detected in dataset")}
+  if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset")}
   prepedData<-NULL
   plotData<-NULL
   lWidth<-NULL
