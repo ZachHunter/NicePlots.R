@@ -22,6 +22,7 @@
 #' @param add logical; Adds the plot to the existing window rather the generating a new plotting enviroment
 #' @param lWidth numeric; Line width, equivelent to the cex \code{lwd} option.
 #' @param logScale numeric; A length two numeric vector indicating the log scale the x and y axis, respectively. If only one value is given, it is applied to boxth axis. Set to \code{\link{FALSE}} to disable (Default).
+#' @param trimCurves logical; Should the density curves be restricted to the min and max of the data.
 #' @param ... additional options for S3 method variants
 #'
 #' @examples
@@ -32,14 +33,14 @@
 #' @importFrom purrr walk2 map_dbl
 #' @importFrom graphics polygon contour lines persp
 #' @export
-niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subGroup=FALSE, useRgl=TRUE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", rotateLabels=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE, ...) {UseMethod("niceDensity",x)}
+niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subGroup=FALSE, useRgl=TRUE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", rotateLabels=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, ...) {UseMethod("niceDensity",x)}
 
 #' @import dplyr
 #' @importFrom KernSmooth bkde bkde2D dpih
 #' @importFrom purrr walk2 map_dbl
 #' @importFrom graphics polygon contour lines persp
 #' @export
-niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGroup=FALSE, useRgl=TRUE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), showCalc=FALSE, calcType="none", rotateLabels=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE, ...)  {
+niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGroup=FALSE, useRgl=TRUE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), showCalc=FALSE, calcType="none", rotateLabels=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, ...)  {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset")}
   prepedData<-NULL
   plotData<-NULL
@@ -177,8 +178,20 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
       if(length(plotColors$fill)==1) {plotColors$fill<-plotColors$points}
       n_groups<-length(levels(by))
       densities<-vector(mode="list",length=n_groups)
-      for(i in 1:n_groups){
-        densities[[i]]<-bkde(x[by==levels(by)[i]],gridsize=curvePoints)
+      if(trimCurves[1]==TRUE) {
+        for(i in 1:n_groups){
+          if(length(x[by==levels(by)[i]])>1) {
+            densities[[i]]<-bkde(x[by==levels(by)[i]],gridsize=curvePoints,range.x=c(min(x),max(x)))
+            densities[[i]]$x<-c(min(x),densities[[i]]$x,max(x))
+            densities[[i]]$y<-c(0,densities[[i]]$y,0)
+          }
+        }
+      } else {
+        for(i in 1:n_groups){
+          if(length(x[by==levels(by)[i]])>1) {
+            densities[[i]]<-bkde(x[by==levels(by)[i]],gridsize=curvePoints)
+          }
+        }
       }
       maxx<-max(map_dbl(densities, function(z) max(z$x)))
       minx<-min(map_dbl(densities, function(z) min(z$x)))
@@ -188,7 +201,12 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
         title(main=main,sub=sub,ylab=ylab,xlab=xlab)
       }
       #plot(-1,-1,type="n",xlim=c(minx,maxx),ylim=c(0,maxy),main=main,sub=sub,ylab=ylab)
-      walk2(.x=densities,.y=plotColors$fill[1:n_groups],~polygon(.x,col=.y,border=0))
+      if(!is.na(plotColors$fill[1]) & !is.null(plotColors$fill[1])){
+        walk2(.x=densities,.y=plotColors$fill[1:n_groups],~polygon(.x,col=.y,border=0))
+      }
+      if(length(plotColors$lines)<n_groups){
+        plotColors$lines<-rep(plotColors$lines,trunc(n_groups/length(plotColors$lines))+1)
+      }
       walk2(.x=densities,.y=plotColors$lines[1:n_groups],~lines(.x,col=.y,lwd=lWidth))
     } else {
       densities<-bkde(x,gridsize=curvePoints)

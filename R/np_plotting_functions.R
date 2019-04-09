@@ -318,28 +318,32 @@ drawViolinPlot <- function(x,groups,at=seq(1,length(levels(groups))),h=NULL, plo
   kernals<-NULL
   if(is.null(h)){
     if(trimViolins) {
-      kernals<-purrr::map(myLevels, function(y) KernSmooth::bkde(x[groups==y],gridsize = points,range.x = c(min(x[groups==y]),max(x[groups==y]))))
+      kernals<-purrr::map(myLevels, function(y) if(length(x[groups==y])>1) {KernSmooth::bkde(x[groups==y],gridsize = points,range.x = c(min(x[groups==y]),max(x[groups==y])))}else{NULL})
     } else {
-      kernals<-purrr::map(myLevels, function(y) KernSmooth::bkde(x[groups==y],gridsize = points))
+      kernals<-purrr::map(myLevels, function(y) if(length(x[groups==y])>1) {KernSmooth::bkde(x[groups==y],gridsize = points)}else{NULL})
     }
 
   } else {
     for(i in 1:length(myLevels)){
-      if(trimViolins) {
-        kernals<-KernSmooth::bkde(x[groups==myLevels[i]],gridsize=points,bandwidth = h[(i-1) %% length(h) + 1],range.x = c(min(x[groups==myLevels[i]]),max(x[x[groups==myLevels[i]]])))
-      } else {
-        kernals<-KernSmooth::bkde(x[groups==myLevels[i]],gridsize=points,bandwidth = h[(i-1) %% length(h) + 1])
+      if(length(x[groups==myLevels[i]])>1) {
+        if(trimViolins) {
+          kernals[i]<-KernSmooth::bkde(x[groups==myLevels[i]],gridsize=points,bandwidth = h[(i-1) %% length(h) + 1],range.x = c(min(x[groups==myLevels[i]]),max(x[x[groups==myLevels[i]]])))
+        } else {
+          kernals[i]<-KernSmooth::bkde(x[groups==myLevels[i]],gridsize=points,bandwidth = h[(i-1) %% length(h) + 1])
+        }
       }
     }
   }
 
   #Use polygon to plot symetrical kernal densities by category to draw violins
-  vioWidth<-purrr::map_dbl(kernals, function(z) max(z$y)*2/width)
+  vioWidth<-purrr::map_dbl(kernals, function(z) if(!is.null(z)){max(z$y)*2/width} else {0})
   for(i in 1:length(myLevels)){
-    if(sidePlot){
-      polygon(c(kernals[[i]]$x,rev(kernals[[i]]$x)),c(at[i]+kernals[[i]]$y/vioWidth[i],rev(at[i]-kernals[[i]]$y/vioWidth[i])),col=fill[(i-1) %% length(fill) + 1],border=borderCol[(i-1) %% length(borderCol) + 1],lwd=borderWidth)
-    } else {
-      polygon(c(at[i]+kernals[[i]]$y/vioWidth[i],rev(at[i]-kernals[[i]]$y/vioWidth[i])),c(kernals[[i]]$x,rev(kernals[[i]]$x)),col=fill[(i-1) %% length(fill) + 1],border=borderCol[(i-1) %% length(borderCol) + 1],lwd=borderWidth)
+    if(!is.null(kernals[[i]])) {
+      if(sidePlot){
+        polygon(c(kernals[[i]]$x,rev(kernals[[i]]$x)),c(at[myLevels[i]]+kernals[[i]]$y/vioWidth[i],rev(at[myLevels[i]]-kernals[[i]]$y/vioWidth[i])),col=fill[(i-1) %% length(fill) + 1],border=borderCol[(i-1) %% length(borderCol) + 1],lwd=borderWidth)
+      } else {
+        polygon(c(at[myLevels[i]]+kernals[[i]]$y/vioWidth[i],rev(at[myLevels[i]]-kernals[[i]]$y/vioWidth[i])),c(kernals[[i]]$x,rev(kernals[[i]]$x)),col=fill[(i-1) %% length(fill) + 1],border=borderCol[(i-1) %% length(borderCol) + 1],lwd=borderWidth)
+      }
     }
   }
 }

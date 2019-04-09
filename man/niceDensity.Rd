@@ -13,7 +13,7 @@ niceDensity(x, by = NULL, drawPoints = TRUE, groupNames = NULL,
   add = FALSE, minorGuides = NULL, extendTicks = TRUE,
   expLabels = FALSE, lWidth = NULL, na.rm = FALSE, verbose = FALSE,
   logAdjustment = 1, xLim = NULL, yLim = NULL,
-  strictLimits = FALSE, legend = FALSE, ...)
+  strictLimits = FALSE, legend = FALSE, trimCurves = TRUE, ...)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
@@ -79,6 +79,8 @@ niceDensity(x, by = NULL, drawPoints = TRUE, groupNames = NULL,
 \item{strictLimits}{logical; eliminates padding on the value axis so 0 can be flush with the x-axis. Defaults to \code{\link{FALSE}}.}
 
 \item{legend}{logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.}
+
+\item{trimCurves}{logical; Should the density curves be restricted to the min and max of the data.}
 
 \item{...}{additional options for S3 method variants}
 }
