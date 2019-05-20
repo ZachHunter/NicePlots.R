@@ -108,6 +108,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
         minorGuides<-FALSE
       }
     }
+    graphics.off()
     prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels, theme=theme, legend=legend, pointHighlights=pointHighlights,logAdjustment=logAdjustment)
   }
   pvalue<-NULL
@@ -128,6 +129,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
   }
 
   #Data is set and ready to go. Plotting is handled based on cases handling if 'x' and 'by' are vectors or dataframes
+
   if(is.numeric(prepedData[[1]])){
     #CASE: by is a factor and data is a numeric vector
     if(is.factor(by)) {
@@ -266,5 +268,6 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
   }
   par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)
   dataOut<-list(data=data.frame(prepedData$data,by),summary=plotData,stats=pvalue)
+
   invisible(dataOut)
 }

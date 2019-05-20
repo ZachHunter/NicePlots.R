@@ -153,103 +153,71 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
 #'
 #' @import dplyr
 #' @import tidyr
-#' @seealso \code{\link{niceBox}}, \code{\link{niceVio}}, \code{\link{niceDots}}
+#' @importFrom grDevices boxplot.stats
+#' @seealso \code{\link{niceBox}}, \code{\link{niceVio}}, \code{\link{niceDots}}, \code{\link[grDevices]{boxplot.stats}}
 prepNiceData<- function(prepedData,by, subGroup=FALSE,outliers=TRUE,filter,groupNames,plotLoc,width=1,flipFacts=FALSE,verbose=FALSE){
-  #CASE: by is a factor data is a numeric vector
+  #CASE: by is a factor; data is a numeric vector
   if(is.numeric(prepedData[[1]])){
     if(is.factor(by)) {
-      if(outliers==FALSE){
-        plotData<-bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
+      plotData<-bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
+        group_by(.data$fact) %>%
+        do(data.frame(t(boxplot.stats(.data$data,coef=outliers)$stats),n=length(.data$data))) %>%
+        ungroup() %>%
+        select(fact=.data$fact,n=n,min=.data$X1,q1=.data$X2,median=.data$X3,q3=.data$X4, max=.data$X5) %>%
+        mutate(at=plotLoc,width=.25*width)
+
+      if(verbose){print(select(plotData,.data$fact,.data$n,.data$median,.data$q1,.data$q3,.data$tmin,.data$tmax))}
+      return(plotData)
+    } else {
+      #CASE: by is not a factor; data is a numeric vector; subGroup is TRUE
+      if(subGroup) {
+        plotData<-bind_cols(data=prepedData[[1]],fact=by[filter,1],subGroup=by[filter,2]) %>%
+          group_by(.data$fact,.data$subGroup) %>%
+          do(data.frame(t(boxplot.stats(.data$data,coef=outliers)$stats),n=length(.data$data))) %>%
+          ungroup() %>%
+          select(fact=.data$fact,subGroup=.data$subGroup,n=n,min=.data$X1,q1=.data$X2,median=.data$X3,q3=.data$X4, max=.data$X5) %>%
+          mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."))
+
+        if(verbose){print(select(plotData,.data$fact,.data$subGroup,.data$n,.data$median,.data$q1,.data$q3,.data$min,.data$max))}
+        return(plotData)
+      } else {
+        #CASE: by is not a factor; data is a numeric vector; subGroup is FALSE
+        plotData<-bind_cols(data=prepedData[[1]],fact=by[filter,1]) %>%
           group_by(.data$fact) %>%
-          summarize(median=median(data),min=min(data),max=max(data),n=n(),q1=quantile(data,.25),q3=quantile(data,.75)) %>%
-          bind_cols(at=plotLoc,width=rep(.25*width,length(groupNames)))
+          do(data.frame(t(boxplot.stats(.data$data,coef=outliers)$stats),n=length(.data$data))) %>%
+          ungroup() %>%
+          select(fact=.data$fact,n=n,min=.data$X1,q1=.data$X2,median=.data$X3,q3=.data$X4, max=.data$X5) %>%
+          mutate(at=plotLoc,width=.25*width)
+
         if(verbose){print(select(plotData,.data$fact,.data$n,.data$median,.data$q1,.data$q3,.data$min,.data$max))}
         return(plotData)
-      } else {
-        plotData<-bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
-          group_by(.data$fact) %>%
-          summarize(median=median(data),tmin=min(data),min=min(quantileTrim(data,threshold=outliers)),tmax=max(data),max=max(quantileTrim(data,threshold=outliers)),n=n(),q1=quantile(data,.25),q3=quantile(data,.75)) %>%
-          bind_cols(at=plotLoc,width=rep(.25*width,length(groupNames)))
-        if(verbose){print(select(plotData,.data$fact,.data$n,.data$median,.data$q1,.data$q3,.data$tmin,.data$tmax))}
-        return(plotData)
-      }
-    } else {
-      #CASE: by is not a factor data is a numeric vector and subGroup is TRUE
-      if(subGroup) {
-        if(outliers==FALSE) {
-          plotData<-bind_cols(data=prepedData[[1]],fact=by[filter,1],subGroup=by[filter,2]) %>%
-            group_by(.data$fact,.data$subGroup) %>%
-            summarize(median=median(data),min=min(data),max=max(data),n=n(),q1=quantile(data,.25),q3=quantile(data,.75)) %>%
-            mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."))
-          if(verbose){print(select(plotData,.data$fact,.data$subGroup,.data$n,.data$median,.data$q1,.data$q3,.data$min,.data$max))}
-          return(plotData)
-        } else {
-          plotData<-bind_cols(data=prepedData[[1]],fact=by[filter,1],subGroup=by[filter,2]) %>%
-            group_by(.data$fact,.data$subGroup) %>%
-            summarize(median=median(data),tmin=min(data),min=min(quantileTrim(data,threshold=outliers)),tmax=max(data),max=max(quantileTrim(data,threshold=outliers)),n=n(),q1=quantile(data,.25),q3=quantile(data,.75)) %>%
-            mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."))
-          if(verbose){print(select(plotData,.data$fact,.data$subGroup,.data$n,.data$median,.data$q1,.data$q3,.data$tmin,.data$tmax))}
-          return(plotData)
-        }
-      } else {
-        #CASE: by is not a factor, data is a numeric vector and subGroup is FALSE
-        if(outliers==FALSE) {
-          plotData<-bind_cols(data=prepedData[[1]],fact=by[filter,1]) %>%
-            group_by(.data$fact) %>%
-            summarize(median=median(data),min=min(data),max=max(data),n=n(),q1=quantile(data,.25),q3=quantile(data,.75)) %>%
-            bind_cols(at=plotLoc,width=rep(.25*width,length(groupNames)))
-          if(verbose){print(select(plotData,.data$fact,.data$n,.data$median,.data$q1,.data$q3,.data$min,.data$max))}
-          return(plotData)
-        } else {
-          plotData<-bind_cols(data=prepedData[[1]],fact=by[filter,1]) %>%
-            group_by(.data$fact) %>%
-            summarize(median=median(data),tmin=min(data),min=min(quantileTrim(data,threshold=outliers)),tmax=max(data),max=max(quantileTrim(data,threshold=outliers)),n=n(),q1=quantile(data,.25),q3=quantile(data,.75)) %>%
-            bind_cols(at=plotLoc,width=rep(.25*width,length(groupNames)))
-          if(verbose){print(select(plotData,.data$fact,.data$n,.data$median,.data$q1,.data$q3,.data$tmin,.data$tmax))}
-          return(plotData)
-        }
       }
     }
   } else {
-    #CASE: data is a dataframe, by is a factor, subGroup is ignored
+    #CASE: data is a dataframe; by is a factor; subGroup is ignored
     if(is.factor(by)) {
-      if(outliers==FALSE) {
-        plotData<-bind_cols(prepedData[[1]],fact=by[filter]) %>%
-          tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
-          group_by(.data$fact,.data$subGroup) %>%
-          summarize(median=median(data),min=min(data),max=max(data),n=n(),q1=quantile(data,.25),q3=quantile(data,.75)) %>%
-          mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."))
-        if(verbose){print(select(plotData,.data$fact,.data$subGroup,.data$n,.data$median,.data$q1,.data$q3,.data$min,.data$max))}
-        return(plotData)
-      } else {
-        plotData<-bind_cols(prepedData[[1]],fact=by[filter]) %>%
-          tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
-          group_by(.data$fact,.data$subGroup) %>%
-          summarize(median=median(data),tmin=min(data),min=min(quantileTrim(data,threshold=outliers)),tmax=max(data),max=max(quantileTrim(data,threshold=outliers)),n=n(),q1=quantile(data,.25),q3=quantile(data,.75)) %>%
-          mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."))
-        if(verbose){print(select(plotData,.data$fact,.data$subGroup,.data$n,.data$median,.data$q1,.data$q3,.data$tmin,.data$tmax))}
-        return(plotData)
-      }
-    } else {
-      #CASE: data is a dataframe, by is a dataframe, subGroup is ignored
-      if(outliers==FALSE) {
-        plotData<-bind_cols(prepedData[[1]],fact=by[filter,1]) %>%
-          tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
-          group_by(.data$fact,.data$subGroup) %>%
-          summarize(median=median(data),min=min(data),max=max(data),n=n(),q1=quantile(data,.25),q3=quantile(data,.75)) %>%
-          mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."))
-        if(verbose){print(select(plotData,.data$fact,.data$subGroup,.data$n,.data$median,.data$q1,.data$q3,.data$min,.data$max))}
-        return(plotData)
+      plotData<-bind_cols(prepedData[[1]],fact=by[filter]) %>%
+        tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
+        group_by(.data$fact,.data$subGroup) %>%
+        do(data.frame(t(boxplot.stats(.data$data,coef=outliers)$stats),n=length(.data$data))) %>%
+        ungroup() %>%
+        select(fact=.data$fact,subGroup=.data$subGroup,n=n,min=.data$X1,q1=.data$X2,median=.data$X3,q3=.data$X4, max=.data$X5) %>%
+        mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."))
 
-      } else {
-        plotData<-bind_cols(prepedData[[1]],fact=by[filter,1]) %>%
-          tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
-          group_by(.data$fact,.data$subGroup) %>%
-          summarize(median=median(data),tmin=min(data),min=min(quantileTrim(data,threshold=outliers)),tmax=max(data),max=max(quantileTrim(data,threshold=outliers)),n=n(),q1=quantile(data,.25),q3=quantile(data,.75)) %>%
-          mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."))
-        if(verbose){print(select(plotData,.data$fact,.data$subGroup,.data$n,.data$median,.data$q1,.data$q3,.data$tmin,.data$tmax))}
-        return(plotData)
-      }
+      if(verbose){print(select(plotData,.data$fact,.data$subGroup,.data$n,.data$median,.data$q1,.data$q3,.data$min,.data$max))}
+      return(plotData)
+    } else {
+      #CASE: data is a dataframe; by is a dataframe; subGroup is ignored
+      plotData<-bind_cols(prepedData[[1]],fact=by[filter,1]) %>%
+        tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
+        group_by(.data$fact,.data$subGroup) %>%
+        do(data.frame(t(boxplot.stats(.data$data,coef=outliers)$stats),n=length(.data$data))) %>%
+        ungroup() %>%
+        select(fact=.data$fact,subGroup=.data$subGroup,n=n,min=.data$X1,q1=.data$X2,median=.data$X3,q3=.data$X4, max=.data$X5) %>%
+        mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."))
+
+      if(verbose){print(select(plotData,.data$fact,.data$subGroup,.data$n,.data$median,.data$q1,.data$q3,.data$min,.data$max))}
+      return(plotData)
     }
   }
 }

@@ -139,6 +139,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
     if(is.null(xlab)) {xlab<-colnames(x)[1]}
     if(is.null(ylab)) {ylab<-colnames(x)[2]}
     if(add[1]==FALSE) {
+      graphics.off()
       x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
       title(main=main,sub=sub,ylab=ylab,xlab=xlab)
     }
@@ -197,6 +198,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
       minx<-min(map_dbl(densities, function(z) min(z$x)))
       maxy<-max(map_dbl(densities, function(z) max(z$y)))
       if(add[1]==FALSE) {
+        graphics.off()
         test<-prepNiceWindow(data.frame(x=x,y=x), by, minorTick=minorTick, guides=guides, yLim=c(0,maxy), xLim=c(minx,maxx), rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
         title(main=main,sub=sub,ylab=ylab,xlab=xlab)
       }
@@ -214,6 +216,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
       minx<-min(densities$x)
       maxy<-max(densities$y)
       if(add[1]==FALSE) {
+        graphics.off()
         test<-prepNiceWindow(data.frame(x=x,y=x), by, minorTick=minorTick, guides=guides, yLim=c(0,maxy), xLim=c(minx,maxx), rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
         title(main=main,sub=sub,ylab=ylab,xlab=xlab)
       }

@@ -47,5 +47,5 @@ data<-list(data=iris[,1:4])
 
 }
 \seealso{
-\code{\link{niceBox}}, \code{\link{niceVio}}, \code{\link{niceDots}}
+\code{\link{niceBox}}, \code{\link{niceVio}}, \code{\link{niceDots}}, \code{\link[grDevices]{boxplot.stats}}
 }
