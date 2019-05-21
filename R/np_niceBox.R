@@ -68,6 +68,11 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
   lWidth<-NULL
   whiskerLineType<-NULL
   capWidth<-NULL
+
+  #This is to make sure multivariate unput to X is ploted as a primary factor if subGroup==FALSE
+  if(is.data.frame(x) | is.matrix(x)) {
+    if(dim(x)[2]>1 & subGroup==FALSE) {flipFacts<-TRUE}
+  }
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = flipFacts)
   x<-checked$d
   by<-checked$b
