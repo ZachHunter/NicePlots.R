@@ -47,14 +47,14 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
       } else {
         by<-factor(by)
       }
-    } else if(is.data.frame(by)){
+    } else if(tibble::is.tibble(by)) {
+      by<-as.data.frame(by)
       if(dim(by)[2]>1) {
         for(i in 1:dim(by)[2]){by[,i]<-factor(by[,i])}
       } else {
         by<-factor(by[,1])
       }
-    } else if(tibble::is.tibble(by)) {
-      by<-as.data.frame(by)
+    } else if(is.data.frame(by)){
       if(dim(by)[2]>1) {
         for(i in 1:dim(by)[2]){by[,i]<-factor(by[,i])}
       } else {
