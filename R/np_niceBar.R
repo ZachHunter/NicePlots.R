@@ -55,9 +55,13 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   lWidth<-NULL
   whiskerLineType<-NULL
   capWidth<-NULL
+<<<<<<< HEAD
   if(is.data.frame(x) | is.matrix(x)) {
     if(dim(x)[2]>1 & subGroup==FALSE) {flipFacts<-TRUE}
   }
+=======
+  if((is.data.frame(x) | is.matrix(x)) & dim(x)[2]>1 & subGroup==FALSE) {flipFacts<-TRUE}
+>>>>>>> 87a92e254b7df1ff7c3d0edffc7df910db5e81de
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = flipFacts)
   x<-checked$d
   by<-checked$b
