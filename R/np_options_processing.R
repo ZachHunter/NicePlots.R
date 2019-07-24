@@ -373,7 +373,7 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
       plotColors$vioBoxLineCol<-plotColors$vioBoxLineCol[1:myLevels][cFilter]
     }
   }
-  #If left blank by the user, colors and shapes are adjust so that the repeat based on factor levels
+  #If left blank by the user, colors and shapes are adjusted so that the repeat based on factor levels
   if(length(pointShape)>1 & defaultShapes==FALSE){pointShape<-pointShape[1:myLevels]}
   if(length(plotColors$points)>1 & defaultPoints==FALSE){plotColors$points<-plotColors$points[1:myLevels]}
 

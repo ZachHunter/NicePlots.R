@@ -99,7 +99,7 @@ prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TR
           legendTitle<-colnames(by)[legendIndex]
           legendLevels<-levels(by[,legendIndex])
         } else {
-          warning(paste0("Warning: Unable to determine level which factor to use for legend.\nExpected ",legendIndex," columns for by but only found ",dim(by)[2],".\nProceeding  using the 2nd column of by."))
+          warning(paste0("Warning: Unable to determine level which factor to use for legend.\nExpected ",legendIndex," columns for by but only found ",dim(by)[2],".\nProceeding  using the 2nd column of by."), call.=FALSE)
           legendTitle<-colnames(by)[2]
           legendLevels<-levels(by[,2])
         }
@@ -176,58 +176,6 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
 
   #Set margins for legends now
   prepLegendMarigins(x=x,by=by,theme=theme,legend=legend,pointHighlights=pointHighlights,subGroup=subGroup)
-  # legendIndex<-NA
-  # legendTitle<-""
-  # legendSize<-.66
-  # legendLevels<-NULL
-  # if(!is.na(theme[1])){
-  #   legendSize<-theme$LegendSize
-  # }
-  # if(legend!=FALSE) {
-  #   maxLabelW<-0
-  #   maxLabelH<-0
-  #   if(pointHighlights==FALSE & subGroup==TRUE) {
-  #     legendIndex<-2
-  #   } else if(pointHighlights==TRUE & subGroup==TRUE) {
-  #     legendIndex<-3
-  #   } else if(pointHighlights==TRUE & subGroup==FALSE) {
-  #     legendIndex<-2
-  #   }
-  #   if(is.data.frame(x)){
-  #     if(is.data.frame(by) & pointHighlights==TRUE){
-  #       legendTitle<-colnames(by)[2]
-  #       legendLevels<-levels(by[,2])
-  #     } else {
-  #       legendTitle<-"Legend"
-  #       legendLevels<-colnames(x)
-  #     }
-  #   } else {
-  #     if(is.data.frame(by)){
-  #       if(dim(by)[2]>=legendIndex) {
-  #         legendTitle<-colnames(by)[legendIndex]
-  #         legendLevels<-levels(by[,legendIndex])
-  #       } else {
-  #         warning(paste0("Warning: Unable to determine level which factor to use for legend.\nExpected ",legendIndex," columns for by but only found ",dim(by)[2],".\nProceeding  using the 2nd column of by."))
-  #         legendTitle<-colnames(by)[2]
-  #         legendLevels<-levels(by[,2])
-  #       }
-  #     } else {
-  #       legendTitle<-"Legend"
-  #       legendLevels<-levels(by)
-  #     }
-  #   }
-  #   if(!(is.na(legend) | is.null(legend) | legend==TRUE)) {
-  #     legendTitle<-legend
-  #   }
-  #   maxLabelW<-purrr::map_dbl(legendLevels,strwidth,cex=legendSize,units="in") %>% max()
-  #   titleW<-strwidth(legendTitle,font=2,cex=legendSize,units="in")
-  #   if(titleW>maxLabelW){maxLabelW<-titleW}
-  #   maxLabelH<-purrr::map_dbl(legendLevels, strheight,cex=legendSize,units="in") %>% max()
-  #   titleH<-strheight(legendTitle,font=2,cex=legendSize,units="in")
-  #   nMai<-oMai
-  #   nMai[4]<-nMai[4]+maxLabelW
-  #   par(mai=nMai)
-  # }
 
   #capture data range for plot formating
   dataRange<-NULL

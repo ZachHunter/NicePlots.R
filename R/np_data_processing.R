@@ -21,7 +21,7 @@
 dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
   if(is.vector(data)){
     if(is.list(data)){
-      warning("List provided as data: unlisting and attempting to proceed but use with caution.\nUnlist data to silence this warning.")
+      warning("List provided as data: unlisting and attempting to proceed but use with caution.\nUnlist data to silence this warning.", call.=FALSE)
       data<-as.numeric(unlist(data))
     } else {
       data<-as.numeric(data)
@@ -37,12 +37,12 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
   } else if(is.data.frame(data)){
     for(i in 1:dim(data)[2]){data[,i]<-as.numeric(as.character(data[,i]))}
   } else {
-    warning(paste0("Data type not recognized.\nClasses observered: ",class(data)))
+    warning(paste0("Data type not recognized.\nClasses observered: ",class(data)), call.=FALSE)
   }
   if(!is.factor(by)){
     if(is.vector(by)){
       if(is.list(by)) {
-        warning("List provided as a factor for by: unlisting and attempting to proceed but use with caution.\nUnlist data to silence this warning.")
+        warning("List provided as a factor for by: unlisting and attempting to proceed but use with caution.\nUnlist data to silence this warning.", call.=FALSE)
         by<-factor(unlist(by))
       } else {
         by<-factor(by)
@@ -74,7 +74,7 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
         by<-factor(rep("Group",length(data)))
       }
     } else {
-      warning(paste0("By factor input type not recognized.\nClasses observered: ",class(by)))
+      warning(paste0("By factor input type not recognized.\nClasses observered: ",class(by)),call.=FALSE)
     }
   }
   if(na.rm==TRUE){
@@ -100,7 +100,7 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
       by<-by[!naFilter,]
       for(i in 1:dim(by)[2]){by[,i]<-factor(by[,i])}
     }
-    warning(paste("NAs detected in data input.",sum(naFilter),"observations removed."))
+    warning(paste("NAs detected in data input.",sum(naFilter),"observations removed."), call.=FALSE)
   }
   #The default handling for data is for the column names of an input dataframe to be used
   #as the default secondary factor. with by taking priority. This changes the order prior to plotting.

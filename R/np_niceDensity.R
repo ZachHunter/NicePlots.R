@@ -41,7 +41,7 @@ niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subGroup=FAL
 #' @importFrom graphics polygon contour lines persp
 #' @export
 niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGroup=FALSE, useRgl=TRUE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), showCalc=FALSE, calcType="none", rotateLabels=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, ...)  {
-  if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset")}
+  if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset",call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = FALSE)
@@ -139,7 +139,8 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
     if(is.null(xlab)) {xlab<-colnames(x)[1]}
     if(is.null(ylab)) {ylab<-colnames(x)[2]}
     if(add[1]==FALSE) {
-      graphics.off()
+      #RStudio seems not to update the graphics devices properly
+      if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
       x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
       title(main=main,sub=sub,ylab=ylab,xlab=xlab)
     }
@@ -198,7 +199,8 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
       minx<-min(map_dbl(densities, function(z) min(z$x)))
       maxy<-max(map_dbl(densities, function(z) max(z$y)))
       if(add[1]==FALSE) {
-        graphics.off()
+        #RStudio seems not to update the graphics devices properly
+        if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
         test<-prepNiceWindow(data.frame(x=x,y=x), by, minorTick=minorTick, guides=guides, yLim=c(0,maxy), xLim=c(minx,maxx), rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
         title(main=main,sub=sub,ylab=ylab,xlab=xlab)
       }
@@ -216,7 +218,8 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
       minx<-min(densities$x)
       maxy<-max(densities$y)
       if(add[1]==FALSE) {
-        graphics.off()
+        #RStudio seems not to update the graphics devices properly
+        if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
         test<-prepNiceWindow(data.frame(x=x,y=x), by, minorTick=minorTick, guides=guides, yLim=c(0,maxy), xLim=c(minx,maxx), rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
         title(main=main,sub=sub,ylab=ylab,xlab=xlab)
       }
@@ -228,7 +231,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
   #Draw legend and set associated options if indicated
   if(length(legendColors)<length(legendLabels) & legend!=FALSE){
     legend<-FALSE
-    warning("Not enough point colors to uniquely color subGroups levels\nPlease update plotColors point options to use legend options with this subgroup.")
+    warning("Not enough point colors to uniquely color subGroups levels\nPlease update plotColors point options to use legend options with this subgroup.", call.=FALSE)
   }
 
   if(legend!=FALSE) {

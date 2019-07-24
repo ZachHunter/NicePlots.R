@@ -272,7 +272,7 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
       points(x=distData$spread,y=distData$data,pch=shape[shapeSelector],col=col[colSelector],cex=size[sizeSelector])
     }
   } else {
-    warning(paste0("drawPoints argument type=",type," is not a recognized option.\nPlease set to either 'jitter', 'linear', 'beeswarm', or 'distribution'"))
+    warning(paste0("drawPoints argument type=",type," is not a recognized option.\nPlease set to either 'jitter', 'linear', 'beeswarm', or 'distribution'"), call.=FALSE)
   }
 }
 
@@ -386,7 +386,7 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
   #This section builds out the color list to match the number of factors for stacted barplots
   if(stacked){
     if(length(colorOrder)<length(levels(x$fact))) {
-      warning("There are fewer colors in plotColors$fill than factor levels for stacking. Stacks will have repeated colors. Use plotColors=list(fill=c(...)) to make a custom color vector.")
+      warning("There are fewer colors in plotColors$fill than factor levels for stacking. Stacks will have repeated colors. Use plotColors=list(fill=c(...)) to make a custom color vector.", call. = FALSE)
       colorOrder<-as.character(rep(colorOrder,1+trunc(length(levels(x$fact))/length(colorOrder)))[1:length(levels(x$fact))])
     } else {
       colorOrder<-as.character(colorOrder[1:length(levels(x$fact))])
