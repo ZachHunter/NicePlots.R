@@ -78,6 +78,11 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   groupNames<-finalOptions$groupNames
   errorCap<-finalOptions$errorCap
 
+  #If fill colors are needed to distinguish groups but are of length 1, point colors will be used if it has more levels.
+  if(length(plotColors$fill)<=1 & length(plotColors$lines)<=1 & length(plotColors$points)>1 & (subGroup==T | stack == T)) {
+    plotColors$fill<-plotColors$points
+  }
+
   #To handle the fact the range is actually two different functions, upper and lower error bars are assined separately
   upperErrorFun<-errFun[1]
   lowerErrorFun<-errFun[1]
@@ -125,7 +130,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   } else {
     prepedData<-x
     #in order to know how to set the window size, we need to preprocess the data
-    if(logScale>1) {prepedData<-log(prepedData+logAdjustment,logScale)}
+    #if(logScale>1) {prepedData<-log(prepedData+logAdjustment,logScale)}
     pData<-prepBarData(x=prepedData,by=by,errorMultiple=errorMultiple,upperErrorFun=upperErrorFun,lowerErrorFun=lowerErrorFun,aggFunction=aggFun,stack=stack,subGroup=subGroup)
 
     #If all aggregated values are >= 0 then we want to interect the y-axis exactly at zero
