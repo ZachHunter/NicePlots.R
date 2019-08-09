@@ -3,8 +3,8 @@
 \docType{data}
 \name{npColorTheme}
 \alias{npColorTheme}
-\title{Nice Plots Theme: Colors}
-\format{An object of class \code{npTheme} (inherits from \code{list}) of length 46.}
+\title{NicePlots Theme: Colors}
+\format{An object of class \code{npTheme} (inherits from \code{list}) of length 48.}
 \usage{
 npColorTheme
 }

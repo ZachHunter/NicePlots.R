@@ -142,7 +142,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
       #RStudio seems not to update the graphics devices properly
       if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
       x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
-      title(main=main,sub=sub,ylab=ylab,xlab=xlab)
+      title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$numbers)
     }
     den2D<-bkde2D(as.matrix(x[,1:2]),bandwidth=c(dpih(x[,1],gridsize=curvePoints),dpih(x[,2],gridsize=curvePoints),gridsize=c(curvePoints,curvePoints)))
     if(plotType[1]=="contour") {
@@ -173,7 +173,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
     }
   } else {
     if(logScaleX+logScaleY!=0) {
-      x<-log(x + logAdjustment, max(logScaleX+logScaleY))
+       x<-log(x + logAdjustment, logScaleX)
     }
     if(is.null(ylab)) {ylab<-"Density"}
     if(!is.null(by) & subGroup==TRUE){
@@ -201,8 +201,8 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
       if(add[1]==FALSE) {
         #RStudio seems not to update the graphics devices properly
         if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
-        test<-prepNiceWindow(data.frame(x=x,y=x), by, minorTick=minorTick, guides=guides, yLim=c(0,maxy), xLim=c(minx,maxx), rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
-        title(main=main,sub=sub,ylab=ylab,xlab=xlab)
+        test<-prepNiceWindow(data.frame(x=x,y=x), by, minorTick=minorTick, guides=guides, yLim=c(0,maxy), xLim=c(minx,maxx), rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=FALSE, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
+        title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$numbers)
       }
       #plot(-1,-1,type="n",xlim=c(minx,maxx),ylim=c(0,maxy),main=main,sub=sub,ylab=ylab)
       if(!is.na(plotColors$fill[1]) & !is.null(plotColors$fill[1])){

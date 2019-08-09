@@ -308,9 +308,9 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       sub<-pvalue
     }
     if(sidePlot) {
-      title(main=main,xlab=ylab,sub=sub)
+      title(main=main,col.main=plotColors$title,sub=sub,col.sub=plotColors$subtext,xlab=ylab,col.lab=plotColors$numbers)
     } else {
-      title(main=main,sub=sub,ylab=ylab)
+      title(main=main,col.main=plotColors$title,sub=sub,col.sub=plotColors$subtext,ylab=ylab,col.lab=plotColors$numbers)
     }
   }
   par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)

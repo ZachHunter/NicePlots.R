@@ -281,6 +281,17 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
   whichSide<-1
   groupCex<-1
   subGroupCex<-.66
+  groupLine<-.9
+  subGroupLine<-.25
+  if(!is.na(theme[1])){
+    groupCex<-theme$groupLabSize
+    subGroupCex<-theme$subGroupLabSize
+    groupLine<-theme$groupLabelSpacing
+    subGroupLine<-theme$subgroupLabelSpacing
+  }
+  sideGroupLine<-groupLine+.33
+  sideSubGroupLine<-subGroupLine+.33
+  axisNumCol<-plotColors$label
   if(!is.na(theme[1])){
     if(is.numeric(theme$groupLabSize)){
       groupCex<-theme$groupLabSize
@@ -294,17 +305,23 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
     if(is.null(subGroupLabels)){subGroupLabels<-names(x)}
     if(sidePlot) {
       if(legend==FALSE | pointHighlights==TRUE) {
-        axis(side=2,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,line=.85,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
-        axis(side=2,at=subLabLoc,labels=rep(subGroupLabels,length(groupNames)),lwd=0,lwd.ticks=1,cex.axis=subGroupCex,col=plotColors$axis,col.ticks=plotColors$minorTicks)
+        axis(side=2,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
+        mtext(side=2, at=seq(1:levelCount), text=groupNames,las=rotateLabels, col=plotColors$labels,line=sideGroupLine ,cex=groupCex)
+        axis(side=2,at=subLabLoc,labels=F,lwd=0,lwd.ticks=1,cex.axis=subGroupCex,col=plotColors$axis,col.ticks=plotColors$majorTick)
+        mtext(side=2,at=subLabLoc,text=rep(subGroupLabels,length(groupNames)),cex=subGroupCex, line=sideSubGroupLine, col=plotColors$subGroupLabels)
       } else {
-        axis(side=2,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
+        axis(side=2,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
+        mtext(side=2,at=seq(1:levelCount),line=groupLine, text=groupNames,las=rotateLabels, col=plotColors$labels,cex=theme$groupLabSize)
       }
     } else {
       if(legend==FALSE | pointHighlights==TRUE) {
-        axis(side=1,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,line=.85,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
-        axis(side=1,at=subLabLoc,labels=rep(subGroupLabels,length(groupNames)),lwd=0,lwd.ticks=1,cex.axis=0.66,col=plotColors$axis,col.ticks=plotColors$minorTicks,cex.axis=subGroupCex)
+        axis(side=1,at=seq(1:levelCount),labels=FALSE,las=rotateLabels,lwd=0,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
+        mtext(side=1,at=seq(1:levelCount),text = groupNames,las=rotateLabels, col=plotColors$labels,line=groupLine ,cex=groupCex)
+        axis(side=1,at=subLabLoc,labels=F,lwd=0,lwd.ticks=1,cex.axis=subGroupCex,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=theme$subGroupLabSize)
+        mtext(text=rep(subGroupLabels,length(groupNames)),at=subLabLoc,side=1,line=subGroupLine,col=plotColors$subGroupLabels, cex=subGroupCex)
       } else {
-        axis(side=1,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
+        axis(side=1,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
+        mtext(side=1,at=seq(1:levelCount),line=groupLine-.15,text=groupNames,cex=theme$groupLabSize,col=plotColors$labels,las=rotateLabels)
       }
       whichSide<-2
     }
@@ -313,25 +330,33 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
     if(is.null(subGroupLabels)){subGroupLabels<-levels(by[,2])}
     if(sidePlot) {
       if(legend==FALSE | (legend!=FALSE & pointHighlights==TRUE)) {
-        axis(side=2,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,line=.85,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
-        axis(side=2,at=subLabLoc,labels=rep(subGroupLabels,length(groupNames)),lwd=0,lwd.ticks=1,cex.axis=0.66,col=plotColors$axis,col.ticks=plotColors$minorTicks,cex.axis=subGroupCex)
+        axis(side=2,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
+        mtext(side=2,at=seq(1:levelCount),text=groupNames,las=rotateLabels,line=sideGroupLine, col=plotColors$labels,cex=groupCex)
+        axis(side=2,at=subLabLoc,labels=F,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=subGroupCex)
+        mtext(side=2,at=subLabLoc,text=rep(subGroupLabels,length(groupNames)),line=sideSubGroupLine, cex=subGroupCex,col=plotColors$subGroupLabels)
       } else {
-        axis(side=2,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
+        axis(side=2,at=seq(1:levelCount),,labels=F,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
+        mtext(side=2,at=seq(1:levelCount),line=groupLine,text=groupNames,las=rotateLabels,cex=groupCex,col=plotColors$labels)
       }
     } else {
       if(legend==FALSE | (legend!=FALSE & pointHighlights==TRUE)) {
-        axis(side=1,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,line=.85,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
-        axis(side=1,at=subLabLoc,labels=rep(subGroupLabels,length(groupNames)),lwd=0,lwd.ticks=1,cex.axis=0.66,col=plotColors$axis,col.ticks=plotColors$minorTicks,cex.axis=subGroupCex)
+        axis(side=1,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
+        mtext(side=1,at=seq(1:levelCount),text=groupNames,las=rotateLabels,line=groupLine,col=plotColors$labels, cex=groupCex)
+        axis(side=1,at=subLabLoc,labels=F,lwd=0,lwd.ticks=1,cex.axis=theme$subGroupLabSize,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=subGroupCex)
+        mtext(side=1,at=subLabLoc,text=rep(subGroupLabels,length(groupNames)),line=subGroupLine,cex=subGroupCex,col=plotColors$subGroupLabels)
       } else {
-        axis(side=1,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
+        axis(side=1,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
+        mtext(side=1,line=groupLine-.15,at=seq(1:levelCount),text=groupNames,las=rotateLabels,col=plotColors$labels,cex=groupCex)
       }
       whichSide<-2
     }
   } else {
     if(sidePlot) {
-      axis(side=2,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
+      axis(side=2,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
+      mtext(side=2,at=seq(1:levelCount),line=groupLine,text=groupNames,las=rotateLabels,col=plotColors$labels,cex=groupCex)
     } else {
-      axis(side=1,at=seq(1:levelCount),labels=groupNames,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
+      axis(side=1,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
+      mtext(side=1,at=seq(1:levelCount),line=groupLine-.15,text=groupNames,las=rotateLabels,col=plotColors$labels,cex=groupCex)
       whichSide<-2
     }
   }
@@ -402,17 +427,17 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
       }
     }
     if(sidePlot) {
-      axis(side = 1, at = minorLoc, labels = FALSE, tcl = -0.2,col=plotColors$axis,col.ticks=plotColors$minorTicks)
+      axis(side = 1, at = minorLoc, labels = FALSE, tcl = -0.2,col=plotColors$axis ,col.ticks=plotColors$minorTick)
     } else {
-      axis(side = 2, at = minorLoc, labels = FALSE, tcl = -0.2,col=plotColors$axis,col.ticks=plotColors$minorTicks)
+      axis(side = 2, at = minorLoc, labels = FALSE, tcl = -0.2,col=plotColors$axis,col.ticks=plotColors$minorTick)
     }
   }
   clCex<-par()$cex.axis
   par(cex.axis=labelCex)
   if (sidePlot) {
-    axis(side=1,labels=myLabels,at=myMajorTicks,las=rotateY,col=plotColors$axis,col.ticks=plotColors$majorTicks)
+    axis(side=1,labels=myLabels,at=myMajorTicks,las=rotateY,col=plotColors$axis,col.axis=axisNumCol,col.ticks=plotColors$majorTick)
   } else {
-    axis(side=2,labels=myLabels,at= myMajorTicks,las=rotateY,col=plotColors$axis,col.ticks=plotColors$majorTicks)
+    axis(side=2,labels=myLabels,at= myMajorTicks,las=rotateY,col=plotColors$axis,col.axis=axisNumCol,col.ticks=plotColors$majorTick)
   }
   par(cex.axis=clCex)
   if(guides[1]!=FALSE){
@@ -585,6 +610,8 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
     }
   }
 
+  minorLocY<-NULL
+  minorLocX<-NULL
   if (minorTick > 0) {
     lowerLimY<-par("usr")[3]
     upperLimY<-par("usr")[4]
@@ -714,7 +741,7 @@ makeNiceLegend<-function(labels, title="Legend", fontCol="black", border=NULL, l
     startH<-par("usr")[4]-iRange/3/ConvertH + totalLegendH/2/ConvertH
   }
   if(!is.null(border)){
-    rect(LegendCo-oMai[4]/9/ConvertW,startH-totalLegendH/ConvertH-oMai[4]/9/ConvertH*2,LegendCo+ maxLabelW/ConvertW+oMai[4]/9/ConvertW, startH+oMai[4]/9/ConvertH*2,col=bg,border=border)
+    rect(LegendCo-oMai[4]/9/ConvertW,startH-totalLegendH/ConvertH-oMai[4]/9/ConvertH*1.1,LegendCo+maxLabelH/ConvertW+maxLabelW/ConvertW+oMai[4]/9/ConvertW*2, startH+oMai[4]/9/ConvertH*2,col=bg,border=border)
   }
   text(LegendCo, startH, label=title,cex=size, font=2, offset=0, pos=4, col=fontCol)
   for(i in 1:length(labels)){

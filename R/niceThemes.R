@@ -1,6 +1,6 @@
 #Themes
 #' @include np_options_processing.R np_utility.R
-#' @title Nice Plots Theme: Basic
+#' @title NicePlots Theme: Basic
 #' @description This is the default theme for nicePlots
 #' @details This default theme has uses transparent solid circles for point overlays with up to 8 colors.
 #' Fill and line options as constant.
@@ -9,7 +9,9 @@ basicTheme<- list(
   #General Plot Settings
   fontFamily="sans", #Possible values: 'sans', 'mono', or 'serif'
   groupLabSize=1, #Label cex for the primary group labels
-  subGroupLabSize=.6, #Label cex for subgroup labels
+  subGroupLabSize=.66, #Label cex for subgroup labels
+  groupLabelSpacing=.9, #distance of group labels from axis in lines
+  subgroupLabelSpacing=.3, #distance of subgroup labels from axis in lines
   yAxisLabSize=.9, #Label cex for y-axis tick labels
   axisLabelSize=1, #overall axis label cex (ei, not the tick mark labels)
   titleSize=1.2, #Plot title cex
@@ -69,6 +71,9 @@ basicTheme<- list(
     axis="black", #Axis color
     majorTick="black", #Major tick mark color
     minorTick="black", #Minor tick mark color
+    title="black", #Title color
+    numbers="black", #Color of y-axis numbers
+    subtext="black", #Color of sub text
     labels="black", #label color
     subGroupLabels="black", #color of subgroups
     vioBoxFill=setAlpha("black",.8), #Color of interquartile box for violin plots
@@ -77,7 +82,7 @@ basicTheme<- list(
 )
 class(basicTheme)<-c("npTheme","list")
 
-#' @title Nice Plots Theme: Colors
+#' @title NicePlots Theme: Colors
 #' @description A more colorful and sparse option compared to the default
 #' @details This theme uses fill, line, and point colors. Not a good option for \code{pointHighlights}
 #' @export
@@ -86,6 +91,8 @@ npColorTheme<- list(
   fontFamily="serif", #Possible values: 'sans', 'mono', or 'serif'
   groupLabSize=1, #Label cex for the primary group labels
   subGroupLabSize=.6, #Label cex for subgroup labels
+  groupLabelSpacing=.9, #distance of group labels from axis in lines
+  subgroupLabelSpacing=.3, #distance of subgroup labels from axis in lines
   yAxisLabSize=.9, #Label cex for y-axis tick labels
   axisLabelSize=1, #overall axis label cex (ei, not the tick mark labels)
   titleSize=1.2, #Plot title cex
@@ -145,6 +152,9 @@ npColorTheme<- list(
     axis="black", #Axis color
     majorTick="black", #Major tick mark color
     minorTick="black", #Minor tick mark color
+    title="black", #Title color
+    numbers="black", #Color of y-axis numbers
+    subtext="black", #Color of sub text
     labels="black", #label color
     subGroupLabels="black", #color of subgroups
     vioBoxFill=purrr::map_chr(RColorBrewer::brewer.pal(9,"Set1"),function(x) setAlpha(x,.3)), #Color of interquartile box for violin plots
@@ -153,7 +163,7 @@ npColorTheme<- list(
 )
 class(npColorTheme)<-c("npTheme","list")
 
-#' @title Nice Plots Theme: Stata Like
+#' @title NicePlots Theme: Stata Like
 #' @description Looks a bit like stata plots
 #' @details Todo
 #' @export
@@ -162,6 +172,8 @@ npStataTheme<- list(
   fontFamily="sans", #Possible values: 'sans', 'mono', or 'serif'
   groupLabSize=1, #Label cex for the primary group labels
   subGroupLabSize=.6, #Label cex for subgroup labels
+  groupLabelSpacing=.9, #distance of group labels from axis in lines
+  subgroupLabelSpacing=.3, #distance of subgroup labels from axis in lines
   yAxisLabSize=.9, #Label cex for y-axis tick labels
   axisLabelSize=1, #overall axis label cex (ei, not the tick mark labels)
   titleSize=1.2, #Plot title cex
@@ -221,6 +233,9 @@ npStataTheme<- list(
     axis="black", #Axis color
     majorTick="black", #Major tick mark color
     minorTick="black", #Minor tick mark color
+    title="black", #Title color
+    numbers="black", #Color of y-axis numbers
+    subtext="black", #Color of sub text
     labels="black", #label color
     subGroupLabels="black", #color of subgroups
     vioBoxFill=setAlpha("black",.8), #Color of interquartile box for violin plots
@@ -229,7 +244,7 @@ npStataTheme<- list(
 )
 class(npStataTheme)<-c("npTheme","list")
 
-#' @title Nice Plots Theme: ggPlot Like
+#' @title NicePlots Theme: ggPlot Like
 #' @description Looks a bit like stata plots
 #' @details Todo
 #' @export
@@ -238,6 +253,8 @@ npGGTheme<- list(
   fontFamily="serif", #Possible values: 'sans', 'mono', or 'serif'
   groupLabSize=1, #Label cex for the primary group labels
   subGroupLabSize=.6, #Label cex for subgroup labels
+  groupLabelSpacing=.9, #distance of group labels from axis in lines
+  subgroupLabelSpacing=.3, #distance of subgroup labels from axis in lines
   yAxisLabSize=.9, #Label cex for y-axis tick labels
   axisLabelSize=1, #overall axis label cex (ei, not the tick mark labels)
   titleSize=1.2, #Plot title cex
@@ -297,6 +314,9 @@ npGGTheme<- list(
     axis="darkgrey", #Axis color
     majorTick="darkgrey", #Major tick mark color
     minorTick="darkgrey", #Minor tick mark color
+    title="black", #Title color
+    numbers="black", #Color of y-axis numbers
+    subtext="black", #Color of sub text
     labels="black", #label color
     subGroupLabels="black", #color of subgroups
     vioBoxFill=setAlpha("black",.8), #Color of interquartile box for violin plots
@@ -304,3 +324,67 @@ npGGTheme<- list(
   ))
 )
 class(npGGTheme)<-c("npTheme","list")
+
+
+#' @title Find Themes
+#' @description Find NicePlot Themes Availble in the Namespace
+#'
+#' @details
+#' This function takes the output of \code{\link{search}()} to check for variables that are members of \code{npTheme} \link{class}.
+#' These variable names are then returned by the function.
+#'
+#' @examples
+#' npThemes()
+#' newBasic<-basicTheme
+#' newBasic$plotColors$lines=rainbow(10)
+#' npThemes()
+#' @import dplyr
+#' @importFrom purrr map map_lgl reduce
+#' @export
+#' @seealso \code{\link{search}}, \code{\link{class}}
+npThemes<-function() {
+  loadedNames<-map(search(),function(e) ls(name=e)) %>% reduce(.f=c)
+  loadedNames[map_lgl(loadedNames,function(n) "npTheme" %in% do.call("class",list(x=as.symbol(n))))]
+}
+
+
+#' @title Creat a NicePlots Theme
+#' @description
+#' Makes a new \code{NicePlots} theme off of an existing template
+#'
+#' @details
+#' Useing an exisiting template, this function updates all of the options theme options
+#' supplied in \code{...}. To see the theme options, print an existing theme to the console.
+#' You can see the available themes using the \code{\link{npThemes}} function.
+#'
+#' @param theme list; A \code{NicePlots} plotColor list from a theme or a list with values corresponding to the plotColor options you wish to update.
+#' @param plotColors list; a named list of vectors of colors that set the color options for all NicePlot functions. Names left unspecified will be added and set to default values automatically.
+#' @param ... All theme options can be set but as if they were comma separted funcitonal arguments. See example for details.
+#'
+#' @return A \code{NicePlots} theme of class "npTheme".
+#' @examples
+#' data(iris)
+#' npThemes()
+#' myTheme<-newNPTheme(theme=npColorTheme,
+#'    plotColors=list(lines=c("darkgrey")),
+#'    pointMethodBP="beeswarm")
+#' npThemes()
+#' niceBox(iris[,1:2],iris$Species,subGroup=TRUE,legend=TRUE,theme=myTheme)
+#' @seealso \code{\link{npThemes}}
+#' @export
+newNPTheme<-function(theme=basicTheme, plotColors=NULL,...){
+  if("npTheme" %in% class(theme)){
+    newPC<-formatPlotColors(plotColors,theme=theme$plotColors)
+    themeUpdates<-list(...)
+    for(i in 1:length(themeUpdates)){
+      if(!is.null(theme[[names(themeUpdates)[i]]]) & class(theme[[names(themeUpdates)[i]]])[1] %in% class(themeUpdates[[i]])) {
+        theme[[names(themeUpdates)[i]]]<-themeUpdates[[i]]
+      }
+    }
+    theme$plotColors<-newPC
+    class(theme)<-c("npTheme","list")
+  } else {
+    stop("The theme argument must be a NicePlots theme of class 'npTheme'", call. = FALSE)
+  }
+  theme
+}

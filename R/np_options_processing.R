@@ -90,6 +90,21 @@ formatPlotColors<-function(plotColors, theme=NA){
     else if (is.null(theme$vioBoxLineCol)) {plotColors$vioBoxLineCol<-"black"}
     else {plotColors$vioBoxLineCol<-theme$vioBoxLineCol}
   }
+  if(is.null(plotColors$title)){
+    if(is.na(theme[1])) {plotColors$title<-"black"}
+    else if (is.null(theme$title)) {plotColors$title<-"black"}
+    else {plotColors$title<-theme$title}
+  }
+  if(is.null(plotColors$numbers)){
+    if(is.na(theme[1])) {plotColors$numbers<-"black"}
+    else if (is.null(theme$numbers)) {plotColors$numbers<-"black"}
+    else {plotColors$numbers<-theme$numbers}
+  }
+  if(is.null(plotColors$subtext)){
+    if(is.na(theme[1])) {plotColors$subtext<-"black"}
+    else if (is.null(theme$subtext)) {plotColors$subtext<-"black"}
+    else {plotColors$subtext<-theme$subtext}
+  }
   plotColors
 }
 
@@ -398,3 +413,4 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
   theme$plotColors<-plotColors
   list(groupNames=groupNames,minorTick=minorTick,pointShape=pointShape,whiskerLineType=whiskerLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subGroup=subGroup,stack=stack,pointHighlights=pointHighlights,theme=theme,plotColors=plotColors,pointMethod=pointMethod,swarmOverflow=swarmOverflow,errorCap=errorCap)
 }
+

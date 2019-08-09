@@ -3,8 +3,8 @@
 \docType{data}
 \name{npStataTheme}
 \alias{npStataTheme}
-\title{Nice Plots Theme: Stata Like}
-\format{An object of class \code{npTheme} (inherits from \code{list}) of length 46.}
+\title{NicePlots Theme: Stata Like}
+\format{An object of class \code{npTheme} (inherits from \code{list}) of length 48.}
 \usage{
 npStataTheme
 }

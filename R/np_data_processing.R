@@ -166,7 +166,7 @@ prepNiceData<- function(prepedData,by, subGroup=FALSE,outliers=TRUE,filter,group
         select(fact=.data$fact,n=n,min=.data$X1,q1=.data$X2,median=.data$X3,q3=.data$X4, max=.data$X5) %>%
         mutate(at=plotLoc,width=.25*width)
 
-      if(verbose){print(select(plotData,.data$fact,.data$n,.data$median,.data$q1,.data$q3,.data$tmin,.data$tmax))}
+      if(verbose){print(select(plotData,.data$fact,.data$n,.data$median,.data$q1,.data$q3,.data$min,.data$max))}
       return(plotData)
     } else {
       #CASE: by is not a factor; data is a numeric vector; subGroup is TRUE

@@ -3,8 +3,8 @@
 \docType{data}
 \name{basicTheme}
 \alias{basicTheme}
-\title{Nice Plots Theme: Basic}
-\format{An object of class \code{npTheme} (inherits from \code{list}) of length 46.}
+\title{NicePlots Theme: Basic}
+\format{An object of class \code{npTheme} (inherits from \code{list}) of length 48.}
 \usage{
 basicTheme
 }
