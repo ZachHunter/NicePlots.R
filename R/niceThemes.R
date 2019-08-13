@@ -376,9 +376,27 @@ newNPTheme<-function(theme=basicTheme, plotColors=NULL,...){
   if("npTheme" %in% class(theme)){
     newPC<-formatPlotColors(plotColors,theme=theme$plotColors)
     themeUpdates<-list(...)
-    for(i in 1:length(themeUpdates)){
-      if(!is.null(theme[[names(themeUpdates)[i]]]) & class(theme[[names(themeUpdates)[i]]])[1] %in% class(themeUpdates[[i]])) {
-        theme[[names(themeUpdates)[i]]]<-themeUpdates[[i]]
+    if(length(themeUpdates)>=1){
+      for(i in 1:length(themeUpdates)){
+        if(!is.null(theme[[names(themeUpdates)[i]]]) & class(theme[[names(themeUpdates)[i]]])[1] %in% class(themeUpdates[[i]])) {
+          theme[[names(themeUpdates)[i]]]<-themeUpdates[[i]]
+        } else if(names(themeUpdates)[i]=="pointSize"){
+          theme[grep("pointSize[BV|VP|DP]",names(theme))]<-themeUpdates[[i]]
+        } else if(names(themeUpdates)[i]=="width"){
+          theme[grep("width[BV|VP|DP|Bar]",names(theme))]<-themeUpdates[[i]]
+        } else if(names(themeUpdates)[i]=="pointShape"){
+          theme[grep("pointShape[BV|VP|DP]",names(theme))]<-themeUpdates[[i]]
+        } else if(names(themeUpdates)[i]=="pointLaneWidth"){
+          theme[grep("pointLaneWidth[BV|VP|DP]",names(theme))]<-themeUpdates[[i]]
+        } else if(names(themeUpdates)[i]=="pointMethod"){
+          theme[grep("pointMethod[BV|VP|DP]",names(theme))]<-themeUpdates[[i]]
+        } else if(names(themeUpdates)[i]=="lWidth"){
+          theme[grep("lWidth[BV|VP|DP|Bar]",names(theme))]<-themeUpdates[[i]]
+        } else if(names(themeUpdates)[i]=="errorBarLineType"){
+          theme[grep("errorBarLineType[BV|VP|DP|Bar]",names(theme))]<-themeUpdates[[i]]
+        } else if(names(themeUpdates)[i]=="errorBarCapWidth"){
+          theme[grep("errorBarCapWidth[BV|VP|DP|Bar]",names(theme))]<-themeUpdates[[i]]
+        }
       }
     }
     theme$plotColors<-newPC

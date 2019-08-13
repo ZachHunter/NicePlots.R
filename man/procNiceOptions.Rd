@@ -8,7 +8,7 @@ procNiceOptions(x, by, minorTick, pointShape, whiskerLineType, lWidth,
   capWidth, pointLaneWidth, width, guides, pointSize, subGroup = FALSE,
   stack = F, pointHighlights = F, type = c("BP", "VP", "DP", "Bar"),
   theme, plotColors, pointMethod, logScale, drawPoints, groupNames,
-  swarmOverflow, errorCap = NULL)
+  swarmOverflow, errorCap = NULL, CLOptions = NULL)
 }
 \arguments{
 \item{x}{Data to be plotted which has been preprocessed by \code{\link{dataFlightCheck}}}
@@ -56,6 +56,8 @@ procNiceOptions(x, by, minorTick, pointShape, whiskerLineType, lWidth,
 \item{swarmOverflow}{character; Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.}
 
 \item{errorCap}{character; Determines the style for the ends of the error bars. Valid options are \code{ball}, \code{bar} or \code{none}.}
+
+\item{CLOptions}{list; A list of command line options captured by \code{...} being passed along to allow for theme values to be set directly from the function call even if it is not an explicit option.}
 }
 \value{
 Named listed of graphical options

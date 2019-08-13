@@ -140,11 +140,12 @@ formatPlotColors<-function(plotColors, theme=NA){
 #' @param groupNames character; A character vector for the primary group names
 #' @param swarmOverflow character; Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.
 #' @param errorCap character; Determines the style for the ends of the error bars. Valid options are \code{ball}, \code{bar} or \code{none}.
+#' @param CLOptions list; A list of command line options captured by \code{...} being passed along to allow for theme values to be set directly from the function call even if it is not an explicit option.
 #'
 #' @return Named listed of graphical options
 #' @importFrom purrr reduce map map_lgl map_dbl
 #' @seealso \code{\link{formatPlotColors}}, \code{\link{niceBox}}, \code{\link{niceDots}}, \code{\link{niceVio}}, \code{\link{niceBar}}
-procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWidth,pointLaneWidth,width,guides,pointSize,subGroup=FALSE,stack=F,pointHighlights=F,type=c("BP","VP","DP","Bar"),theme,plotColors,pointMethod,logScale,drawPoints,groupNames,swarmOverflow,errorCap=NULL){
+procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWidth,pointLaneWidth,width,guides,pointSize,subGroup=FALSE,stack=F,pointHighlights=F,type=c("BP","VP","DP","Bar"),theme,plotColors,pointMethod,logScale,drawPoints,groupNames,swarmOverflow,errorCap=NULL,CLOptions=NULL){
   #Here we check to see if the user specified any options so that they are left unaltered if present
   defaultPoints<-FALSE
   defaultLines<-FALSE
@@ -157,7 +158,7 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
     if(!("fill" %in% pcNames)){defaultFill<-TRUE}
   }
   #Formating all options
-  if(!is.list(theme)) {
+  if(!is.list(theme) | !("npTheme" %in% class(theme))) {
     plotColors<-formatPlotColors(plotColors)
     if(is.null(minorTick)){minorTick<-FALSE}
     if(is.null(guides)){guides<-TRUE}
@@ -189,6 +190,33 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
       swarmOverflow<-"random"
     }
   } else {
+    if(length(CLOptions)>=1){
+      #We are checking options derived from the ... capture to see if there are any theme options
+      #Note we are only implmenting this for when a valid theme has been selected.
+      #Themes let you make different settings for different plot types but since this is a one off
+      #We check to see if the shorter version of the settting was used and update all the settings for all plot types
+      for(i in 1:length(CLOptions)){
+        if(names(CLOptions)[i] %in% names(theme)){
+          theme[[names(CLOptions)[i]]]<-CLOptions[[i]]
+        } else if(names(CLOptions)[i]=="pointSize"){
+          theme[grep("pointSize[BV|VP|DP]",names(theme))]<-CLOptions[[i]]
+        } else if(names(CLOptions)[i]=="width"){
+          theme[grep("width[BV|VP|DP|Bar]",names(theme))]<-CLOptions[[i]]
+        } else if(names(CLOptions)[i]=="pointShape"){
+          theme[grep("pointShape[BV|VP|DP]",names(theme))]<-CLOptions[[i]]
+        } else if(names(CLOptions)[i]=="pointLaneWidth"){
+          theme[grep("pointLaneWidth[BV|VP|DP]",names(theme))]<-CLOptions[[i]]
+        } else if(names(CLOptions)[i]=="pointMethod"){
+          theme[grep("pointMethod[BV|VP|DP]",names(theme))]<-CLOptions[[i]]
+        } else if(names(CLOptions)[i]=="lWidth"){
+          theme[grep("lWidth[BV|VP|DP|Bar]",names(theme))]<-CLOptions[[i]]
+        } else if(names(CLOptions)[i]=="errorBarLineType"){
+          theme[grep("errorBarLineType[BV|VP|DP|Bar]",names(theme))]<-CLOptions[[i]]
+        } else if(names(CLOptions)[i]=="errorBarCapWidth"){
+          theme[grep("errorBarCapWidth[BV|VP|DP|Bar]",names(theme))]<-CLOptions[[i]]
+        }
+      }
+    }
     if(is.null(plotColors)){plotColors<-theme$plotColors}
     else (plotColors<-formatPlotColors(plotColors,theme$plotColors))
     if(is.null(minorTick)){

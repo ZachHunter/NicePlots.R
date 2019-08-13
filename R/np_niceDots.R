@@ -35,7 +35,8 @@ niceDots.default<-function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab
   #Here we check to see if the user specified any options so that they are left unaltered if present
   lWidth<-NULL
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = flipFacts)
-  finalOptions<-procNiceOptions(x=checked$d,by=checked$b,minorTick=minorTick,pointShape=pointShape,whiskerLineType=1,lWidth=lWidth,capWidth=1,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subGroup=subGroup,stack=F,pointHighlights=pointHighlights,type="DP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=pointMethod,drawPoints=TRUE,groupNames=groupNames,swarmOverflow=NULL)
+  moreOptions<-list(...)
+  finalOptions<-procNiceOptions(x=checked$d,by=checked$b,minorTick=minorTick,pointShape=pointShape,whiskerLineType=1,lWidth=lWidth,capWidth=1,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subGroup=subGroup,stack=F,pointHighlights=pointHighlights,type="DP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=pointMethod,drawPoints=TRUE,groupNames=groupNames,swarmOverflow=NULL,CLOptions=moreOptions)
   minorTick<-finalOptions$minorTick
   pointShape<-finalOptions$pointShape
   lWidth<-finalOptions$lWidth
