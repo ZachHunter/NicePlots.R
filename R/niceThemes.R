@@ -9,9 +9,9 @@ basicTheme<- list(
   #General Plot Settings
   fontFamily="sans", #Possible values: 'sans', 'mono', or 'serif'
   groupLabSize=1, #Label cex for the primary group labels
-  subGroupLabSize=.66, #Label cex for subgroup labels
-  groupLabelSpacing=.9, #distance of group labels from axis in lines
-  subgroupLabelSpacing=.3, #distance of subgroup labels from axis in lines
+  subGroupLabSize=.68, #Label cex for subgroup labels
+  groupLabelSpacing=.96, #distance of group labels from axis in lines
+  subgroupLabelSpacing=.26, #distance of subgroup labels from axis in lines
   yAxisLabSize=.9, #Label cex for y-axis tick labels
   axisLabelSize=1, #overall axis label cex (ei, not the tick mark labels)
   titleSize=1.2, #Plot title cex
@@ -52,9 +52,11 @@ basicTheme<- list(
   lWidthBar=1, #Line width (lwd) for violin plots
   errorBarLineTypeBP=2, #Line type (lty) for boxplot wiskers
   errorBarLineTypeBar=1, #Line type (lty) for bar plot error bars
+  errorBarLineTypeDP=1, #Line type (lty) for dot plot error bars
   errorBarLineTypeVP=1, #Whisker line type (lty) for box plot overlay in violin plots
   errorBarCapWidthBP=.25, #relative width of cap on box plot wiskers
   errorBarCapWidthBar=1, #relative width of cap on bar plot error bars
+  errorBarCapWidthDP=.25, #relative width of cap on dot plot error bars
   errorBarCapWidthVP=0, #Whisker cap width for box plot overlay in violin plots
   errorCapType="ball", #Error bar cap type for bar plots.
   vioBoxWidth=.25, #Factor by which the box plot width should shrick relative to the violins (note: this should be inverted to be more intuitive)
@@ -90,10 +92,10 @@ npColorTheme<- list(
   #General Plot Settings
   fontFamily="serif", #Possible values: 'sans', 'mono', or 'serif'
   groupLabSize=1, #Label cex for the primary group labels
-  subGroupLabSize=.6, #Label cex for subgroup labels
-  groupLabelSpacing=.9, #distance of group labels from axis in lines
-  subgroupLabelSpacing=.3, #distance of subgroup labels from axis in lines
-  yAxisLabSize=.9, #Label cex for y-axis tick labels
+  subGroupLabSize=.75, #Label cex for subgroup labels
+  groupLabelSpacing=.96, #distance of group labels from axis in lines
+  subgroupLabelSpacing=.26, #distance of subgroup labels from axis in lines
+  yAxisLabSize=.95, #Label cex for y-axis tick labels
   axisLabelSize=1, #overall axis label cex (ei, not the tick mark labels)
   titleSize=1.2, #Plot title cex
   subSize=1, #Sub label cex
@@ -107,7 +109,7 @@ npColorTheme<- list(
   LegendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
   LegendLineCol=NA, #Border color for the legend color boxes
   LegendBG=NA, #Legend background color
-  LegendSize=.75, #overall legend cex
+  LegendSize=.85, #overall legend cex
   LegendSpacing=.3, #Relative spacing padding legend entries
 
   #Plot Specific Defaults
@@ -134,7 +136,9 @@ npColorTheme<- list(
   errorBarLineTypeBP=2, #Line type (lty) for boxplot wiskers
   errorBarLineTypeBar=1, #Line type (lty) for bar plot error bars
   errorBarLineTypeVP=2, #Whisker line type (lty) for box plot overlay in violin plots
+  errorBarLineTypeVP=2,  #Line type (lty) for dot plot error bars
   errorBarCapWidthBP=.25, #relative width of cap on box plot wiskers
+  errorBarCapWidthDP=.25, #relative width of cap on dot plots
   errorBarCapWidthBar=1, #relative width of cap on bar plot error bars
   errorBarCapWidthVP=.25, #Whisker cap width for box plot overlay in violin plots
   errorCapType="bar", #Error bar cap type for bar plots.
@@ -171,8 +175,8 @@ npStataTheme<- list(
   #General Plot Settings
   fontFamily="sans", #Possible values: 'sans', 'mono', or 'serif'
   groupLabSize=1, #Label cex for the primary group labels
-  subGroupLabSize=.6, #Label cex for subgroup labels
-  groupLabelSpacing=.9, #distance of group labels from axis in lines
+  subGroupLabSize=.66, #Label cex for subgroup labels
+  groupLabelSpacing=.96, #distance of group labels from axis in lines
   subgroupLabelSpacing=.3, #distance of subgroup labels from axis in lines
   yAxisLabSize=.9, #Label cex for y-axis tick labels
   axisLabelSize=1, #overall axis label cex (ei, not the tick mark labels)
@@ -214,8 +218,10 @@ npStataTheme<- list(
   lWidthBar=1.5, #Line width (lwd) for violin plots
   errorBarLineTypeBP=1, #Line type (lty) for boxplot wiskers
   errorBarLineTypeBar=1, #Line type (lty) for bar plot error bars
+  errorBarLineTypeDP=1, #Line type (lty) for dot plot error bars
   errorBarLineTypeVP=1, #Whisker line type (lty) for box plot overlay in violin plots
   errorBarCapWidthBP=10, #relative width of cap on box plot wiskers
+  errorBarCapWidthDP=10,  #relative width of cap on dot plot
   errorBarCapWidthBar=1, #relative width of cap on bar plot error bars
   errorBarCapWidthVP=0, #Whisker cap width for box plot overlay in violin plots
   errorCapType="none", #Error bar cap type for bar plots.
@@ -252,10 +258,10 @@ npGGTheme<- list(
   #General Plot Settings
   fontFamily="serif", #Possible values: 'sans', 'mono', or 'serif'
   groupLabSize=1, #Label cex for the primary group labels
-  subGroupLabSize=.6, #Label cex for subgroup labels
-  groupLabelSpacing=.9, #distance of group labels from axis in lines
-  subgroupLabelSpacing=.3, #distance of subgroup labels from axis in lines
-  yAxisLabSize=.9, #Label cex for y-axis tick labels
+  subGroupLabSize=.68, #Label cex for subgroup labels
+  groupLabelSpacing=.96, #distance of group labels from axis in lines
+  subgroupLabelSpacing=.25, #distance of subgroup labels from axis in lines
+  yAxisLabSize=.95, #Label cex for y-axis tick labels
   axisLabelSize=1, #overall axis label cex (ei, not the tick mark labels)
   titleSize=1.2, #Plot title cex
   subSize=1, #Sub label cex
@@ -295,7 +301,9 @@ npGGTheme<- list(
   lWidthBar=1.5, #Line width (lwd) for violin plots
   errorBarLineTypeBP=1, #Line type (lty) for boxplot wiskers
   errorBarLineTypeBar=1, #Line type (lty) for bar plot error bars
+  errorBarLineTypeDP=1, #Line type (lty) for dot plot error bars
   errorBarLineTypeVP=1, #Whisker line type (lty) for box plot overlay in violin plots
+  errorBarCapWidthDP=0, #relative width of error cap on dot plots
   errorBarCapWidthBP=0, #relative width of cap on box plot wiskers
   errorBarCapWidthBar=0, #relative width of cap on bar plot error bars
   errorBarCapWidthVP=0, #Whisker cap width for box plot overlay in violin plots

@@ -281,8 +281,8 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
   whichSide<-1
   groupCex<-1
   subGroupCex<-.66
-  groupLine<-.9
-  subGroupLine<-.25
+  groupLine<-.95
+  subGroupLine<-.22
   if(!is.na(theme[1])){
     groupCex<-theme$groupLabSize
     subGroupCex<-theme$subGroupLabSize

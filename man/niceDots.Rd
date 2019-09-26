@@ -4,18 +4,22 @@
 \alias{niceDots}
 \title{draw a dot plot}
 \usage{
-niceDots(x, by = NULL, groupNames = NULL, main = NULL, sub = NULL,
-  ylab = NULL, minorTick = FALSE, theme = basicTheme,
-  guides = TRUE, outliers = 1.5, pointSize = 1, width = 1,
-  pointShape = 1, plotColors = list(bg = "open"), logScale = FALSE,
+niceDots(x, by = NULL, groupNames = NULL, drawPoints = TRUE,
+  drawBar = TRUE, barWidth = 0.33, barType = c("bar", "dot"),
+  barThickness = 2, aggFun = c("mean", "median", "none"),
+  errFun = c("sd", "se", "range"), errorMultiple = 2, main = NULL,
+  sub = NULL, ylab = NULL, minorTick = FALSE, theme = basicTheme,
+  guides = TRUE, outliers = 1.5, pointSize = 1, width = NULL,
+  pointShape = NULL, plotColors = NULL, logScale = FALSE,
   trim = FALSE, pointMethod = NULL, axisText = c(NULL, NULL),
   showCalc = FALSE, calcType = "none", yLim = NULL,
   rotateLabels = FALSE, rotateY = FALSE, add = FALSE,
   minorGuides = NULL, extendTicks = TRUE, subGroup = FALSE,
   subGroupLabels = NULL, expLabels = TRUE, sidePlot = FALSE,
-  pointHighlights = FALSE, pointLaneWidth = 1, na.rm = FALSE,
+  pointHighlights = FALSE, pointLaneWidth = NULL, na.rm = FALSE,
   flipFacts = FALSE, verbose = FALSE, legend = FALSE,
-  logAdjustment = 1, ...)
+  logAdjustment = 1, errorCap = NULL, errorLineType = NULL,
+  capWidth = NULL, lWidth = NULL, ...)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
@@ -23,6 +27,22 @@ niceDots(x, by = NULL, groupNames = NULL, main = NULL, sub = NULL,
 \item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subGroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
 
 \item{groupNames}{character vector; overrides the factor levels of \code{by} to label the groups}
+
+\item{drawPoints}{logical; draws a dot plot overlay of the data.}
+
+\item{drawBar}{logical; Determins if the aggregate data and error (if any) is displayed}
+
+\item{barWidth}{numeric; cex like scaling factor for the size of the bar representing the mean or median.}
+
+\item{barType}{character; Indicates the style of the \code{mean}/\code{median} bar. Should be 'dot', 'bar' or 'none'.}
+
+\item{barThickness}{numeric; a cex like multiple for the thickness (\code{lwd}) of the aggregate bar relative to the line width \code{lWidth}.}
+
+\item{aggFun}{character; Determines how the data is summarized by factor level. Valid options are \code{\link[base]{mean}}, \code{\link[stats]{median}}.}
+
+\item{errFun}{character; How the data spread is charactarized by the error bars. Valid options are \code{\link[stats]{sd}} (standard deviation), \code{\link{se}} (standard error of the mean) or \code{\link[base]{range}}.}
+
+\item{errorMultiple}{numeric; How many standard errors/deviations should be represented by the error bars. Set to zero to supress error bars.}
 
 \item{main}{character; title for the graph which is supplied to the \code{main} argument.}
 
@@ -40,7 +60,7 @@ niceDots(x, by = NULL, groupNames = NULL, main = NULL, sub = NULL,
 
 \item{pointSize}{positive integer; sets the cex multiplier for point size.}
 
-\item{width}{numeric; scaling factor controlling the width of the boxes.}
+\item{width}{numeric; cex-like scaling factor controlling the width of the width of each category lane.}
 
 \item{pointShape}{positive integer; sets pty for plotting data points. Can be a vector to support additional graphical customization.}
 
@@ -88,11 +108,19 @@ niceDots(x, by = NULL, groupNames = NULL, main = NULL, sub = NULL,
 
 \item{verbose}{logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.}
 
-\item{legend}{logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.}
+\item{legend}{logical/character; if not equal to \code{\link{FALSE}} with cause a legend to be drawn in the margins. If set to a character string instead of a logical value, the string will be used as the legend title insteas of the factor column name from \code{by}.}
 
 \item{logAdjustment}{= numeric; This number is added to the input data prior to log transformation. Default value is 1.}
 
-\item{...}{additional options for S3 method variants}
+\item{errorCap}{character; Determines the style for the ends of the error bars. Valid options are '\code{ball}', '\code{bar}' or '\code{none}'.}
+
+\item{errorLineType}{numeric; Sets \code{lty} line type for drawing the error bars.}
+
+\item{capWidth}{numeric; Controls the cex like scaling of the ball or width of the cap if they are drawn at the end of the error bars for the bar plot.}
+
+\item{lWidth}{numeric; Line width (\code{lwd}) for drawing the bar plot.}
+
+\item{...}{additional options for S3 method variants.}
 }
 \description{
 draws a categorical dot plot with optional data highlighting and log scale support.

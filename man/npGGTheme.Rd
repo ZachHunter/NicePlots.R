@@ -4,7 +4,7 @@
 \name{npGGTheme}
 \alias{npGGTheme}
 \title{NicePlots Theme: ggPlot Like}
-\format{An object of class \code{npTheme} (inherits from \code{list}) of length 48.}
+\format{An object of class \code{npTheme} (inherits from \code{list}) of length 50.}
 \usage{
 npGGTheme
 }

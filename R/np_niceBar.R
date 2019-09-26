@@ -84,7 +84,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
     plotColors$fill<-plotColors$points
   }
 
-  #To handle the fact the range is actually two different functions, upper and lower error bars are assined separately
+  #To handle the fact the range is actually two different functions, upper and lower error bars are assinged separately
   upperErrorFun<-errFun[1]
   lowerErrorFun<-errFun[1]
   aggFun<-aggFun[1]
