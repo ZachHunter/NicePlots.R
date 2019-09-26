@@ -32,7 +32,7 @@ niceDots(x, by = NULL, groupNames = NULL, drawPoints = TRUE,
 
 \item{drawBar}{logical; Determins if the aggregate data and error (if any) is displayed}
 
-\item{barWidth}{numeric; cex like scaling factor for the size of the bar representing the mean or median.}
+\item{barWidth}{numeric; cex like scaling factor for percentage of the column width the \code{mean}/\code{median} bar will span if drawn.}
 
 \item{barType}{character; Indicates the style of the \code{mean}/\code{median} bar. Should be 'dot', 'bar' or 'none'.}
 
@@ -40,7 +40,7 @@ niceDots(x, by = NULL, groupNames = NULL, drawPoints = TRUE,
 
 \item{aggFun}{character; Determines how the data is summarized by factor level. Valid options are \code{\link[base]{mean}}, \code{\link[stats]{median}}.}
 
-\item{errFun}{character; How the data spread is charactarized by the error bars. Valid options are \code{\link[stats]{sd}} (standard deviation), \code{\link{se}} (standard error of the mean) or \code{\link[base]{range}}.}
+\item{errFun}{character; How the data spread is charactarized by the error bars. Valid options are \code{\link[stats]{sd}} (standard deviation), \code{\link{se}} (standard error of the mean), \code{t95ci} (t-distribution), \code{boot95ci} (\code{\link[boot]{boot}} strap confidence interval) or \code{\link[base]{range}}.}
 
 \item{errorMultiple}{numeric; How many standard errors/deviations should be represented by the error bars. Set to zero to supress error bars.}
 
@@ -100,7 +100,7 @@ niceDots(x, by = NULL, groupNames = NULL, drawPoints = TRUE,
 
 \item{pointHighlights}{logical; will use additional factors in \code{by} to highlight points in the dot plot}
 
-\item{pointLaneWidth}{numeric; This controls how far data point dots can move along the categorical axis when plotting. Used for \code{pointMethod} options 'jitter', 'beeswarm', and 'distribution'.}
+\item{pointLaneWidth}{numeric; This controls how far data point dots can spread along the categorical axis when plotting. Used for \code{pointMethod} options 'jitter', 'beeswarm', and 'distribution'.}
 
 \item{na.rm}{logical; Should \code{NA}s be removed from the data set? Both data input and the factor input from \code{by} with be checked.}
 
@@ -118,16 +118,20 @@ niceDots(x, by = NULL, groupNames = NULL, drawPoints = TRUE,
 
 \item{capWidth}{numeric; Controls the cex like scaling of the ball or width of the cap if they are drawn at the end of the error bars for the bar plot.}
 
-\item{lWidth}{numeric; Line width (\code{lwd}) for drawing the bar plot.}
+\item{lWidth}{numeric; Line width (\code{lwd}) for drawing the \code{mean}/\code{median} bars and errorbars.}
 
 \item{...}{additional options for S3 method variants.}
 }
 \description{
-draws a categorical dot plot with optional data highlighting and log scale support.
+draws a categorical dot plot with optional data highlighting, log scale support and optional mean/median/distribution overlays.
 }
 \details{
-This is a wrapper function for \code{\link{niceBox}} that just plots the points with no box distribution data. data point overlay options, data subsetting with a secondary factor, and data point highlighting with a tertiary factor.
-The complicated part of using this function is handling its many options. A wrapper function to set up and run it with preset options may be a good idea if you are using it along. The function \code{\link{niceDots}} is an example of this.
+This is really two different plotting functions merged together. First, the data points can be plotted individually using a \code{distribution} waterfall, \code{jitter}, \code{beeswarm}, just \code{linear} or not plotted at all.
+A signle data vector can be subset (eg using multiple factors with \code{by} and optionally \code{subGroup==\link{TRUE}}) using up to two factors. If a multi-column tibble, matrix or dataframe is used for data input, then can be grouped by a single factor from \code{by} with the column names used for factor subgroups.
+The option \code{flipFacts} can be used in this case to make the data columns the primary grouping factor and the first factor in \code{by} used for subgroups.
+On top of this, the \code{\link[base]{mean}}/\code{\link[stats]{median}} values can be overplotted using \code{drawBar==\link{TRUE}} and error or distribution (eg. \code{\link[stats]{sd}}, \code{\link{se}} \code{\link[base]{range}}, etc.) can be also be shown as errorbars. The error bars can be multiplied by \code{errorMultiple} and supressid if \code{errorMultiple==0}.
+
+The complicated part of using this function is handling its many options. A wrapper function to set up and run it with preset options may be a good idea if you are using it alot.
 Briefly put, the \code{by} argument can be a data frame of factors and the function will  work through the columns in order as needed.
 If \code{x} is a numeric vector, then \code{by} should be a factor to group it into categories. If \code{by} is a data frame of factors and \code{subGroup=\link{TRUE}}, then the first column for \code{by}
 is used as the grouping factor and the second column is used as the sub-grouping factor. If \code{pointHighlights==\link{TRUE}}, and \code{subGroup=\link{TRUE}}, the the third column of \code{by}
@@ -137,7 +141,7 @@ by the first column of \code{by}. Data point highlighting with \code{pointHighli
 Please note that the p-values can not always be calculated and are for general exploratory use only. More careful analysis is necessary to determine statistical significance.
 This function is as S3 generic and can be extended to provide class specific functionality.
 To further facilitate data exploration, outputs from statistical testing and data set summaries
-are printed to the console.
+are printed to the console if \code{verbose==link{TRUE}}.
 }
 \examples{
 data(iris)
@@ -148,5 +152,5 @@ niceDots(iris$Sepal.Length,iris$Species,minorTick=4,showCalc=TRUE,calcType="anov
 
 }
 \seealso{
-\code{\link[graphics]{stripchart}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{quantileTrim}}, \code{\link{prepCategoryWindow}}, \code{\link{niceBox}}
+\code{\link[graphics]{stripchart}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{quantileTrim}}, \code{\link{prepCategoryWindow}}, \code{\link[base]{jitter}}
 }

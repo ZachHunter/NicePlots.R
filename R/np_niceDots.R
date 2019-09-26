@@ -1,11 +1,15 @@
 #' @include np_options_processing.R niceThemes.R np_categorical_plot_setup.R np_plotting_functions.R np_utility.R np_data_processing.R
 #'
 #' @title draw a dot plot
-#' @description draws a categorical dot plot with optional data highlighting and log scale support.
+#' @description draws a categorical dot plot with optional data highlighting, log scale support and optional mean/median/distribution overlays.
 #'
 #' @details
-#' This is a wrapper function for \code{\link{niceBox}} that just plots the points with no box distribution data. data point overlay options, data subsetting with a secondary factor, and data point highlighting with a tertiary factor.
-#' The complicated part of using this function is handling its many options. A wrapper function to set up and run it with preset options may be a good idea if you are using it along. The function \code{\link{niceDots}} is an example of this.
+#' This is really two different plotting functions merged together. First, the data points can be plotted individually using a \code{distribution} waterfall, \code{jitter}, \code{beeswarm}, just \code{linear} or not plotted at all.
+#' A signle data vector can be subset (eg using multiple factors with \code{by} and optionally \code{subGroup==\link{TRUE}}) using up to two factors. If a multi-column tibble, matrix or dataframe is used for data input, then can be grouped by a single factor from \code{by} with the column names used for factor subgroups.
+#' The option \code{flipFacts} can be used in this case to make the data columns the primary grouping factor and the first factor in \code{by} used for subgroups.
+#' On top of this, the \code{\link[base]{mean}}/\code{\link[stats]{median}} values can be overplotted using \code{drawBar==\link{TRUE}} and error or distribution (eg. \code{\link[stats]{sd}}, \code{\link{se}} \code{\link[base]{range}}, etc.) can be also be shown as errorbars. The error bars can be multiplied by \code{errorMultiple} and supressid if \code{errorMultiple==0}.
+#'
+#' The complicated part of using this function is handling its many options. A wrapper function to set up and run it with preset options may be a good idea if you are using it alot.
 #' Briefly put, the \code{by} argument can be a data frame of factors and the function will  work through the columns in order as needed.
 #' If \code{x} is a numeric vector, then \code{by} should be a factor to group it into categories. If \code{by} is a data frame of factors and \code{subGroup=\link{TRUE}}, then the first column for \code{by}
 #' is used as the grouping factor and the second column is used as the sub-grouping factor. If \code{pointHighlights==\link{TRUE}}, and \code{subGroup=\link{TRUE}}, the the third column of \code{by}
@@ -15,21 +19,21 @@
 #' Please note that the p-values can not always be calculated and are for general exploratory use only. More careful analysis is necessary to determine statistical significance.
 #' This function is as S3 generic and can be extended to provide class specific functionality.
 #' To further facilitate data exploration, outputs from statistical testing and data set summaries
-#' are printed to the console.
+#' are printed to the console if \code{verbose==link{TRUE}}.
 #'
 #' @inheritParams prepCategoryWindow
 #' @param aggFun character; Determines how the data is summarized by factor level. Valid options are \code{\link[base]{mean}}, \code{\link[stats]{median}}.
-#' @param errFun character; How the data spread is charactarized by the error bars. Valid options are \code{\link[stats]{sd}} (standard deviation), \code{\link{se}} (standard error of the mean) or \code{\link[base]{range}}.
+#' @param errFun character; How the data spread is charactarized by the error bars. Valid options are \code{\link[stats]{sd}} (standard deviation), \code{\link{se}} (standard error of the mean), \code{t95ci} (t-distribution), \code{boot95ci} (\code{\link[boot]{boot}} strap confidence interval) or \code{\link[base]{range}}.
 #' @param theme list object; Themes are are an optional way of storing graphical preset options that are compatible with all nicePlot graphing functions.
 #' @param width numeric; cex-like scaling factor controlling the width of the width of each category lane.
 #' @param errorMultiple numeric; How many standard errors/deviations should be represented by the error bars. Set to zero to supress error bars.
-#' @param barWidth numeric; cex like scaling factor for the size of the bar representing the mean or median.
+#' @param barWidth numeric; cex like scaling factor for percentage of the column width the \code{mean}/\code{median} bar will span if drawn.
 #' @param barType character; Indicates the style of the \code{mean}/\code{median} bar. Should be 'dot', 'bar' or 'none'.
 #' @param barThickness numeric; a cex like multiple for the thickness (\code{lwd}) of the aggregate bar relative to the line width \code{lWidth}.
 #' @param errorCap character; Determines the style for the ends of the error bars. Valid options are '\code{ball}', '\code{bar}' or '\code{none}'.
 #' @param errorLineType numeric; Sets \code{lty} line type for drawing the error bars.
 #' @param capWidth numeric; Controls the cex like scaling of the ball or width of the cap if they are drawn at the end of the error bars for the bar plot.
-#' @param lWidth numeric; Line width (\code{lwd}) for drawing the bar plot.
+#' @param lWidth numeric; Line width (\code{lwd}) for drawing the \code{mean}/\code{median} bars and errorbars.
 #' @param add logical; causes plotting to be added to the existing plot rather the start a new one.
 #' @param main character; title for the graph which is supplied to the \code{main} argument.
 #' @param sub character; subtitle for the graph which is supplied to the \code{sub} argument. If \code{\link{NULL}} and \code{showCalc=\link{TRUE}} it will be used to display the output form \code{\link{calcStats}}.
@@ -47,7 +51,7 @@
 #' @param pointShape positive integer; sets pty for plotting data points. Can be a vector to support additional graphical customization.
 #' @param drawPoints logical; draws a dot plot overlay of the data.
 #' @param pointHighlights logical; will use additional factors in \code{by} to highlight points in the dot plot
-#' @param pointLaneWidth numeric; This controls how far data point dots can move along the categorical axis when plotting. Used for \code{pointMethod} options 'jitter', 'beeswarm', and 'distribution'.
+#' @param pointLaneWidth numeric; This controls how far data point dots can spread along the categorical axis when plotting. Used for \code{pointMethod} options 'jitter', 'beeswarm', and 'distribution'.
 #' @param ... additional options for S3 method variants.
 
 #' @examples
@@ -59,7 +63,7 @@
 #'
 #' @import dplyr
 #' @export
-#' @seealso \code{\link[graphics]{stripchart}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{quantileTrim}}, \code{\link{prepCategoryWindow}}, \code{\link{niceBox}}
+#' @seealso \code{\link[graphics]{stripchart}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{quantileTrim}}, \code{\link{prepCategoryWindow}}, \code{\link[base]{jitter}}
 niceDots <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawBar=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {UseMethod("niceDots",x)}
 
 #' @import dplyr
@@ -97,6 +101,9 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
   swarmOverflow<-finalOptions$swarmOverflow
   pointLaneWidth<-finalOptions$pointLaneWidth
 
+  if(grepl("ball",errorCap,ignore.case = TRUE)) {
+    capWidth<-capWidth*6
+  }
   #If fill colors are needed to distinguish groups but are of length 1, point colors will be used if it has more levels.
   if(length(plotColors$fill)<=1 & length(plotColors$lines)<=1 & length(plotColors$points)>1 & subGroup==T) {
     plotColors$fill<-plotColors$points
