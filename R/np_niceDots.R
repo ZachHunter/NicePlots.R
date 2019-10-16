@@ -7,19 +7,19 @@
 #' This is really two different plotting functions merged together. First, the data points can be plotted individually using a \code{distribution} waterfall, \code{jitter}, \code{beeswarm}, just \code{linear} or not plotted at all.
 #' A signle data vector can be subset (eg using multiple factors with \code{by} and optionally \code{subGroup==\link{TRUE}}) using up to two factors. If a multi-column tibble, matrix or dataframe is used for data input, then can be grouped by a single factor from \code{by} with the column names used for factor subgroups.
 #' The option \code{flipFacts} can be used in this case to make the data columns the primary grouping factor and the first factor in \code{by} used for subgroups.
-#' On top of this, the \code{\link[base]{mean}}/\code{\link[stats]{median}} values can be overplotted using \code{drawBar==\link{TRUE}} and error or distribution (eg. \code{\link[stats]{sd}}, \code{\link{se}} \code{\link[base]{range}}, etc.) can be also be shown as errorbars. The error bars can be multiplied by \code{errorMultiple} and supressid if \code{errorMultiple==0}.
+#' On top of this, the \code{\link[base]{mean}}/\code{\link[stats]{median}} values can be overplotted using \code{drawBar==\link{TRUE}} and error or distribution (eg. \code{\link[stats]{sd}}, \code{\link{se}} \code{\link[base]{range}}, etc.) can be also be shown as errorbars. The error bars can be multiplied by \code{errorMultiple} and supressed if \code{errorMultiple=0}.
 #'
 #' The complicated part of using this function is handling its many options. A wrapper function to set up and run it with preset options may be a good idea if you are using it alot.
 #' Briefly put, the \code{by} argument can be a data frame of factors and the function will  work through the columns in order as needed.
 #' If \code{x} is a numeric vector, then \code{by} should be a factor to group it into categories. If \code{by} is a data frame of factors and \code{subGroup=\link{TRUE}}, then the first column for \code{by}
-#' is used as the grouping factor and the second column is used as the sub-grouping factor. If \code{pointHighlights==\link{TRUE}}, and \code{subGroup=\link{TRUE}}, the the third column of \code{by}
+#' is used as the grouping factor and the second column is used as the sub-grouping factor. If \code{pointHighlights=\link{TRUE}}, and \code{subGroup=\link{TRUE}}, the the third column of \code{by}
 #' is used to highlight points data point overlay (assuming \code{drawPoints=\link{TRUE}}). If \code{subGroup=\link{FALSE}} and \code{subGroup=\link{TRUE}}, then the second column of \code{by} is used to control
 #' the point highlighting. If \code{x} itself is a data frame of numeric vectors, \code{subGroup} is automatically set to false and each column of \code{x} is plotted like a sub-group and grouped
 #' by the first column of \code{by}. Data point highlighting with \code{pointHighlights=\link{TRUE}} can still be used when \code{x} is a data frame and the highlighting factor will be drawn from the second column of \code{by}.
 #' Please note that the p-values can not always be calculated and are for general exploratory use only. More careful analysis is necessary to determine statistical significance.
 #' This function is as S3 generic and can be extended to provide class specific functionality.
 #' To further facilitate data exploration, outputs from statistical testing and data set summaries
-#' are printed to the console if \code{verbose==link{TRUE}}.
+#' are printed to the console if \code{verbose=\link{TRUE}}.
 #'
 #' @inheritParams prepCategoryWindow
 #' @param aggFun character; Determines how the data is summarized by factor level. Valid options are \code{\link[base]{mean}}, \code{\link[stats]{median}}.
@@ -181,7 +181,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
 
     #RStudio seems not to update the graphics devices properly
     if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
-    prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels,strictLimits=FALSE,theme=theme,legend=legend,logAdjustment=logAdjustment)
+    prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels,strictLimits=FALSE,theme=theme,legend=legend,logAdjustment=logAdjustment, pointHighlights=pointHighlights)
   }
   pvalue<-NULL
   if(subGroup==TRUE){width<-width*2}

@@ -6,7 +6,7 @@
 \usage{
 drawBar(x, plotColors, errorBars = FALSE, errorCap = "ball",
   errorLineType = 1, width = 0.5, sidePlot = FALSE,
-  stacked = FALSE, capSize = 2, lineWidth = 1)
+  stacked = FALSE, capSize = 2, lineWidth = 1, normalize = FALSE)
 }
 \arguments{
 \item{x}{dataframe; number of interquartile ranges (IQR) past the Q1 (25\%) and Q3 (75\%) cumulative distribution values. Outliers are often defined as \eqn{1.5 \times IQR}{1.5 * IQR} and extreme outliers are more than \eqn{3 \times IQR}{3 * IQR} away from the inner 50\% data range.}
@@ -28,6 +28,8 @@ drawBar(x, plotColors, errorBars = FALSE, errorCap = "ball",
 \item{capSize}{numeric; cex like scaling value the controls the size of the caps on the error bars.}
 
 \item{lineWidth}{numeric; Sets the \code{lwd} options for controling line plotting thickness for the bar plot.}
+
+\item{normalize}{logical; Normalizes stacked bars to 100\%. If \code{stacked==\link{TRUE}} and \code{normalize==\link{TRUE}} the stacked bars will all go to 100\%. Otherwise the bars represent the cumuative value.}
 }
 \description{
 Add a barplot with options error pars to the active ploting enviroment

@@ -55,7 +55,7 @@ basicTheme<- list(
   errorBarLineTypeDP=1, #Line type (lty) for dot plot error bars
   errorBarLineTypeVP=1, #Whisker line type (lty) for box plot overlay in violin plots
   errorBarCapWidthBP=.25, #relative width of cap on box plot wiskers
-  errorBarCapWidthBar=1, #relative width of cap on bar plot error bars
+  errorBarCapWidthBar=.33, #relative width of cap on bar plot error bars
   errorBarCapWidthDP=.25, #relative width of cap on dot plot error bars
   errorBarCapWidthVP=0, #Whisker cap width for box plot overlay in violin plots
   errorCapType="ball", #Error bar cap type for bar plots.

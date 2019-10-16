@@ -5,20 +5,22 @@
 \title{Set Legend Margins}
 \usage{
 prepLegendMarigins(x, by, theme, legend, pointHighlights = FALSE,
-  subGroup = TRUE)
+  subGroup = TRUE, stack = FALSE)
 }
 \arguments{
-\item{x}{numeric; a numeric vector with the min and max values for the data set prior to log transformation.}
+\item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
 
-\item{by}{positive integer; the number of minor tick marks to be drawn between each major tick.}
+\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subGroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
 
-\item{theme}{numeric; the logarithm base to use for the log scale transformation.}
+\item{theme}{list object; Themes are are an optional way of storing graphical preset options that are compatible with all nicePlot graphing functions.}
 
 \item{legend}{character; Title for the legend collumn. Set to \code{\link{TRUE}} if no header is desired.}
 
-\item{pointHighlights}{character; a length two character vector containing text to be prepend or append to the major tick labels, respectively.}
+\item{pointHighlights}{logical; Is pointHightlights turned on? This is used to determin with column of \code{by} should be used for legend factor levels.}
 
-\item{subGroup}{logical; if set to \code{\link{TRUE}}, the major labels will written as \eqn{logbase^{x}}{logbase^x}. Otherwise the labels will correspond to the non-transformed values at that point.}
+\item{subGroup}{subGroup logical; use additional column in \code{by} to group the data within each level of the major factor.}
+
+\item{stack}{logical; Used for stack stacked bar plots. Used exclusively by \code{\link{niceBar}}.}
 }
 \value{
 Does not return a value but changes the global \code{par(mai)} settings.

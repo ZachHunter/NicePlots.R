@@ -51,11 +51,12 @@ makeLogTicks<-function(dataRange,minorCount=10,logScale=2,axisText=c(NULL,NULL),
 #' @details
 #' This is a utility function used by the window setup routines to calculate how much space the legend will take up in the margin and setting the \code{par(mai)} setting accordingly.
 #'
-#' @param x numeric; a numeric vector with the min and max values for the data set prior to log transformation.
-#' @param by positive integer; the number of minor tick marks to be drawn between each major tick.
-#' @param theme numeric; the logarithm base to use for the log scale transformation.
-#' @param pointHighlights character; a length two character vector containing text to be prepend or append to the major tick labels, respectively.
-#' @param subGroup logical; if set to \code{\link{TRUE}}, the major labels will written as \eqn{logbase^{x}}{logbase^x}. Otherwise the labels will correspond to the non-transformed values at that point.
+#' @param x numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.
+#' @param by factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subGroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.
+#' @param theme list object; Themes are are an optional way of storing graphical preset options that are compatible with all nicePlot graphing functions.
+#' @param pointHighlights logical; Is pointHightlights turned on? This is used to determin with column of \code{by} should be used for legend factor levels.
+#' @param subGroup subGroup logical; use additional column in \code{by} to group the data within each level of the major factor.
+#' @param stack logical; Used for stack stacked bar plots. Used exclusively by \code{\link{niceBar}}.
 #' @param legend character; Title for the legend collumn. Set to \code{\link{TRUE}} if no header is desired.
 #'
 #' @return Does not return a value but changes the global \code{par(mai)} settings.
@@ -63,7 +64,7 @@ makeLogTicks<-function(dataRange,minorCount=10,logScale=2,axisText=c(NULL,NULL),
 #' TODO<-1
 #' @import dplyr
 #' @importFrom purrr map_dbl
-prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TRUE){
+prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TRUE,stack=FALSE){
   legendIndex<-NA
   legendTitle<-""
   legendLevels<-NULL
@@ -78,12 +79,20 @@ prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TR
   if(legend!=FALSE) {
     maxLabelW<-0
     maxLabelH<-0
-    if(pointHighlights==FALSE & subGroup==TRUE) {
-      legendIndex<-2
-    } else if(pointHighlights==TRUE & subGroup==TRUE) {
+    if(stack==FALSE) {
+      if(pointHighlights==FALSE & subGroup==TRUE) {
+        legendIndex<-2
+      } else if(pointHighlights==TRUE & subGroup==TRUE) {
+        legendIndex<-3
+      } else if(pointHighlights==TRUE & subGroup==FALSE) {
+        legendIndex<-2
+      } else {
+        warning("Neither pointHighlights or subGroup are active - has legend been activated by accident?.\nUsing first factor level for legend.\n", call.=FALSE)
+      }
+    } else if (subGroup==TRUE) {
       legendIndex<-3
-    } else if(pointHighlights==TRUE & subGroup==FALSE) {
-      legendIndex<-2
+    } else {
+      legendIndex<-3
     }
     if(is.data.frame(x)){
       if(is.data.frame(by) & pointHighlights==TRUE){
@@ -151,6 +160,7 @@ prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TR
 #' @param legend logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.
 #' @param pointHighlights logical; Is pointHightlights turned on? This is used to determin with column of \code{by} should be used for legend factor levels.
 #' @param logAdjustment = numeric; This number is added to the input data prior to log transformation. Default value is 1.
+#' @param stack logical; Used for stack stacked bar plots. Used exclusively by \code{\link{niceBar}}.
 #'
 #' @return formats the plotting area and returns a named list with 'data' and 'labels' corresponding to the trimmed and/or transformed data and the labels for the primary factors, respectively.
 #' @examples
@@ -163,7 +173,7 @@ prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TR
 #' @importFrom utils data str
 #'
 #' @seealso \code{\link[grDevices]{axisTicks}}, \code{\link[graphics]{axis}}, \code{\link{makeLogTicks}}, \code{\link{facetSpacing}}
-prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, guides=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, theme=NA, plotColors=if(is.na(theme)){list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white")}else{theme$plotColors}, trim=FALSE, logScale=FALSE, axisText=c(NULL,NULL), minorGuides=FALSE, extendTicks=F,subGroup=FALSE, expLabels=TRUE,sidePlot=FALSE,subGroupLabels=NULL,strictLimits=F, legend=FALSE, pointHighlights=FALSE, logAdjustment=1) {
+prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, guides=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, theme=NA, plotColors=if(is.na(theme)){list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white")}else{theme$plotColors}, trim=FALSE, logScale=FALSE, axisText=c(NULL,NULL), minorGuides=FALSE, extendTicks=F,subGroup=FALSE, expLabels=TRUE,sidePlot=FALSE,subGroupLabels=NULL,strictLimits=F, legend=FALSE, pointHighlights=FALSE, logAdjustment=1, stack=FALSE) {
   levelCount<-1
   tData<-x
   tBy<-by
@@ -175,7 +185,7 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
   }
 
   #Set margins for legends now
-  prepLegendMarigins(x=x,by=by,theme=theme,legend=legend,pointHighlights=pointHighlights,subGroup=subGroup)
+  prepLegendMarigins(x=x,by=by,theme=theme,legend=legend,pointHighlights=pointHighlights,subGroup=subGroup,stack=stack)
 
   #capture data range for plot formating
   dataRange<-NULL
@@ -335,7 +345,7 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
         axis(side=2,at=subLabLoc,labels=F,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=subGroupCex)
         mtext(side=2,at=subLabLoc,text=rep(subGroupLabels,length(groupNames)),line=sideSubGroupLine, cex=subGroupCex,col=plotColors$subGroupLabels)
       } else {
-        axis(side=2,at=seq(1:levelCount),,labels=F,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
+        axis(side=2,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
         mtext(side=2,at=seq(1:levelCount),line=groupLine,text=groupNames,las=rotateLabels,cex=groupCex,col=plotColors$labels)
       }
     } else {

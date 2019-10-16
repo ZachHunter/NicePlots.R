@@ -367,6 +367,7 @@ drawViolinPlot <- function(x,groups,at=seq(1,length(levels(groups))),h=NULL, plo
 #' @param stacked logical; draws a stacked barplot if set to \code{\link{TRUE}}.
 #' @param capSize numeric; cex like scaling value the controls the size of the caps on the error bars.
 #' @param lineWidth numeric; Sets the \code{lwd} options for controling line plotting thickness for the bar plot.
+#' @param normalize logical; Normalizes stacked bars to 100\%. If \code{stacked==\link{TRUE}} and \code{normalize==\link{TRUE}} the stacked bars will all go to 100\%. Otherwise the bars represent the cumuative value.
 #'
 #' @examples
 #' data(iris)
@@ -381,17 +382,17 @@ drawViolinPlot <- function(x,groups,at=seq(1,length(levels(groups))),h=NULL, plo
 #' @import dplyr
 #' @importFrom graphics rect
 #' @seealso \code{\link[graphics]{barplot}}, \code{\link{niceBar}}, \code{\link{errorBars}}
-drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineType=1, width=.5, sidePlot=FALSE, stacked=FALSE,capSize=2,lineWidth=1) {
+drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineType=1, width=.5, sidePlot=FALSE, stacked=FALSE,capSize=2,lineWidth=1,normalize=FALSE) {
   colorOrder<-plotColors$fill
   #This section builds out the color list to match the number of factors for stacted barplots
   if(stacked){
-    if(length(colorOrder)<length(levels(x$fact))) {
+    if(length(colorOrder)<length(levels(x$Stack))) {
       warning("There are fewer colors in plotColors$fill than factor levels for stacking. Stacks will have repeated colors. Use plotColors=list(fill=c(...)) to make a custom color vector.", call. = FALSE)
-      colorOrder<-as.character(rep(colorOrder,1+trunc(length(levels(x$fact))/length(colorOrder)))[1:length(levels(x$fact))])
+      colorOrder<-as.character(rep(colorOrder,1+trunc(length(levels(x$Stack))/length(colorOrder)))[1:length(levels(x$Stack))])
     } else {
-      colorOrder<-as.character(colorOrder[1:length(levels(x$fact))])
+      colorOrder<-as.character(colorOrder[1:length(levels(x$Stack))])
     }
-    names(colorOrder)<-levels(x$fact)
+    names(colorOrder)<-levels(x$Stack)
   }
   if(sidePlot) {
     #IE plot with xy axis fliped
@@ -400,9 +401,12 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
       for (at in unique(x$at)) {
         temp<-x[x$at==at,]
         hAdjust<-0
-        for(i in unique(factor(temp$fact))) {
-          rect(temp[temp$fact==i,"yb"]+hAdjust,at-width,temp[temp$fact==i,"yt"]+hAdjust,at+width,col=colorOrder[as.character(i)],border=plotColors$lines[1], lwd=lineWidth)
-          hAdjust<-temp[temp$fact==i,"yt"]+hAdjust
+        if(normalize==TRUE) {
+          temp$yt<-temp$yt/sum(temp$ty)
+        }
+        for(i in levels(factor(temp$Stack))) {
+          rect(temp[temp$Stack==i,"yb"]+hAdjust,at-width,temp[temp$Stack==i,"yt"]+hAdjust,at+width,col=colorOrder[as.character(i)],border=plotColors$lines[1], lwd=lineWidth)
+          hAdjust<-temp[temp$Stack==i,"yt"]+hAdjust
         }
       }
     } else {
@@ -425,11 +429,14 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
     if(stacked){
       #Build stacks by position using factor levels. Missing factor levels are skipped.
       for (at in unique(x$at)) {
-        temp<-x[x$at==at,]
+        temp<-x[x$at==at,,drop=FALSE]
         hAdjust<-0
-        for(i in unique(factor(temp$fact))) {
-          rect(at-width, temp[temp$fact==i,"yb"]+hAdjust,at+width,temp[temp$fact==i,"yt"]+hAdjust,col=colorOrder[as.character(i)],border=plotColors$lines[1], lwd=lineWidth)
-          hAdjust<-temp[temp$fact==i,"yt"]+hAdjust
+        if(normalize==TRUE) {
+          temp$yt<-temp$yt/sum(temp$yt,na.rm=TRUE)*100
+        }
+        for(i in levels(factor(temp$Stack))) {
+          rect(at-width, temp[temp$Stack==i,"yb"]+hAdjust,at+width,temp[temp$Stack==i,"yt"]+hAdjust,col=colorOrder[as.character(i)],border=plotColors$lines[1], lwd=lineWidth)
+          hAdjust<-temp[temp$Stack==i,"yt"]+hAdjust
         }
       }
     } else {

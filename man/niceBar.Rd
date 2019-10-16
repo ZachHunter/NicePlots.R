@@ -16,7 +16,7 @@ niceBar(x, by = NULL, groupNames = NULL, aggFun = c("mean", "median",
   subGroupLabels = NULL, expLabels = FALSE, sidePlot = FALSE,
   errorBars = TRUE, errorCap = "ball", errorLineType = 1,
   capWidth = 1.2, lWidth = 1.5, na.rm = FALSE, flipFacts = FALSE,
-  verbose = FALSE, logAdjustment = 1, ...)
+  verbose = FALSE, logAdjustment = 1, normalize = FALSE, ...)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
@@ -45,7 +45,7 @@ niceBar(x, by = NULL, groupNames = NULL, aggFun = c("mean", "median",
 
 \item{guides}{logical; will draw guidelines at the major tick-marks if set to \code{\link{TRUE}}. Color of the guidelines is determined by \code{plotColors$guides}.}
 
-\item{outliers}{positive numeric; number of interquartile ranges (IQR) past the Q1 (25\%) and Q3 (75\%) cumulative distribution values. Outliers are often defined as \eqn{1.5 \times IQR}{1.5 * IQR} and extreme outliers are more than \eqn{3 \times IQR}{3 * IQR} away from the inner 50\% data range.}
+\item{outliers}{positive numeric; number of interquartile ranges (IQR) past the Q1 (25\%) and Q3 (75\%) cumulative distribution values. Outliers are often defined as \eqn{1.5 \times IQR} and extreme outliers are more than \eqn{3 \times IQR} away from the inner 50\% data range.}
 
 \item{width}{numeric; cex-like scaling factor controlling the width of the bars.}
 
@@ -100,6 +100,8 @@ niceBar(x, by = NULL, groupNames = NULL, aggFun = c("mean", "median",
 \item{verbose}{logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.}
 
 \item{logAdjustment}{= numeric; This number is added to the input data prior to log transformation. Default value is 1.}
+
+\item{normalize}{logical; Normalizes stacked bars to 100\%. If \code{stacked==\link{TRUE}} and \code{normalize==\link{TRUE}} the stacked bars will all go to 100\%. Otherwise the bars represent the cumuative value.}
 
 \item{...}{additional options for S3 method variants.}
 }

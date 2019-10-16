@@ -27,13 +27,14 @@
 #' @param main character; title for the graph which is supplied to the \code{main} argument.
 #' @param sub character; subtitle for the graph which is supplied to the \code{sub} argument. If \code{\link{NULL}} and \code{showCalc=\link{TRUE}} it will be used to display the output form \code{\link{calcStats}}.
 #' @param ylab character; y-axis label.
-#' @param outliers positive numeric; number of interquartile ranges (IQR) past the Q1 (25\%) and Q3 (75\%) cumulative distribution values. Outliers are often defined as \eqn{1.5 \times IQR}{1.5 * IQR} and extreme outliers are more than \eqn{3 \times IQR}{3 * IQR} away from the inner 50\% data range.
+#' @param outliers positive numeric; number of interquartile ranges (IQR) past the Q1 (25\%) and Q3 (75\%) cumulative distribution values. Outliers are often defined as \eqn{1.5 \times IQR} and extreme outliers are more than \eqn{3 \times IQR} away from the inner 50\% data range.
 #' @param showCalc logical; if a p-value can be easily calculated for your data, it will be displayed using the \code{sub} annotation setting.
 #' @param calcType character; should match one of 'none', 'wilcox', 'Tukey','t.test','anova' which will determine which, if any statistical test should be performed on the data.
 #' @param flipFacts logical; When a dataframe of values is given, column names are used as a secondary grouping factor by default. Setting \code{flipFacts=\link{TRUE}} makes the column names the primary factor and \code{by} the secondary factor.
 #' @param na.rm logical; Should \code{NA}s be removed from the data set? Both data input and the factor input from \code{by} with be checked.
 #' @param legend logical/character; if not equal to \code{\link{FALSE}} with cause a legend to be drawn in the margins. If set to a character string instead of a logical value, the string will be used as the legend title insteas of the factor column name from \code{by}.
 #' @param verbose logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.
+#' @param normalize logical; Normalizes stacked bars to 100\%. If \code{stacked==\link{TRUE}} and \code{normalize==\link{TRUE}} the stacked bars will all go to 100\%. Otherwise the bars represent the cumuative value.
 #' @param ... additional options for S3 method variants.
 #' @examples
 #' data(mtcars)
@@ -43,12 +44,11 @@
 #' @import dplyr
 #' @export
 #' @seealso \code{\link[vioplot]{vioplot}}, \code{\link{boxplot}}, \code{\link{niceBox}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{prepCategoryWindow}}
-niceBar <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, outliers=FALSE, width=NULL, errorMultiple=1, plotColors=list(bg="open",fill=setAlpha("grey",.8)), logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap="ball", errorLineType=1,capWidth=1.2, lWidth=1.5, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1, ...) {UseMethod("niceBar",x)}
+niceBar <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, outliers=FALSE, width=NULL, errorMultiple=1, plotColors=list(bg="open",fill=setAlpha("grey",.8)), logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap="ball", errorLineType=1,capWidth=1.2, lWidth=1.5, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1,normalize=FALSE, ...) {UseMethod("niceBar",x)}
 
 #' @import dplyr
 #' @export
-
-niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median"),errFun=c("sd","se","range", "t95ci", "boot95ci"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=NULL, outliers=FALSE, width=NULL, errorMultiple=1, plotColors=NULL, logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1, ...) {
+niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median"),errFun=c("se","sd","range", "t95ci", "boot95ci"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=NULL, outliers=FALSE, width=NULL, errorMultiple=1, plotColors=NULL, logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1, normalize=FALSE, ...) {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset", call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -66,7 +66,38 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
 
   #Here we check to see if the user specified any options so that they are left unaltered if present
   moreOptions<-list(...)
-  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=1,whiskerLineType=errorLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=1,width=width,guides=guides,pointSize=1,subGroup=subGroup,stack=stack,pointHighlights=FALSE,type="Bar",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod="jitter",drawPoints=FALSE,groupNames=groupNames,swarmOverflow="random" ,errorCap=errorCap,CLOptions=moreOptions)
+  #If a theme does not have more than one fill color or line color we try to see if we can use point colors instead.
+  #This means we need to do some work in advance of the procNiceOptions function
+  cFill<-basicTheme$plotColors$fill
+  cPoint<-basicTheme$plotColors$points
+  cLine<-basicTheme$plotColors$lines
+  if(is.null(plotColors$fill)) {
+    if(!is.null(theme)) {
+      cFill<-theme$plotColors$fill
+    }
+  } else {
+    cFill<-plotColors$fill
+  }
+  if(is.null(plotColors$points)) {
+    if(!is.null(theme)) {
+      cPoint<-theme$plotColors$points
+    }
+  } else {
+    cPoint<-plotColors$points
+  }
+  if(is.null(plotColors$lines)) {
+    if(!is.null(theme)) {
+      cLine<-theme$plotColors$lines
+    }
+  } else {
+    cLine<-plotColors$lines
+  }
+  #If fill colors are needed to distinguish groups but are of length 1, point colors will be used if it has more levels.
+  if(length(cFill)<=1 & length(cLine)<=1 & length(cPoint)>1 & (subGroup==T | stack == T)) {
+    plotColors$fill<-cPoint
+  }
+  #Note we are using stack here for pointHighlights as they have the same priority.
+  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=1,whiskerLineType=errorLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=1,width=width,guides=guides,pointSize=1,subGroup=subGroup,stack=stack,pointHighlights=stack,type="Bar",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod="jitter",drawPoints=FALSE,groupNames=groupNames,swarmOverflow="random" ,errorCap=errorCap,CLOptions=moreOptions)
   minorTick<-finalOptions$minorTick
   pointShape<-finalOptions$pointShape
   errorLineType<-finalOptions$whiskerLineType
@@ -79,10 +110,6 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   groupNames<-finalOptions$groupNames
   errorCap<-finalOptions$errorCap
 
-  #If fill colors are needed to distinguish groups but are of length 1, point colors will be used if it has more levels.
-  if(length(plotColors$fill)<=1 & length(plotColors$lines)<=1 & length(plotColors$points)>1 & (subGroup==T | stack == T)) {
-    plotColors$fill<-plotColors$points
-  }
 
   #To handle the fact the range is actually two different functions, upper and lower error bars are assinged separately
   upperErrorFun<-errFun[1]
@@ -136,8 +163,28 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
 
     #If all aggregated values are >= 0 then we want to interect the y-axis exactly at zero
     dmin<-min(pData$plot$AData)
-    dRange<-c(min(pData$plot$AData-pData$plot$lowerError),max(pData$plot$AData+pData$plot$upperError))
     bVal<-0
+    dRange<-c(0,100)
+    if (stack==TRUE) {
+      if(!all(pData$Adata>=0)) {
+        stop(paste0("All aggregated data values (i.e. mean/median) values must be greater or equal to zero to use stacked bar plots.\n"))
+      }
+      if(normalize==TRUE){
+        if(isTRUE(all.equal(axisText, c(NULL,NULL)))) {
+          axisText<-c("","%")
+        }
+      } else {
+        #Find the height of the the stacked bars to set the window data ranges
+        if(subGroup==T) {
+          dRange<-c(bVal,max(map_dbl(levels(pData$plot$fact), function(l) max(map_dbl(levels(pData$plot$subGroup), function(s) sum(pData$plot$AData[which(pData$plot$fact==l & pData$plot$subGroup==s)])),na.rm=TRUE))))
+        } else {
+          dRange<-c(bVal,max(map_dbl(levels(pData$plot$fact),function(l) sum(pData$plot$AData[which(pData$plot$fact==l)])),na.rm=TRUE))
+        }
+      }
+    } else {
+      #find the size of error bars arround the aggregated data to calculate plotting window ranges
+      dRange<-c(min(pData$plot$AData-pData$plot$lowerError),max(pData$plot$AData+pData$plot$upperError))
+    }
     if(!is.null(yLim)){
       dRange<-yLim
       bVal<-yLim[1]
@@ -166,7 +213,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
     }
     #RStudio seems not to update the graphics devices properly
     if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
-    prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels,strictLimits=strictBase,theme=theme,legend=legend,logAdjustment=logAdjustment)
+    prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels,strictLimits=strictBase,theme=theme,legend=legend,logAdjustment=logAdjustment, stack=stack, pointHighlights=stack)
   }
   pvalue<-NULL
   if(subGroup==TRUE){width<-width*2}
@@ -279,15 +326,15 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   if(verbose){
     print(pData[[2]])
   }
-  #updating preping the plot data fromp pData to be compatible with drawBar
+  #updating the plot data from pData to be compatible with drawBar
   pData[[1]] %>%
     mutate(yb=bVal,UpperError=.data$upperError, LowerError=.data$lowerError,yt=.data$AData) %>%
-    drawBar(plotColors=plotColors, errorBars=errorBars, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth)
+    drawBar(plotColors=plotColors, errorBars=errorBars, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth, normalize=normalize)
 
   #Draw legend and set associated options if indicated
   if(length(legendColors)<length(legendLabels) & legend!=FALSE){
     legend<-FALSE
-    warning("Not enough point colors to uniquely color subGroups levels\nPlease update plotColors point options to use legend options with this subgroup.", call.=FALSE)
+    warning("Not enough point colors to uniquely color subGroups levels\nPlease update plotColors point options to use legend options.", call.=FALSE)
   }
   oFont<-par()$family
   oCexMain<-par()$cex.main

@@ -16,7 +16,7 @@
 #'	todo<-1
 #'
 #' @import dplyr
-#' @importFrom tibble is.tibble
+#' @importFrom tibble is_tibble
 #' @importFrom tidyr gather
 dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
   if(is.vector(data)){
@@ -28,7 +28,7 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
     }
   } else if(is.factor(data)){
     data<-as.numeric(as.character(data))
-  } else if(tibble::is.tibble(data)){
+  } else if(tibble::is_tibble(data)){
     data<-as.data.frame(data)
     for(i in 1:dim(data)[2]){data[,i]<-as.numeric(as.character(data[,i]))}
   } else if(is.matrix(data)){
@@ -39,6 +39,11 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
   } else {
     warning(paste0("Data type not recognized.\nClasses observered: ",class(data)), call.=FALSE)
   }
+  if(is.data.frame(data)){
+    if(dim(data)[2]==1) {
+      data<-as.numeric(data[,1])
+    }
+  }
   if(!is.factor(by)){
     if(is.vector(by)){
       if(is.list(by)) {
@@ -47,7 +52,7 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
       } else {
         by<-factor(by)
       }
-    } else if(tibble::is.tibble(by)) {
+    } else if(tibble::is_tibble(by)) {
       by<-as.data.frame(by)
       if(dim(by)[2]>1) {
         for(i in 1:dim(by)[2]){by[,i]<-factor(by[,i])}
