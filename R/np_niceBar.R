@@ -176,15 +176,22 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       } else {
         #Find the height of the the stacked bars to set the window data ranges
         if(subGroup==T) {
-          dRange<-c(bVal,max(map_dbl(levels(pData$plot$fact), function(l) max(map_dbl(levels(pData$plot$subGroup), function(s) sum(pData$plot$AData[which(pData$plot$fact==l & pData$plot$subGroup==s)])),na.rm=TRUE))))
+          dRange<-c(bVal,max(map_dbl(levels(pData$plot$fact),
+            function(l) max(map_dbl(levels(pData$plot$subGroup),
+              function(g) sum(pData$plot$AData[which(pData$plot$fact==l & pData$plot$subGroup==g)],na.rm=T)
+            ),na.rm=T)
+          ),na.rm=T)*1.04)
         } else {
-          dRange<-c(bVal,max(map_dbl(levels(pData$plot$fact),function(l) sum(pData$plot$AData[which(pData$plot$fact==l)])),na.rm=TRUE))
+          dRange<-c(bVal,max(map_dbl(levels(pData$plot$fact),
+            function(l) sum(pData$plot$AData[which(pData$plot$fact==l)],na.rm=T)
+          ),na.rm=TRUE)*1.04)
         }
       }
     } else {
       #find the size of error bars arround the aggregated data to calculate plotting window ranges
       dRange<-c(min(pData$plot$AData-pData$plot$lowerError),max(pData$plot$AData+pData$plot$upperError))
     }
+
     if(!is.null(yLim)){
       dRange<-yLim
       bVal<-yLim[1]

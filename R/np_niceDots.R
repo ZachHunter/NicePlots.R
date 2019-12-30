@@ -162,6 +162,9 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
     dRange<-1
     if(drawBar[1]==TRUE) {
       dRange<-c(min(c(min(pData$plot$AData-pData$plot$lowerError),min(x))),max(c(max(pData$plot$AData+pData$plot$upperError),max(x))))
+      if(logScale>0 & dRange[1]<.04*(abs(dRange[2]-dRange[1]))) {
+        dRange[1]<-.04*(abs(dRange[2]-dRange[1]))
+      }
     } else {
       dRange<-c(min(x),max(x))
     }

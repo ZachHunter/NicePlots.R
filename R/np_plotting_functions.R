@@ -513,12 +513,12 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
       if(outliers==FALSE){
         bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
           mutate(at=facetLoc[.data$fact]) %>%
-          drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
+          drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
       } else {
         if(drawPoints){
           bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
             mutate(at=facetLoc[.data$fact]) %>%
-            drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
+            drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
         } else {
           #draws outliers if drawPoints is off
           bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
@@ -526,7 +526,7 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
             group_by(.data$fact) %>%
             mutate(tFilter=quantileTrim(data,threshold=outliers,returnFilter = TRUE)[[2]]==FALSE) %>%
             filter(.data$tFilter) %>% bind_rows() %>%
-            drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
+            drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
         }
       }
     } else {
@@ -537,11 +537,11 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
             if(pointHighlights) {
               bind_cols(data=prepedData[[1]],fact=by[filter,1],subGroup=by[filter,2],pfact=by[filter,3]) %>%
                 mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
-                drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/length(levels(by[,2])),col=plotColors$points,swarmOverflow=swarmOverflow)
+                drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth/length(levels(by[,2])),col=plotColors$points,swarmOverflow=swarmOverflow)
             } else {
               bind_cols(data=prepedData[[1]],fact=by[filter,1],subGroup=by[filter,2]) %>%
                 mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
-                drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/length(levels(by[,2])),col=plotColors$points,swarmOverflow=swarmOverflow)
+                drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth/length(levels(by[,2])),col=plotColors$points,swarmOverflow=swarmOverflow)
             }
           }
         } else {
@@ -549,11 +549,11 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
             if(pointHighlights) {
               bind_cols(data=prepedData[[1]],fact=by[filter,1],subGroup=by[filter,2],pfact=by[filter,3]) %>%
                 mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
-                drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/length(levels(by[,2])),col=plotColors$points,swarmOverflow=swarmOverflow)
+                drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth/length(levels(by[,2])),col=plotColors$points,swarmOverflow=swarmOverflow)
             } else {
               bind_cols(data=prepedData[[1]],fact=by[filter,1],subGroup=by[filter,2]) %>%
                 mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
-                drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/length(levels(by[,2])),col=plotColors$points,swarmOverflow=swarmOverflow)
+                drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth/length(levels(by[,2])),col=plotColors$points,swarmOverflow=swarmOverflow)
             }
           } else {
             #draw the outlier points if drawPoints == FALSE and outliers != FALSE
@@ -562,7 +562,7 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
               group_by(.data$facetLevel) %>%
               mutate(tFilter=quantileTrim(data,threshold=outliers,returnFilter = TRUE)[[2]]==FALSE) %>%
               filter(.data$tFilter) %>% bind_rows() %>%
-              drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/length(levels(by[,2])),col=plotColors$points,swarmOverflow=swarmOverflow)
+              drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth/length(levels(by[,2])),col=plotColors$points,swarmOverflow=swarmOverflow)
           }
         }
       } else {
@@ -572,11 +572,11 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
             if(pointHighlights) {
               bind_cols(data=prepedData[[1]],fact=by[filter,1],pfact=by[filter,2]) %>%
                 mutate(at=facetLoc[.data$fact]) %>%
-                drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
+                drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
             } else {
               bind_cols(data=prepedData[[1]],fact=by[filter,1]) %>%
                 mutate(at=facetLoc[.data$fact]) %>%
-                drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
+                drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
             }
           }
         } else {
@@ -584,11 +584,11 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
             if(pointHighlights) {
               bind_cols(data=prepedData[[1]],fact=by[filter,1],pfact=by[filter,2]) %>%
                 mutate(at=facetLoc[.data$fact]) %>%
-                drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
+                drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
             } else {
               bind_cols(data=prepedData[[1]],fact=by[filter,1]) %>%
                 mutate(at=facetLoc[.data$fact]) %>%
-                drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
+                drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
             }
           } else {
             #draws outliers if drawPoints is off
@@ -597,7 +597,7 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
               group_by(.data$fact) %>%
               mutate(tFilter=quantileTrim(data,threshold=outliers,returnFilter = TRUE)[[2]]==FALSE) %>%
               filter(.data$tFilter) %>% bind_rows() %>%
-              drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
+              drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
           }
         }
       }
@@ -610,14 +610,14 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
           bind_cols(prepedData[[1]],fact=by[filter]) %>%
             tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
             mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
-            drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
+            drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
         }
       } else {
         if(drawPoints) {
           bind_cols(prepedData[[1]],fact=by[filter]) %>%
             tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
             mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
-            drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
+            drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
         } else {
           #draws outliers if drawPoints is off
           bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
@@ -626,7 +626,7 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
             group_by(.data$facetLevel) %>%
             mutate(tFilter=quantileTrim(data,threshold=outliers,returnFilter = TRUE)[[2]]==FALSE) %>%
             filter(.data$tFilter) %>% bind_rows() %>%
-            drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
+            drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
         }
       }
     } else {
@@ -637,12 +637,12 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
             bind_cols(prepedData[[1]],fact=by[filter,1],pfact=by[filter,2]) %>%
               tidyr::gather(key=subGroup,value=data,-.data$fact,-.data$pfact) %>%
               mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
-              drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
+              drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
           } else {
             bind_cols(prepedData[[1]],fact=by[filter,1]) %>%
               tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
               mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
-              drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
+              drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
           }
         }
       } else {
@@ -651,12 +651,12 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
             bind_cols(prepedData[[1]],fact=by[filter,1],pfact=by[filter,2]) %>%
               tidyr::gather(key=subGroup,value=data,-.data$fact,-.data$pfact) %>%
               mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
-              drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
+              drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
           } else {
             bind_cols(prepedData[[1]],fact=by[filter,1]) %>%
               tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
               mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
-              drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
+              drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
           }
         } else {
           #draws outliers if drawPoints is off
@@ -666,7 +666,7 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
             group_by(.data$facetLevel) %>%
             mutate(tFilter=quantileTrim(data,threshold=outliers,returnFilter = TRUE)[[2]]==FALSE) %>%
             filter(.data$tFilter) %>% bind_rows() %>%
-            drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.8*.25*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
+            drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
         }
       }
     }
