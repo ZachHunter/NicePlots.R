@@ -4,16 +4,42 @@
 \alias{niceDensity}
 \title{draw a kernal density plot}
 \usage{
-niceDensity(x, by = NULL, drawPoints = TRUE, groupNames = NULL,
-  subGroup = FALSE, useRgl = TRUE, plotType = c("contour",
-  "surface"), theme = basicTheme, main = NULL, sub = NULL,
-  ylab = NULL, xlab = NULL, minorTick = FALSE, guides = NULL,
-  plotColors = NULL, logScale = FALSE, axisText = c(NULL, NULL),
-  showCalc = FALSE, calcType = "none", rotateLabels = FALSE,
-  add = FALSE, minorGuides = NULL, extendTicks = TRUE,
-  expLabels = FALSE, lWidth = NULL, na.rm = FALSE, verbose = FALSE,
-  logAdjustment = 1, xLim = NULL, yLim = NULL,
-  strictLimits = FALSE, legend = FALSE, trimCurves = TRUE, ...)
+niceDensity(
+  x,
+  by = NULL,
+  drawPoints = TRUE,
+  groupNames = NULL,
+  subGroup = FALSE,
+  useRgl = TRUE,
+  plotType = c("contour", "surface"),
+  theme = basicTheme,
+  main = NULL,
+  sub = NULL,
+  ylab = NULL,
+  xlab = NULL,
+  minorTick = FALSE,
+  guides = NULL,
+  plotColors = NULL,
+  logScale = FALSE,
+  axisText = c(NULL, NULL),
+  showCalc = FALSE,
+  calcType = "none",
+  rotateLabels = FALSE,
+  add = FALSE,
+  minorGuides = NULL,
+  extendTicks = TRUE,
+  expLabels = FALSE,
+  lWidth = NULL,
+  na.rm = FALSE,
+  verbose = FALSE,
+  logAdjustment = 1,
+  xLim = NULL,
+  yLim = NULL,
+  strictLimits = FALSE,
+  legend = FALSE,
+  trimCurves = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}

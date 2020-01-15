@@ -4,8 +4,14 @@
 \alias{makeLogTicks}
 \title{format a log scale axis}
 \usage{
-makeLogTicks(dataRange, minorCount = 10, logScale = 2,
-  axisText = c(NULL, NULL), expLabels = TRUE, logAdjustment = 1)
+makeLogTicks(
+  dataRange,
+  minorCount = 10,
+  logScale = 2,
+  axisText = c(NULL, NULL),
+  expLabels = TRUE,
+  logAdjustment = 1
+)
 }
 \arguments{
 \item{dataRange}{numeric; a numeric vector with the min and max values for the data set prior to log transformation.}

@@ -4,11 +4,20 @@
 \alias{drawViolinPlot}
 \title{draw a violin plot}
 \usage{
-drawViolinPlot(x, groups, at = seq(1, length(levels(groups))),
-  h = NULL, plotColors = basicTheme$plotColors, sidePlot = FALSE,
-  borderCol = plotColors$lines, borderWidth = 1,
-  fill = plotColors$fill, width = 1, trimViolins = TRUE,
-  samplePoints = NULL)
+drawViolinPlot(
+  x,
+  groups,
+  at = seq(1, length(levels(groups))),
+  h = NULL,
+  plotColors = basicTheme$plotColors,
+  sidePlot = FALSE,
+  borderCol = plotColors$lines,
+  borderWidth = 1,
+  fill = plotColors$fill,
+  width = 1,
+  trimViolins = TRUE,
+  samplePoints = NULL
+)
 }
 \arguments{
 \item{x}{numeric; A vector of numeric values that will be subset and formated by the factor(s) in \code{by}.}

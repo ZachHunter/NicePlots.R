@@ -4,11 +4,32 @@
 \alias{procNiceOptions}
 \title{Process ploting options}
 \usage{
-procNiceOptions(x, by, minorTick, pointShape, whiskerLineType, lWidth,
-  capWidth, pointLaneWidth, width, guides, pointSize, subGroup = FALSE,
-  stack = F, pointHighlights = F, type = c("BP", "VP", "DP", "Bar"),
-  theme, plotColors, pointMethod, logScale, drawPoints, groupNames,
-  swarmOverflow, errorCap = NULL, CLOptions = NULL)
+procNiceOptions(
+  x,
+  by,
+  minorTick,
+  pointShape,
+  whiskerLineType,
+  lWidth,
+  capWidth,
+  pointLaneWidth,
+  width,
+  guides,
+  pointSize,
+  subGroup = FALSE,
+  stack = F,
+  pointHighlights = F,
+  type = c("BP", "VP", "DP", "Bar"),
+  theme,
+  plotColors,
+  pointMethod,
+  logScale,
+  drawPoints,
+  groupNames,
+  swarmOverflow,
+  errorCap = NULL,
+  CLOptions = NULL
+)
 }
 \arguments{
 \item{x}{Data to be plotted which has been preprocessed by \code{\link{dataFlightCheck}}}

@@ -4,9 +4,17 @@
 \alias{drawBoxPlot}
 \title{draw a custom box and whisker plot}
 \usage{
-drawBoxPlot(x, col = "black", fill = NULL, drawBox = T,
-  drawDot = F, whiskerLty = 2, side = FALSE, lWidth = 1,
-  capWidth = 0.25)
+drawBoxPlot(
+  x,
+  col = "black",
+  fill = NULL,
+  drawBox = T,
+  drawDot = F,
+  whiskerLty = 2,
+  side = FALSE,
+  lWidth = 1,
+  capWidth = 0.25
+)
 }
 \arguments{
 \item{x}{named list or data frame; \code{x$at}, \code{x$q2}, \code{x$q4}, \code{x$median}, \code{x$min}, \code{x$max} and \code{x$width} must all be defined as numeric vectors in a named list or data.frame object.}

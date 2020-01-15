@@ -4,9 +4,17 @@
 \alias{drawPoints}
 \title{draw dots for a dot plot}
 \usage{
-drawPoints(x, type = "jitter", col = "black", size = 1, shape = 1,
-  highlight = FALSE, width = 0.2, sidePlot = FALSE,
-  swarmOverflow = "random")
+drawPoints(
+  x,
+  type = "jitter",
+  col = "black",
+  size = 1,
+  shape = 1,
+  highlight = FALSE,
+  width = 0.2,
+  sidePlot = FALSE,
+  swarmOverflow = "random"
+)
 }
 \arguments{
 \item{x}{named list or data frame; \code{x$at}, \code{x$data} and \code{x$pfact} (optional) should all be defined. These vectors are used to place the the point on the chart and determine the point level grouping (highlighting)}

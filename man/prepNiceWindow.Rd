@@ -4,15 +4,28 @@
 \alias{prepNiceWindow}
 \title{prepare a plotting environment for non-categorical data such as bar plots or box plots}
 \usage{
-prepNiceWindow(x, by = NULL, minorTick = FALSE, guides = TRUE,
-  yLim = NULL, xLim = NULL, rotateLabels = FALSE, theme = NA,
-  plotColors = if (is.na(theme)) {     list(bg = "open", guides =
-  "black", lines = "gray22", points = "darkgrey", fill = "white") } else { 
-     theme$plotColors }, logScaleX = FALSE, logScaleY = FALSE,
+prepNiceWindow(
+  x,
+  by = NULL,
+  minorTick = FALSE,
+  guides = TRUE,
+  yLim = NULL,
+  xLim = NULL,
+  rotateLabels = FALSE,
+  theme = NA,
+  plotColors = if (is.na(theme)) {     list(bg = "open", guides = "black", lines =
+    "gray22", points = "darkgrey", fill = "white") } else {     theme$plotColors },
+  logScaleX = FALSE,
+  logScaleY = FALSE,
   axisText = list(x = c(NULL, NULL), y = c(NULL, NULL)),
-  minorGuides = FALSE, extendTicks = F, subGroup = FALSE,
-  expLabels = TRUE, strictLimits = F, legend = FALSE,
-  logAdjustment = 1)
+  minorGuides = FALSE,
+  extendTicks = F,
+  subGroup = FALSE,
+  expLabels = TRUE,
+  strictLimits = F,
+  legend = FALSE,
+  logAdjustment = 1
+)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}

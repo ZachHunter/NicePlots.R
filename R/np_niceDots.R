@@ -231,13 +231,27 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
         width<-width*(facetLoc[2]-facetLoc[1])/4
       }
       if(legend!=FALSE) {
-        if (subGroup==TRUE) {
-          if(legend==TRUE){
-            legendTitle<-colnames(by)[2]
+        if (subGroup==TRUE & dim(by)[2]>1) {
+          if (pointHighlights==TRUE & dim(by)[2]>2) {
+            if(legend==TRUE){
+              legendTitle<-colnames(by)[3]
+            }
+            legendLabels<-levels(by[,3])
+          } else {
+            if(legend==TRUE){
+              legendTitle<-colnames(by)[2]
+            }
+            legendLabels<-levels(by[,2])
           }
-          legendLabels<-levels(by[,2])
         } else {
-          legend<-FALSE
+          if(pointHighlights==TRUE) {
+            if(legend==TRUE){
+              legendTitle<-colnames(by)[2]
+            }
+            legendLabels<-levels(by[,2])
+          } else {
+            legend<-FALSE
+          }
         }
       }
     }
@@ -270,7 +284,11 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
           if(legend==TRUE){
             legendTitle<-"Legend"
           }
-          legendLabels<-levels(by[,1])
+          if(pointHighlights==T & subGroup==T & dim(by)[2]>1) {
+            legendLabels<-levels(by[,2])
+          } else {
+            legendLabels<-levels(by[,1])
+          }
         } else {
           if(legend==TRUE){
             legendTitle<-"Legend"
@@ -285,7 +303,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
     print(pData[[2]])
   }
 
-  #updating preping the plot data fromp pData to be compatible with drawBar
+  #updating preping the plot data from pData to be compatible with drawBar
   if(drawPoints[1]==TRUE) {
     addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x),swarmOverflow = swarmOverflow)
   }
@@ -311,20 +329,6 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
     }
 
   }
-  #' data(iris)
-  #' iData<-iris %>% group_by(Species) %>%
-  #'    summarize(Average=mean(Sepal.Length),SD=sd(Sepal.Length))
-  #' barplot(iData$Average,ylim=c(0,10),names=levels(iris$Species),ylab="sepal length")
-  #' loc<-c(.7,1.9,3.1)
-  #' top<-iData$SD*2+iData$Average
-  #' bottom<-iData$SD*-2+iData$Average
-  #' errorBars(data.frame(at=loc,start=iData$Average,stop=top),capType="ball",capSize=2)
-  #' errorBars(data.frame(at=loc,start=iData$Average,stop=bottom),capType="ball",capSize=2)
-
-
-  #pData[[1]] %>%
-  #  mutate(yb=bVal,UpperError=.data$upperError, LowerError=.data$lowerError,yt=.data$AData) %>%
-  #  drawBar(plotColors=plotColors, errorBars=errorBars, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, capSize=capWidth, lineWidth=lWidth)
 
   #Draw legend and set associated options if indicated
   if(length(legendColors)<length(legendLabels) & legend!=FALSE){

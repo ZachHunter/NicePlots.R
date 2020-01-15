@@ -40,7 +40,7 @@ basicTheme<- list(
   pointShapeBP=16, #Numeric vector; point shapes for box plots
   pointShapeVP=16, #Numeric vector; point shapes for vioin plots
   pointShapeDP=1, #Numeric vector; point shapes for dot plots
-  pointLaneWidthBP=.85, #Restricts the point overlay to a fraction of the box width
+  pointLaneWidthBP=.65, #Restricts the point overlay to a fraction of the box width
   pointLaneWidthDP=.85, #Restricts the point overlay to a fraction of the category width
   pointLaneWidthVP=4.9, #Restricts the point overlay to a fraction of the violin width
   pointMethodBP="jitter", #Point drawing method for box plots

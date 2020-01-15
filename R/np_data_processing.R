@@ -105,7 +105,9 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
       by<-by[!naFilter,]
       for(i in 1:dim(by)[2]){by[,i]<-factor(by[,i])}
     }
-    warning(paste("NAs detected in data input.",sum(naFilter),"observations removed."), call.=FALSE)
+    if(sum(naFilter)>0) {
+      warning(paste("NAs detected in data input.",sum(naFilter),"observations removed."), call.=FALSE)
+    }
   }
   #The default handling for data is for the column names of an input dataframe to be used
   #as the default secondary factor. with by taking priority. This changes the order prior to plotting.
@@ -114,11 +116,11 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
     byDim<-dim(by)
     dataDim<-dim(data)
     if(is.null(byDim)){
-      temp<-data %>% bind_cols(by=by) %>% tidyr::gather(key="newFact",value="Value",-by)
+      temp<-data %>% bind_cols(by=by) %>% tidyr::gather(factor_key=TRUE,key="newFact",value="Value",-by)
       by<-data.frame(factOne=factor(temp[,2]),factTwo=factor(temp[,1]))
       data<-as.numeric(temp$Value)
     } else {
-      temp<-data %>% bind_cols(by=by) %>% tidyr::gather(key="newFact",value="Value",1:dataDim[2])
+      temp<-data %>% bind_cols(by=by) %>% tidyr::gather(factor_key=TRUE,key="newFact",value="Value",1:dataDim[2])
       by<-data.frame(factor(temp$newFact),temp[,1:byDim[2]])
       for(i in 1:dim(by)[2]){by[,i]<-factor(by[,i])}
       data<-as.numeric(temp$Value)
@@ -202,7 +204,7 @@ prepNiceData<- function(prepedData,by, subGroup=FALSE,outliers=TRUE,filter,group
     #CASE: data is a dataframe; by is a factor; subGroup is ignored
     if(is.factor(by)) {
       plotData<-bind_cols(prepedData[[1]],fact=by[filter]) %>%
-        tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
+        tidyr::gather(factor_key=TRUE,key=subGroup,value=data,-.data$fact) %>%
         group_by(.data$fact,.data$subGroup) %>%
         do(data.frame(t(boxplot.stats(.data$data,coef=outliers)$stats),n=length(.data$data))) %>%
         ungroup() %>%
@@ -214,7 +216,7 @@ prepNiceData<- function(prepedData,by, subGroup=FALSE,outliers=TRUE,filter,group
     } else {
       #CASE: data is a dataframe; by is a dataframe; subGroup is ignored
       plotData<-bind_cols(prepedData[[1]],fact=by[filter,1]) %>%
-        tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
+        tidyr::gather(factor_key=TRUE,key=subGroup,value=data,-.data$fact) %>%
         group_by(.data$fact,.data$subGroup) %>%
         do(data.frame(t(boxplot.stats(.data$data,coef=outliers)$stats),n=length(.data$data))) %>%
         ungroup() %>%
@@ -318,7 +320,7 @@ prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=uppe
     facetLoc<-facetSpacing(length(x),length(levels(by)))
     names(facetLoc)<-unlist(lapply(levels(by),FUN=function(y) paste(y,colnames(x),sep=".")))
     plotData<-bind_cols(data=x,fact=by) %>%
-      tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
+      tidyr::gather(factor_key=TRUE,key=subGroup,value=data,-.data$fact) %>%
       group_by(.data$fact,.data$subGroup) %>%
       summarize(AData=invoke(aggFunction, list(x=.data$data)),upperError=invoke(upperErrorFun,append(list(x=.data$data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(x=.data$data),optsL))*errorMultiple,N=n()) %>%
       mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
@@ -332,7 +334,7 @@ prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=uppe
     #Stack is TRUE
     if(stack==T & ncol(by)>1) {
       plotData<-bind_cols(data=x,fact=by[,1],Stack=by[,2]) %>%
-        tidyr::gather(key=subGroup,value=data,-.data$fact,-.data$Stack) %>%
+        tidyr::gather(factor_key=TRUE,key=subGroup,value=data,-.data$fact,-.data$Stack) %>%
         group_by(.data$fact,.data$subGroup,.data$Stack) %>%
         summarize(AData=invoke(aggFunction, list(x=.data$data)),upperError=invoke(upperErrorFun,append(list(x=.data$data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(x=.data$data),optsL))*errorMultiple,N=n()) %>%
         mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
@@ -341,7 +343,7 @@ prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=uppe
     #Stack is FALSE
     } else {
       plotData<-bind_cols(data=x,fact=by[,1]) %>%
-        tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
+        tidyr::gather(factor_key=TRUE,key=subGroup,value=data,-.data$fact) %>%
         group_by(.data$fact,.data$subGroup) %>%
         summarize(AData=invoke(aggFunction, list(x=.data$data)),upperError=invoke(upperErrorFun,append(list(x=.data$data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(x=.data$data),optsL))*errorMultiple,N=n()) %>%
         mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%

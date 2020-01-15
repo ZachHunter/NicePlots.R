@@ -4,9 +4,16 @@
 \alias{prepBarData}
 \title{Prepare and print basic statistics for niceBar}
 \usage{
-prepBarData(x, by, errorMultiple = 1, upperErrorFun = "sd",
-  lowerErrorFun = upperErrorFun, aggFunction = "mean", stack = FALSE,
-  subGroup = FALSE)
+prepBarData(
+  x,
+  by,
+  errorMultiple = 1,
+  upperErrorFun = "sd",
+  lowerErrorFun = upperErrorFun,
+  aggFunction = "mean",
+  stack = FALSE,
+  subGroup = FALSE
+)
 }
 \arguments{
 \item{x}{list; a list object returned by \code{\link{prepCategoryWindow}}}

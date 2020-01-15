@@ -4,8 +4,12 @@
 \alias{calcStats}
 \title{calculate preliminary statistical significance analysis}
 \usage{
-calcStats(x, by, type = c("Wilcox", "Tukey", "T.Test", "ANOVA"),
-  verbose = FALSE)
+calcStats(
+  x,
+  by,
+  type = c("Wilcox", "Tukey", "T.Test", "ANOVA"),
+  verbose = FALSE
+)
 }
 \arguments{
 \item{x}{numeric; numeric vector of data points to analyze.}

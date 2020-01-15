@@ -4,9 +4,19 @@
 \alias{drawBar}
 \title{drawBar}
 \usage{
-drawBar(x, plotColors, errorBars = FALSE, errorCap = "ball",
-  errorLineType = 1, width = 0.5, sidePlot = FALSE,
-  stacked = FALSE, capSize = 2, lineWidth = 1, normalize = FALSE)
+drawBar(
+  x,
+  plotColors,
+  errorBars = FALSE,
+  errorCap = "ball",
+  errorLineType = 1,
+  width = 0.5,
+  sidePlot = FALSE,
+  stacked = FALSE,
+  capSize = 2,
+  lineWidth = 1,
+  normalize = FALSE
+)
 }
 \arguments{
 \item{x}{dataframe; number of interquartile ranges (IQR) past the Q1 (25\%) and Q3 (75\%) cumulative distribution values. Outliers are often defined as \eqn{1.5 \times IQR}{1.5 * IQR} and extreme outliers are more than \eqn{3 \times IQR}{3 * IQR} away from the inner 50\% data range.}

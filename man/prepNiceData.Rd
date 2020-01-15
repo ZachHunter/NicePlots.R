@@ -4,8 +4,18 @@
 \alias{prepNiceData}
 \title{Prepare and print basic statistics for niceBox and niceVio}
 \usage{
-prepNiceData(prepedData, by, subGroup = FALSE, outliers = TRUE, filter,
-  groupNames, plotLoc, width = 1, flipFacts = FALSE, verbose = FALSE)
+prepNiceData(
+  prepedData,
+  by,
+  subGroup = FALSE,
+  outliers = TRUE,
+  filter,
+  groupNames,
+  plotLoc,
+  width = 1,
+  flipFacts = FALSE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{prepedData}{list; a list object returned by \code{\link{prepCategoryWindow}}}

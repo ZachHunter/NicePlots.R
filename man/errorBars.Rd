@@ -4,8 +4,15 @@
 \alias{errorBars}
 \title{draw custom error bars}
 \usage{
-errorBars(x, capType = c("none", "bar", "ball"), capSize = NULL,
-  side = FALSE, col = "black", lType = 1, width = 1)
+errorBars(
+  x,
+  capType = c("none", "bar", "ball"),
+  capSize = NULL,
+  side = FALSE,
+  col = "black",
+  lType = 1,
+  width = 1
+)
 }
 \arguments{
 \item{x}{named list or data frame; \code{x$start}, \code{x$stop} and \code{x$at} must all be defined as numeric vectors in a named list or data.frame object. In the case of a data frame, each row returns a single error bar.}

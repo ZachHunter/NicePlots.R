@@ -4,16 +4,33 @@
 \alias{prepCategoryWindow}
 \title{prepare a plotting environment for categorical data such as bar plots or box plots}
 \usage{
-prepCategoryWindow(x, by = NULL, groupNames = levels(by),
-  minorTick = FALSE, guides = TRUE, yLim = NULL,
-  rotateLabels = FALSE, rotateY = TRUE, theme = NA, plotColors = if
-  (is.na(theme)) {     list(bg = "open", guides = "black", lines =
-  "gray22", points = "darkgrey", fill = "white") } else {    
-  theme$plotColors }, trim = FALSE, logScale = FALSE,
-  axisText = c(NULL, NULL), minorGuides = FALSE, extendTicks = F,
-  subGroup = FALSE, expLabels = TRUE, sidePlot = FALSE,
-  subGroupLabels = NULL, strictLimits = F, legend = FALSE,
-  pointHighlights = FALSE, logAdjustment = 1, stack = FALSE)
+prepCategoryWindow(
+  x,
+  by = NULL,
+  groupNames = levels(by),
+  minorTick = FALSE,
+  guides = TRUE,
+  yLim = NULL,
+  rotateLabels = FALSE,
+  rotateY = TRUE,
+  theme = NA,
+  plotColors = if (is.na(theme)) {     list(bg = "open", guides = "black", lines =
+    "gray22", points = "darkgrey", fill = "white") } else {     theme$plotColors },
+  trim = FALSE,
+  logScale = FALSE,
+  axisText = c(NULL, NULL),
+  minorGuides = FALSE,
+  extendTicks = F,
+  subGroup = FALSE,
+  expLabels = TRUE,
+  sidePlot = FALSE,
+  subGroupLabels = NULL,
+  strictLimits = F,
+  legend = FALSE,
+  pointHighlights = FALSE,
+  logAdjustment = 1,
+  stack = FALSE
+)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}

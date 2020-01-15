@@ -4,8 +4,15 @@
 \alias{prepLegendMarigins}
 \title{Set Legend Margins}
 \usage{
-prepLegendMarigins(x, by, theme, legend, pointHighlights = FALSE,
-  subGroup = TRUE, stack = FALSE)
+prepLegendMarigins(
+  x,
+  by,
+  theme,
+  legend,
+  pointHighlights = FALSE,
+  subGroup = TRUE,
+  stack = FALSE
+)
 }
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
