@@ -108,7 +108,7 @@ prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TR
           legendTitle<-colnames(by)[legendIndex]
           legendLevels<-levels(by[,legendIndex])
         } else {
-          warning(paste0("Warning: Unable to determine level which factor to use for legend.\nExpected ",legendIndex," columns for by but only found ",dim(by)[2],".\nProceeding  using the 2nd column of by."), call.=FALSE)
+          #warning(paste0("Warning: Unable to determine level which factor to use for legend.\nExpected ",legendIndex," columns for by but only found ",dim(by)[2],".\nProceeding  using the 2nd column of by."), call.=FALSE)
           legendTitle<-colnames(by)[2]
           legendLevels<-levels(by[,2])
         }

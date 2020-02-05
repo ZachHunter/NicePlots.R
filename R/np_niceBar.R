@@ -110,6 +110,10 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   groupNames<-finalOptions$groupNames
   errorCap<-finalOptions$errorCap
 
+  #Initialize legend variables so we can update based on options
+  legendTitle<-"Legend"
+  legendLabels<-NULL
+  legendColors<-plotColors$fill
 
   #To handle the fact the range is actually two different functions, upper and lower error bars are assinged separately
   upperErrorFun<-errFun[1]
@@ -225,11 +229,6 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   pvalue<-NULL
   if(subGroup==TRUE){width<-width*2}
 
-  #Initialize legend variables so we can update based on options
-  legendTitle<-"Legend"
-  legendLabels<-NULL
-  legendColors<-plotColors$fill
-
   filter<-rep(TRUE,length(x))
   if(trim>0){
     filter<-quantileTrim(x,trim,na.rm=T,returnFilter=T)[[2]]
@@ -259,7 +258,11 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       } else {
         #CASE: by is not a factor, data is a numeric vector and subGroup is FALSE
         facetLoc<-seq(1,length(groupNames))
-        width<-width*(facetLoc[2]-facetLoc[1])/4
+        if(length(groupNames)>1) {
+          width<-width*(facetLoc[2]-facetLoc[1])/4
+        } else {
+          width<-width/4
+        }
       }
       if(legend!=FALSE) {
         if(stack==TRUE){
@@ -304,21 +307,32 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
         }
       }
     } else {
-      #CASE: data is a dataframe, by is a dataframe, subGroup is ignored
+      #CASE: data is a dataframe, by is a dataframe
       facetLoc<-facetSpacing(length(prepedData[[1]]),length(levels(by[,1])))
       width<-width*(facetLoc[2]-facetLoc[1])/4
       if(legend!=FALSE) {
-        if(stack){
-          if(legend==TRUE){
-            legendTitle<-colnames(by)[2]
+        if(stack & flipFacts ==FALSE){
+          if(subGroup==TRUE) {
+            if(legend==TRUE){
+              legendTitle<-colnames(by)[2]
+            }
+            legendLabels<-levels(by[,2])
+          } else {
+            if(legend==TRUE){
+              legendTitle<-colnames(by)[1]
+            }
+            legendLabels<-levels(by[,1])
           }
-          legendLabels<-levels(by[,2])
         } else {
           if(flipFacts) {
             if(legend==TRUE){
               legendTitle<-"Legend"
             }
-            legendLabels<-levels(by[,1])
+            if(subGroup==TRUE & stack==TRUE){
+              legendLabels<-levels(by[,2])
+            } else {
+              legendLabels<-levels(by[,1])
+            }
           } else {
             if(legend==TRUE){
               legendTitle<-"Legend"

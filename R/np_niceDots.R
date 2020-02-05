@@ -77,6 +77,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
   if(is.data.frame(x) | is.matrix(x)) {
     if(dim(x)[2]>1 & subGroup==FALSE) {flipFacts<-TRUE}
   }
+
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = flipFacts)
   x<-checked$d
   by<-checked$b
@@ -192,8 +193,11 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
 
   #Initialize legend variables so we can update based on options
   legendTitle<-"Legend"
+  legendColors<-plotColors$points
   legendLabels<-NULL
-  legendColors<-plotColors$fill
+  if(length(legendColors)<=1 & length(plotColors$fill)>1){
+    legendColors<-plotColors$fill
+  }
 
   filter<-rep(TRUE,length(x))
   if(trim>0){
@@ -228,7 +232,11 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
         #CASE: by is not a factor, data is a numeric vector and subGroup is FALSE
         facetLoc<-seq(1,length(groupNames),by=1)
         names(facetLoc)<-groupNames
-        width<-width*(facetLoc[2]-facetLoc[1])/4
+        if (length(groupNames)>1) {
+          width<-width*(facetLoc[2]-facetLoc[1])/4
+        } else {
+          width<-width/4
+        }
       }
       if(legend!=FALSE) {
         if (subGroup==TRUE & dim(by)[2]>1) {
@@ -280,20 +288,23 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
       names(facetLoc)<-unlist(lapply(levels(by[,1]),FUN=function(y) paste0(y,names(x),sep=".")))
       width<-width*(facetLoc[2]-facetLoc[1])/4
       if(legend!=FALSE) {
-        if(flipFacts) {
+        if(pointHighlights){
           if(legend==TRUE){
-            legendTitle<-"Legend"
+            legendTitle<-colnames(by)[2]
           }
-          if(pointHighlights==T & subGroup==T & dim(by)[2]>1) {
-            legendLabels<-levels(by[,2])
-          } else {
-            legendLabels<-levels(by[,1])
-          }
+          legendLabels<-levels(by[,2])
         } else {
-          if(legend==TRUE){
-            legendTitle<-"Legend"
+          if(flipFacts) {
+            if(legend==TRUE){
+              legendTitle<-"Legend"
+            }
+            legendLabels<-levels(by[,1])
+          } else {
+            if(legend==TRUE){
+              legendTitle<-"Legend"
+            }
+            legendLabels<-colnames(prepedData[[1]])
           }
-          legendLabels<-colnames(prepedData[[1]])
         }
       }
     }
@@ -305,7 +316,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
 
   #updating preping the plot data from pData to be compatible with drawBar
   if(drawPoints[1]==TRUE) {
-    addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x),swarmOverflow = swarmOverflow)
+    addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
   }
   if(drawBar[1]==TRUE) {
     plotThis<-pData[[1]] %>%
@@ -329,11 +340,10 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
     }
 
   }
-
   #Draw legend and set associated options if indicated
   if(length(legendColors)<length(legendLabels) & legend!=FALSE){
     legend<-FALSE
-    warning("Not enough point colors to uniquely color subGroups levels\nPlease update plotColors point options to use legend options with this subgroup.", call.=FALSE)
+    warning("Not enough point colors to uniquely color factor levels\nPlease update plotColors point options to use legend options.", call.=FALSE)
   }
   oFont<-par()$family
   oCexMain<-par()$cex.main

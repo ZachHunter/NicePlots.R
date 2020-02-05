@@ -251,7 +251,7 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
   #Calcuate the relevant factor levels formating the graph.
   #Note that most of this is for handling empty factor levels
   if(is.data.frame(x)){
-    if(pointHighlights==TRUE) {
+    if(pointHighlights==TRUE | stack==TRUE) {
       if(type=="DP") {
         plotColors$lines<-plotColors$lines[1]
       }
@@ -263,17 +263,29 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
     byLength<-1
     if(is.data.frame(by)){
       byLength<-length(levels(by[,1]))
-      cFilter<-purrr::map(1:dim(x)[2], function(n) purrr::map_lgl(levels(by[,1]), function(y) length(x[by[,1]==y,n])>0)) %>% purrr::reduce(c)
+      if(stack==TRUE & subGroup==TRUE) {
+        cFilter<-purrr::map(1:dim(x)[2], function(n) purrr::map_lgl(levels(by[,2]), function(y) length(x[by[,2]==y,n])>0)) %>% purrr::reduce(c)
+      } else {
+        cFilter<-purrr::map(1:dim(x)[2], function(n) purrr::map_lgl(levels(by[,1]), function(y) length(x[by[,1]==y,n])>0)) %>% purrr::reduce(c)
+      }
     } else {
       byLength<-length(levels(by))
       cFilter<-purrr::map(1:dim(x)[2], function(n) purrr::map_lgl(levels(by), function(y) length(x[by==y,n])>0)) %>% purrr::reduce(c)
     }
     if(length(plotColors$fill)>1 & defaultFill==FALSE){
-      if(length(plotColors$fill)<length(seq(1,dim(x)[2]))) {
-        warning("Not enough fill colors specified to uniquely cover factor levels!")
-        plotColors$fill<-rep(plotColors$fill,length(plotColors$fill) %% dim(x)[2] +1)
+      if(stack==TRUE) {
+        if(length(plotColors$fill)<myLevels) {
+          warning("Not enough fill colors specified to uniquely cover factor levels!")
+          plotColors$fill<-rep(plotColors$fill,length(plotColors$fill) %% myLevels +1)
+        }
+        plotColors$fill<-rep(plotColors$fill[1:myLevels],byLength)[cFilter]
+      } else {
+        if(length(plotColors$fill)<length(seq(1,dim(x)[2]))) {
+          warning("Not enough fill colors specified to uniquely cover factor levels!")
+          plotColors$fill<-rep(plotColors$fill,length(plotColors$fill) %% dim(x)[2] +1)
+        }
+        plotColors$fill<-rep(plotColors$fill[1:dim(x)[2]],byLength)[cFilter]
       }
-      plotColors$fill<-rep(plotColors$fill[1:dim(x)[2]],byLength)[cFilter]
     }
     if(length(plotColors$lines)>1 & defaultLines==FALSE){
       if(length(plotColors$lines)<length(seq(1,dim(x)[2]))) {
@@ -319,11 +331,20 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
       cFilter<-purrr::map_lgl(levels(by), function(y) length(x[by==y])>0)
     }
     if(length(plotColors$fill)>1 & defaultFill==FALSE){
-      if(length(plotColors$fill)<byLevel) {
-        warning("Not enough fill colors specified to uniquely cover factor levels!")
-        plotColors$fill<-rep(plotColors$fill,length(plotColors$fill) %% byLevel +1)
+      if(stack==TRUE){
+        cFilterStack<-purrr::map(levels(by[,1]), function(n) purrr::map_lgl(levels(by[,3]), function(y) length(x[by[,1]==n & by[,3]==y])>0)) %>% purrr::reduce(c)
+        if(length(plotColors$fill)<length(levels(by[,3]))) {
+          warning("Not enough fill colors specified to uniquely cover factor levels!")
+          plotColors$fill<-rep(plotColors$fill,length(plotColors$fill) %% length(levels(by[,3])) +1)
+        }
+        plotColors$fill<-rep(plotColors$fill[1:length(levels(by[,3]))],byFactor)[cFilterStack]
+      } else {
+        if(length(plotColors$fill)<byLevel) {
+          warning("Not enough fill colors specified to uniquely cover factor levels!")
+          plotColors$fill<-rep(plotColors$fill,length(plotColors$fill) %% byLevel +1)
+        }
+        plotColors$fill<-rep(plotColors$fill[1:byLevel],byFactor)[cFilter]
       }
-      plotColors$fill<-rep(plotColors$fill[1:byLevel],byFactor)[cFilter]
     }
     if(length(plotColors$lines)>1 & defaultLines==FALSE){
       if(length(plotColors$lines)<byLevel) {
@@ -348,14 +369,18 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
     }
   } else if(is.data.frame(by)){
     myCol<-1
-    if(pointHighlights==TRUE) {
+    if(pointHighlights==TRUE | stack==TRUE) {
       #Not sure this is necessary
       #if(type=="DP") {
       #  plotColors$lines<-plotColors$lines[1]
       #}
       myLevels<-length(levels(by[,2]))
-      if(stack==TRUE) {
-        myCol<-2
+      if(stack==TRUE & type=="Bar") {
+        if (subGroup==TRUE) {
+          myCol<-3
+        } else {
+          myCol<-2
+        }
       }
     } else {
       myLevels<-length(levels(by[,1]))

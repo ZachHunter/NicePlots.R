@@ -322,7 +322,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
 
   if(length(legendColors)<length(legendLabels) & legend!=FALSE){
     legend<-FALSE
-    warning("Not enough point colors to uniquely color subGroups levels\nPlease update plotColors point options to use legend options with this subgroup.", call.=FALSE)
+    warning("Not enough point colors to uniquely color factor levels\nPlease update plotColors point options to use legend options.", call.=FALSE)
   }
 
   oFont<-par()$family
