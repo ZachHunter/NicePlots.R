@@ -335,7 +335,7 @@ boot95ci<-function(x,agg="mean",upper=FALSE) {
 }
 
 # This is just an extention of plot to handle the npData class for convenience.
-# @export
+#' @export
 plot.npData <- function(x,plotType=NULL, ...) {
   clOptions<-list(...)
   for(opt in names(clOptions)) {
