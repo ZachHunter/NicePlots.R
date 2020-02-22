@@ -84,8 +84,12 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
   rm(checked)
   swarmOverflow<-NULL
 
-  #Here we check to see if the user specified any options so that they are left unaltered if present
+  #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
+  ActiveOptions<-list(x=x, by=by, groupNames=groupNames, drawPoints=drawPoints, drawBar=drawBar,barWidth=barWidth, barType=barType, barThickness=barThickness, aggFun=aggFun,errFun=errFun, errorMultiple=errorMultiple, main=main,sub=sub, ylab=ylab, minorTick=minorTick, theme=theme, guides=guides, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, subGroupLabels=subGroupLabels, expLabels=expLabels, sidePlot=sidePlot, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth, na.rm=na.rm, flipFacts=flipFacts, verbose=verbose, legend=legend,logAdjustment=logAdjustment,errorCap=errorCap, errorLineType=errorLineType,capWidth=capWidth, lWidth=lWidth)
+  ActiveOptions<-append(ActiveOptions,moreOptions)
+
+  #Here we check to see if the user specified any options so that they not overwritten by the designated theme
   finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=pointShape,whiskerLineType=errorLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subGroup=subGroup,stack=FALSE,pointHighlights=pointHighlights,type="DP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=pointMethod,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow=swarmOverflow ,errorCap=errorCap,CLOptions=moreOptions)
   minorTick<-finalOptions$minorTick
   pointShape<-finalOptions$pointShape
@@ -371,6 +375,26 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
     }
   }
   par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)
-  dataOut<-list(data=data.frame(prepedData$data,by),summary=pData[[2]],stats=pvalue)
+
+  #formating the output list and setting class int npData
+  dataOut<-list(summary=pData[[2]],stats=pvalue,plotType="dot",options=ActiveOptions)
+  class(dataOut)<-c("npData","list")
+
   invisible(dataOut)
 }
+
+#' @export
+niceDots.npData <- function(x,  ...) {
+  clOptions<-list(...)
+  for(opt in names(clOptions)) {
+    if(is.null(x$options[opt])){
+      append(x$options,list(opt=clOptions[[opt]]))
+    }else{
+      x$options[[opt]]<-clOptions[[opt]]
+    }
+  }
+  dataOut<-do.call("niceDots",x$options)
+  invisible(dataOut)
+}
+
+

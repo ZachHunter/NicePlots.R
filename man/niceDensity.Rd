@@ -10,7 +10,7 @@ niceDensity(
   drawPoints = TRUE,
   groupNames = NULL,
   subGroup = FALSE,
-  useRgl = TRUE,
+  useRgl = FALSE,
   plotType = c("contour", "surface"),
   theme = basicTheme,
   main = NULL,

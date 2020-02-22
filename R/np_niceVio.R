@@ -82,8 +82,12 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
   swarmOverflow<-NULL
   lWidth<-NULL
 
-  #Here we check to see if the user specified any options so that they are left unaltered if present
+  #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
+  ActiveOptions<-list(x=x, by=by, h=h, groupNames=groupNames, main=main,sub=sub, ylab=ylab, minorTick=minorTick, guides=guides, theme=theme, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, drawBox=drawBox, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, subGroupLabels=subGroupLabels, expLabels=expLabels, sidePlot=sidePlot, drawPoints=drawPoints, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth,flipFacts=flipFacts,  na.rm=na.rm, verbose=verbose,legend=legend, trimViolins=trimViolins,logAdjustment=logAdjustment)
+  ActiveOptions<-append(ActiveOptions,moreOptions)
+
+  #Here we check to see if the user specified any options so that they not overwritten by the designated theme
   finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=pointShape,whiskerLineType=NULL,lWidth=lWidth,capWidth=NULL,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subGroup=subGroup,stack=F,pointHighlights=pointHighlights,type="VP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=pointMethod,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow=swarmOverflow, errorCap = "bar", CLOptions=moreOptions)
   minorTick<-finalOptions$minorTick
   pointShape<-finalOptions$pointShape
@@ -349,6 +353,25 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
     }
   }
   par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)
-  dataOut<-list(data=data.frame(prepedData$data,by),summary=plotData,stats=pvalue)
+
+  #formating the output list and setting class int npData
+  dataOut<-list(summary=plotData,stats=pvalue,plotType="violin",options=ActiveOptions)
+  class(dataOut)<-c("npData","list")
+
   invisible(dataOut)
 }
+
+#' @export
+niceVio.npData <- function(x, ...) {
+  clOptions<-list(...)
+  for(opt in names(clOptions)) {
+    if(is.null(x$options[opt])){
+      append(x$options,list(opt=clOptions[[opt]]))
+    }else{
+      x$options[[opt]]<-clOptions[[opt]]
+    }
+  }
+  dataOut<-do.call("niceVio",x$options)
+  invisible(dataOut)
+}
+

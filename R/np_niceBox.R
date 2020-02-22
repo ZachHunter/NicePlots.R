@@ -68,7 +68,11 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
   lWidth<-NULL
   whiskerLineType<-NULL
   capWidth<-NULL
+
+  #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
+  ActiveOptions<-list(x=x, by=by, groupNames=groupNames, main=main,sub=sub, ylab=ylab, theme=theme, minorTick=minorTick, guides=guides, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, drawBox=drawBox, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, subGroupLabels=subGroupLabels, expLabels=expLabels, sidePlot=sidePlot, drawPoints=drawPoints, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth, flipFacts=flipFacts, na.rm=na.rm, verbose=verbose, legend=legend,logAdjustment=logAdjustment)
+  ActiveOptions<-append(ActiveOptions,moreOptions)
 
   #This is to make sure multivariate input to X is ploted as a primary factor if subGroup==FALSE
   if(is.data.frame(x) | is.matrix(x)) {
@@ -275,7 +279,25 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
     }
   }
   par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)
-  dataOut<-list(data=data.frame(prepedData$data,by),summary=plotData,stats=pvalue)
+
+  #formating the output list and setting class int npData
+  dataOut<-list(summary=plotData,stats=pvalue,plotType="box",options=ActiveOptions)
+  class(dataOut)<-c("npData","list")
 
   invisible(dataOut)
 }
+
+#' @export
+niceBox.npData <- function(x,  ...) {
+  clOptions<-list(...)
+  for(opt in names(clOptions)) {
+    if(is.null(x$options[opt])){
+      append(x$options,list(opt=clOptions[[opt]]))
+    }else{
+      x$options[[opt]]<-clOptions[[opt]]
+    }
+  }
+  dataOut<-do.call("niceBox",x$options)
+  invisible(dataOut)
+}
+

@@ -334,4 +334,35 @@ boot95ci<-function(x,agg="mean",upper=FALSE) {
   errVal
 }
 
+# This is just an extention of plot to handle the npData class for convenience.
+# @export
+plot.npData <- function(x,plotType=NULL, ...) {
+  clOptions<-list(...)
+  for(opt in names(clOptions)) {
+    if(is.null(x$options[opt])){
+      append(x$options,list(opt=clOptions[[opt]]))
+    }else{
+      x$options[[opt]]<-clOptions[[opt]]
+    }
+  }
+  if(!is.null(plotType)) {
+    if(plotType %in% c("bar", "box", "dot", "violin", "density")) {
+      x$plotType<-plotType
+    } else {
+      warning("Invalid plotType options.\nValid options include,'bar', 'box', 'dot', 'violin' and 'density'.\nProceeding with default...",call.=FALSE)
+    }
+  }
+  niceFun<-"niceBox"
+  if(x$plotType=="bar"){
+    niceFun<-"niceBar"
+  } else if (x$plotType=="dot") {
+    niceFun<-"niceDots"
+  } else if (x$plotType=="violin"){
+    niceFun<-"niceVio"
+  } else if (x$plotType=="density"){
+    niceFun<-"niceDenisty"
+  }
+  dataOut<-do.call(niceFun,x$options)
+  invisible(dataOut)
+}
 

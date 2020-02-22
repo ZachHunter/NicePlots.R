@@ -56,16 +56,21 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   whiskerLineType<-NULL
   capWidth<-NULL
 
+  #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
+  moreOptions<-list(...)
+  ActiveOptions<-list(x=x, by=by, groupNames=groupNames, aggFun=aggFun,errFun=errFun, theme=theme, legend=legend, stack=stack, main=main,sub=sub, ylab=ylab, minorTick=minorTick, guides=guides, outliers=outliers, width=width, errorMultiple=errorMultiple, plotColors=plotColors, logScale=logScale, trim=trim, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, subGroupLabels=subGroupLabels, expLabels=expLabels, sidePlot=sidePlot, errorBars=errorBars, errorCap=errorCap, errorLineType=errorLineType,capWidth=capWidth, lWidth=lWidth, na.rm=na.rm, flipFacts=flipFacts, verbose=verbose,logAdjustment=logAdjustment, normalize=normalize)
+  ActiveOptions<-append(ActiveOptions,moreOptions)
+
   if(is.data.frame(x) | is.matrix(x)) {
     if(dim(x)[2]>1 & subGroup==FALSE) {flipFacts<-TRUE}
   }
+
+  #Here we check to see if the user specified any options so that they are left unaltered if present
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = flipFacts)
   x<-checked$d
   by<-checked$b
   rm(checked)
 
-  #Here we check to see if the user specified any options so that they are left unaltered if present
-  moreOptions<-list(...)
   #If a theme does not have more than one fill color or line color we try to see if we can use point colors instead.
   #This means we need to do some work in advance of the procNiceOptions function
   cFill<-basicTheme$plotColors$fill
@@ -383,6 +388,24 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
     }
   }
   par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)
-  dataOut<-list(data=data.frame(prepedData$data,by),summary=pData[[2]],stats=pvalue)
+
+  #formating the output list and setting class int npData
+  dataOut<-list(summary=pData[[2]],stats=pvalue,plotType="bar",options=ActiveOptions)
+  class(dataOut)<-c("npData","list")
+
+  invisible(dataOut)
+}
+
+#' @export
+niceBar.npData <- function(x,  ...) {
+  clOptions<-list(...)
+  for(opt in names(clOptions)) {
+    if(is.null(x$options[opt])){
+      append(x$options,list(opt=clOptions[[opt]]))
+    }else{
+      x$options[[opt]]<-clOptions[[opt]]
+    }
+  }
+  dataOut<-do.call("niceBar",x$options)
   invisible(dataOut)
 }

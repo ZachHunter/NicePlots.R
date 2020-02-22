@@ -33,14 +33,14 @@
 #' @importFrom purrr walk2 map_dbl
 #' @importFrom graphics polygon contour lines persp
 #' @export
-niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subGroup=FALSE, useRgl=TRUE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", rotateLabels=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, ...) {UseMethod("niceDensity",x)}
+niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subGroup=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", rotateLabels=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, ...) {UseMethod("niceDensity",x)}
 
 #' @import dplyr
 #' @importFrom KernSmooth bkde bkde2D dpih
 #' @importFrom purrr walk2 map_dbl
 #' @importFrom graphics polygon contour lines persp
 #' @export
-niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGroup=FALSE, useRgl=TRUE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), showCalc=FALSE, calcType="none", rotateLabels=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, ...)  {
+niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGroup=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), showCalc=FALSE, calcType="none", rotateLabels=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, ...)  {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset",call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -51,8 +51,13 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
   if(is.data.frame(by)){
     by<-factor(by[,1])
   }
-  #Here we check to see if the user specified any options so that they are left unaltered if present
+
+  #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
+  ActiveOptions<-list(x=x, by=by, drawPoints=drawPoints, groupNames=groupNames,subGroup=subGroup, useRgl=useRgl, plotType=plotType,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=showCalc, calcType=calcType, rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimCurves=trimCurves)
+  ActiveOptions<-append(ActiveOptions,moreOptions)
+
+  #Here we check to see if the user specified any options so that they not overwritten by the designated theme
   finalOptions<-procNiceOptions(x=rep(1,length(by)),by=by,minorTick=minorTick,pointShape=NULL,whiskerLineType=NULL,lWidth=lWidth,capWidth=NULL,pointLaneWidth=FALSE,width=NULL,guides=guides,pointSize=NULL,subGroup=subGroup,stack=F,pointHighlights=FALSE,type="VP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=NULL,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow=NULL, errorCap = NULL, CLOptions=moreOptions)
   minorTick<-finalOptions$minorTick
   pointShape<-finalOptions$pointShape
@@ -167,8 +172,29 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
         }
       }
     } else if(plotType=="surface") {
-      legend<-FALSE
-      persp(den2D$x1, den2D$x2, den2D$fhat,col=theme$plotColors$fill[1],main = main,xlab = xlab,ylab=ylab,zlab = "Density")
+      if(useRgl==TRUE) {
+        if (! requireNamespace("rgl", quietly = TRUE)) {
+          useRgl<-FALSE
+          warning("Unable to load package rgl, proceeding with base R plotting options.\nPlease install rgl: install.packages('rgl') or set useRgl to FALSE", call.=FALSE)
+        } else {
+          rgl::open3d()
+          rgl::bg3d("white")
+          rgl::material3d(col = "black")
+          rgl::persp3d(den2D$x1, den2D$x2, den2D$fhat, col=plotColors$fill[1],xlab = xlab,ylab=ylab,zlab = "Density")
+        }
+      }
+        if(useRgl==FALSE){
+        legend<-FALSE
+        theta <- 0
+        phi <- 15
+        r <- sqrt(3)
+        d <- 1
+        if(!is.null(moreOptions[["theta"]])) {theta<-moreOptions[["theta"]]}
+        if(!is.null(moreOptions[["phi"]])) {phi<-moreOptions[["phi"]]}
+        if(!is.null(moreOptions[["r"]])) {r<-moreOptions[["r"]]}
+        if(!is.null(moreOptions[["d"]])) {d<-moreOptions[["d"]]}
+        persp(den2D$x1, den2D$x2, den2D$fhat,col=plotColors$fill[1],main = main,xlab = xlab,ylab=ylab,zlab = "Density",theta=theta,phi=phi,r=r,d=d)
+      }
     } else {
       stop("Error: plotType should be set to either \'contour\' or \'surface\' for 2D desntsity plots")
     }
@@ -239,17 +265,24 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
     makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=theme$LegendBorder, lineCol=theme$LegendLineCol, bg=theme$LegendBG, col=legendColors, shape="rect",size=theme$LegendSize,spacing=theme$LegendSpacing)
   }
   par(col.sub=oSubCol, col.lab=oLabCol,col.main=oMainCol,family=oFont,cex.main=oCexMain,cex.lab=oCexlab,cex.sub=oCexSub)
+
+  #formating the output list and setting class int npData
+  dataOut<-list(summary=NA,stats=NA,plotType="density",options=ActiveOptions)
+  class(dataOut)<-c("npData","list")
+
+  invisible(dataOut)
 }
 
-
-# open3d()
-# bg3d("white")
-# material3d(col = "black")
-# persp3d(test$x1, test$x2, test$fhat,col="lightblue")
-
-# vizz <- function(x, y){
-#   if (! requireNamespace("lattice", quietly = TRUE)) {
-#     stop("Please install lattice: install.packages('lattice')")
-#     lattice::xyplot(y ~ x)
-#   }
-# }
+#' @export
+niceDensity.npData <- function(x, ...) {
+  clOptions<-list(...)
+  for(opt in names(clOptions)) {
+    if(is.null(x$options[opt])){
+      append(x$options,list(opt=clOptions[[opt]]))
+    }else{
+      x$options[[opt]]<-clOptions[[opt]]
+    }
+  }
+  dataOut<-do.call("niceDensity",x$options)
+  invisible(dataOut)
+}
