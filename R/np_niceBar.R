@@ -159,11 +159,11 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
 
   #If we are adding this to an existing plot then we can't count on prepCategoryWindow to log transform the data
   if(add==TRUE) {
-    if(logScale>1) {
-      prepedData<-list(data=log(x+logAdjustment,logScale))
-    } else {
+    #if(logScale>1) {
+    #  prepedData<-list(data=log(x+logAdjustment,logScale))
+    #} else {
       prepedData<-list(data=x)
-    }
+    #}
   } else {
     prepedData<-x
     #in order to know how to set the window size, we need to preprocess the data
@@ -355,8 +355,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   #updating the plot data from pData to be compatible with drawBar
   pData[[1]] %>%
     mutate(yb=bVal,UpperError=.data$upperError, LowerError=.data$lowerError,yt=.data$AData) %>%
-    drawBar(plotColors=plotColors, errorBars=errorBars, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth, normalize=normalize)
-
+    drawBar(plotColors=plotColors, errorBars=errorBars, errorCap=errorCap, errorLineType=errorLineType, width=width, sidePlot=sidePlot, stacked=stack, capSize=capWidth, lineWidth=lWidth, normalize=normalize, logScale=logScale, logAdjustment=logAdjustment)
   #Draw legend and set associated options if indicated
   if(length(legendColors)<length(legendLabels) & legend!=FALSE){
     legend<-FALSE

@@ -65,7 +65,7 @@ makeLogTicks<-function(dataRange,minorCount=10,logScale=2,axisText=c(NULL,NULL),
 #' @import dplyr
 #' @importFrom purrr map_dbl
 prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TRUE,stack=FALSE){
-  legendIndex<-NA
+  legendIndex<-1
   legendTitle<-""
   legendLevels<-NULL
   oMai<-par()$mai

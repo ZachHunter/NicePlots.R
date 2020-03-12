@@ -15,7 +15,9 @@ drawBar(
   stacked = FALSE,
   capSize = 2,
   lineWidth = 1,
-  normalize = FALSE
+  normalize = FALSE,
+  logScale = FALSE,
+  logAdjustment = 1
 )
 }
 \arguments{
@@ -40,6 +42,10 @@ drawBar(
 \item{lineWidth}{numeric; Sets the \code{lwd} options for controling line plotting thickness for the bar plot.}
 
 \item{normalize}{logical; Normalizes stacked bars to 100\%. If \code{stacked==\link{TRUE}} and \code{normalize==\link{TRUE}} the stacked bars will all go to 100\%. Otherwise the bars represent the cumuative value.}
+
+\item{logScale}{numeric; the logarithm base to use for the log scale transformation.}
+
+\item{logAdjustment}{numeric; a number added to each value prior to log trasformation. Defaults value is 1.}
 }
 \description{
 Add a barplot with options error pars to the active ploting enviroment

@@ -360,7 +360,7 @@ plot.npData <- function(x,plotType=NULL, ...) {
   } else if (x$plotType=="violin"){
     niceFun<-"niceVio"
   } else if (x$plotType=="density"){
-    niceFun<-"niceDenisty"
+    niceFun<-"niceDensity"
   }
   dataOut<-do.call(niceFun,x$options)
   invisible(dataOut)

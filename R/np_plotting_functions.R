@@ -318,27 +318,62 @@ drawViolinPlot <- function(x,groups,at=seq(1,length(levels(groups))),h=NULL, plo
   kernals<-NULL
   if(is.null(h)){
     if(trimViolins) {
-      kernals<-purrr::map(myLevels, function(y) if(length(x[groups==y])>1) {KernSmooth::bkde(x[groups==y],gridsize = points,range.x = c(min(x[groups==y]),max(x[groups==y])))}else{NULL})
+      kernals<-purrr::map(myLevels, function(y) if(length(x[groups==y])>1) {
+        tryCatch(
+          {k<-KernSmooth::bkde(x[groups==y],gridsize = points,range.x = c(min(x[groups==y]),max(x[groups==y])))},
+          error = function(e) {
+            k<- -1
+            warning(paste0("KernSmooth bkde: Unable to estimate bandwith for group ",y),call.=FALSE)
+            return(k)
+          })
+        } else {-1}
+      )
     } else {
-      kernals<-purrr::map(myLevels, function(y) if(length(x[groups==y])>1) {KernSmooth::bkde(x[groups==y],gridsize = points)}else{NULL})
+
+      kernals<-purrr::map(myLevels, function(y) if(length(x[groups==y])>1) {
+        tryCatch(
+          {k<-KernSmooth::bkde(x[groups==y],gridsize = points)},
+          error = function(e) {
+            k<- -1
+            warning(paste0("KernSmooth bkde: Unable to estimate bandwith for group ",y),call.=FALSE)
+            return(k)
+          })
+        }else{-1}
+      )
     }
 
   } else {
     for(i in 1:length(myLevels)){
       if(length(x[groups==myLevels[i]])>1) {
         if(trimViolins) {
-          kernals[i]<-KernSmooth::bkde(x[groups==myLevels[i]],gridsize=points,bandwidth = h[(i-1) %% length(h) + 1],range.x = c(min(x[groups==myLevels[i]]),max(x[x[groups==myLevels[i]]])))
+          tryCatch(
+            {kernals[i]<-KernSmooth::bkde(x[groups==myLevels[i]],gridsize=points,bandwidth = h[(i-1) %% length(h) + 1],range.x = c(min(x[groups==myLevels[i]]),max(x[x[groups==myLevels[i]]])))},
+            error = function(e) {
+              k<- -1
+              warning(paste0("KernSmooth bkde: Unable to estimate bandwith for group ",myLevels[i]),call.=FALSE)
+              return(k)
+            }
+          )
         } else {
-          kernals[i]<-KernSmooth::bkde(x[groups==myLevels[i]],gridsize=points,bandwidth = h[(i-1) %% length(h) + 1])
+          tryCatch(
+            {kernals[i]<-KernSmooth::bkde(x[groups==myLevels[i]],gridsize=points,bandwidth = h[(i-1) %% length(h) + 1])},
+            error = function(e) {
+              k<- -1
+              warning(paste0("KernSmooth bkde: Unable to estimate bandwith for group ",myLevels[i]),call.=FALSE)
+              return(k)
+            }
+          )
         }
       }
     }
   }
 
   #Use polygon to plot symetrical kernal densities by category to draw violins
-  vioWidth<-purrr::map_dbl(kernals, function(z) if(!is.null(z)){max(z$y)*2/width} else {0})
+  vioWidth<-purrr::map_dbl(kernals, function(z) if(!is.null(z) & !is.numeric(z)) {max(z$y)*2/width} else {
+    return(0)
+  })
   for(i in 1:length(myLevels)){
-    if(!is.null(kernals[[i]])) {
+    if(!is.null(kernals[[i]]) & !is.numeric(kernals[[i]])) {
       if(sidePlot){
         polygon(c(kernals[[i]]$x,rev(kernals[[i]]$x)),c(at[myLevels[i]]+kernals[[i]]$y/vioWidth[i],rev(at[myLevels[i]]-kernals[[i]]$y/vioWidth[i])),col=fill[(i-1) %% length(fill) + 1],border=borderCol[(i-1) %% length(borderCol) + 1],lwd=borderWidth)
       } else {
@@ -368,6 +403,8 @@ drawViolinPlot <- function(x,groups,at=seq(1,length(levels(groups))),h=NULL, plo
 #' @param capSize numeric; cex like scaling value the controls the size of the caps on the error bars.
 #' @param lineWidth numeric; Sets the \code{lwd} options for controling line plotting thickness for the bar plot.
 #' @param normalize logical; Normalizes stacked bars to 100\%. If \code{stacked==\link{TRUE}} and \code{normalize==\link{TRUE}} the stacked bars will all go to 100\%. Otherwise the bars represent the cumuative value.
+#' @param logScale numeric; the logarithm base to use for the log scale transformation.
+#' @param logAdjustment numeric; a number added to each value prior to log trasformation. Defaults value is 1.
 #'
 #' @examples
 #' data(iris)
@@ -382,7 +419,7 @@ drawViolinPlot <- function(x,groups,at=seq(1,length(levels(groups))),h=NULL, plo
 #' @import dplyr
 #' @importFrom graphics rect
 #' @seealso \code{\link[graphics]{barplot}}, \code{\link{niceBar}}, \code{\link{errorBars}}
-drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineType=1, width=.5, sidePlot=FALSE, stacked=FALSE,capSize=2,lineWidth=1,normalize=FALSE) {
+drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineType=1, width=.5, sidePlot=FALSE, stacked=FALSE,capSize=2,lineWidth=1,normalize=FALSE, logScale=FALSE, logAdjustment=1) {
   colorOrder<-plotColors$fill
   #This section builds out the color list to match the number of factors for stacted barplots
   if(stacked){
@@ -404,9 +441,17 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
         if(normalize==TRUE) {
           temp$yt<-temp$yt/sum(temp$ty)
         }
-        for(i in levels(factor(temp$Stack))) {
-          rect(temp[temp$Stack==i,"yb"]+hAdjust,at-width,temp[temp$Stack==i,"yt"]+hAdjust,at+width,col=colorOrder[as.character(i)],border=plotColors$lines[1], lwd=lineWidth)
-          hAdjust<-temp[temp$Stack==i,"yt"]+hAdjust
+        if(logScale!=FALSE & !is.na(logScale) & !is.null(logScale)){
+          temp$yt<-logScale^temp$yt - logAdjustment
+          for(i in levels(factor(temp$Stack))) {
+            rect(log(temp[temp$Stack==i,"yb"]+hAdjust+logAdjustment,logScale),at-width,log(temp[temp$Stack==i,"yt"]+hAdjust+logAdjustment,logScale),at+width,col=colorOrder[as.character(i)],border=plotColors$lines[1], lwd=lineWidth)
+            hAdjust<-temp[temp$Stack==i,"yt"]+hAdjust
+          }
+        } else {
+          for(i in levels(factor(temp$Stack))) {
+            rect(temp[temp$Stack==i,"yb"]+hAdjust,at-width,temp[temp$Stack==i,"yt"]+hAdjust,at+width,col=colorOrder[as.character(i)],border=plotColors$lines[1], lwd=lineWidth)
+            hAdjust<-temp[temp$Stack==i,"yt"]+hAdjust
+          }
         }
       }
     } else {
@@ -434,9 +479,17 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
         if(normalize==TRUE) {
           temp$yt<-temp$yt/sum(temp$yt,na.rm=TRUE)*100
         }
-        for(i in levels(factor(temp$Stack))) {
-          rect(at-width, temp[temp$Stack==i,"yb"]+hAdjust,at+width,temp[temp$Stack==i,"yt"]+hAdjust,col=colorOrder[as.character(i)],border=plotColors$lines[1], lwd=lineWidth)
-          hAdjust<-temp[temp$Stack==i,"yt"]+hAdjust
+        if(logScale!=FALSE & !is.na(logScale) & !is.null(logScale)){
+          temp$yt<-logScale^temp$yt - logAdjustment
+          for(i in levels(factor(temp$Stack))) {
+            rect(at-width, log(temp[temp$Stack==i,"yb"]+hAdjust + logAdjustment,logScale),at+width,log(temp[temp$Stack==i,"yt"]+hAdjust+logAdjustment,logScale),col=colorOrder[as.character(i)],border=plotColors$lines[1], lwd=lineWidth)
+            hAdjust<-temp[temp$Stack==i,"yt"]+hAdjust
+          }
+        } else {
+         for(i in levels(factor(temp$Stack))) {
+            rect(at-width, temp[temp$Stack==i,"yb"]+hAdjust,at+width,temp[temp$Stack==i,"yt"]+hAdjust,col=colorOrder[as.character(i)],border=plotColors$lines[1], lwd=lineWidth)
+            hAdjust<-temp[temp$Stack==i,"yt"]+hAdjust
+         }
         }
       }
     } else {
@@ -521,16 +574,21 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
             drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
         } else {
           #draws outliers if drawPoints is off
-          bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
-            mutate(at=facetLoc[.data$fact]) %>%
+          #This gets thrown off if there are levels with no outliers so there is some addtional handling of color levels here.
+          tempCols<-plotColors$points
+          if(length(tempCols)<length(levels(by[filter]))){
+            tempCols<-rep(tempCols,(length(levels(by[filter])) %% length(tempCols)) +1)
+          }
+          pointDat<-bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
+            mutate(at=facetLoc[.data$fact],colCheck=tempCols[by[filter]]) %>%
             group_by(.data$fact) %>%
             mutate(tFilter=quantileTrim(data,threshold=outliers,returnFilter = TRUE)[[2]]==FALSE) %>%
-            filter(.data$tFilter) %>% bind_rows() %>%
-            drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
+            filter(.data$tFilter) %>% ungroup()
+          drawPoints(pointDat,highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth,col=tempCols[tempCols %in% as.character(pointDat$colCheck)],swarmOverflow=swarmOverflow)
         }
       }
     } else {
-      #CASE: by is not a factor data is a numeric vector and subGroup is TRUE
+      #CASE: by is not a factor, data is a numeric vector and subGroup is TRUE
       if(subGroup) {
         if(outliers==FALSE) {
           if(drawPoints) {
@@ -557,12 +615,17 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
             }
           } else {
             #draw the outlier points if drawPoints == FALSE and outliers != FALSE
-            bind_cols(data=prepedData[[1]],fact=by[filter,1],subGroup=by[filter,2]) %>%
-              mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+            #This gets thrown off if there are levels with no outliers so there is some addtional handling of color levels here.
+            tempCols<-plotColors$points
+            if(length(tempCols)<length(levels(by[filter,2]))){
+              tempCols<-rep(tempCols,(length(levels(by[filter,2])) %% length(tempCols)) +1)
+            }
+            pointDat<-bind_cols(data=prepedData[[1]],fact=by[filter,1],subGroup=by[filter,2]) %>%
+              mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel],colCheck=tempCols[by[filter,2]]) %>%
               group_by(.data$facetLevel) %>%
               mutate(tFilter=quantileTrim(data,threshold=outliers,returnFilter = TRUE)[[2]]==FALSE) %>%
-              filter(.data$tFilter) %>% bind_rows() %>%
-              drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/length(levels(by[,2])),col=plotColors$points,swarmOverflow=swarmOverflow)
+              filter(.data$tFilter) %>% ungroup()
+            drawPoints(pointDat,highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/length(levels(by[,2])),col=tempCols[tempCols %in% as.character(pointDat$colCheck)],swarmOverflow=swarmOverflow)
           }
         }
       } else {
@@ -592,12 +655,17 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
             }
           } else {
             #draws outliers if drawPoints is off
-            bind_cols(data=prepedData[[1]],fact=by[filter,1]) %>%
-              mutate(at=facetLoc[.data$fact]) %>%
+            #This gets thrown off if there are levels with no outliers so there is some addtional handling of color levels here.
+            tempCols<-plotColors$points
+            if(length(tempCols)<length(levels(by[filter,1]))){
+              tempCols<-rep(tempCols,(length(levels(by[filter,1])) %% length(tempCols)) +1)
+            }
+            pointDat<-bind_cols(data=prepedData[[1]],fact=by[filter,1]) %>%
+              mutate(at=facetLoc[.data$fact],colCheck=tempCols[by[filter,1]]) %>%
               group_by(.data$fact) %>%
               mutate(tFilter=quantileTrim(data,threshold=outliers,returnFilter = TRUE)[[2]]==FALSE) %>%
-              filter(.data$tFilter) %>% bind_rows() %>%
-              drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow)
+              filter(.data$tFilter) %>% ungroup()
+            drawPoints(pointDat,highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth,col=tempCols[tempCols %in% as.character(pointDat$colCheck)],swarmOverflow=swarmOverflow)
           }
         }
       }
@@ -620,13 +688,18 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
             drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
         } else {
           #draws outliers if drawPoints is off
-          bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
+          #This gets thrown off if there are levels with no outliers so there is some addtional handling of color levels here.
+          tempCols<-plotColors$points
+          if(length(tempCols)<length(levels(by[filter]))){
+            tempCols<-rep(tempCols,(length(levels(by[filter])) %% length(tempCols)) +1)
+          }
+          pointDat<-bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
             tidyr::gather(factor_key=TRUE, key=subGroup,value=data,-.data$fact) %>%
-            mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+            mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel],colCheck=tempCols[.data$subGroup]) %>%
             group_by(.data$facetLevel) %>%
             mutate(tFilter=quantileTrim(data,threshold=outliers,returnFilter = TRUE)[[2]]==FALSE) %>%
-            filter(.data$tFilter) %>% bind_rows() %>%
-            drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
+            filter(.data$tFilter) %>% ungroup()
+          drawPoints(pointDat,highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/dataCols,col=tempCols[tempCols %in% as.character(pointDat$colCheck)],swarmOverflow=swarmOverflow)
         }
       }
     } else {
@@ -660,13 +733,18 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
           }
         } else {
           #draws outliers if drawPoints is off
-          bind_cols(data=prepedData[[1]],fact=by[filter,1]) %>%
+          #This gets thrown off if there are levels with no outliers so there is some addtional handling of color levels here.
+          tempCols<-plotColors$points
+          if(length(tempCols)<dim(prepedData[[1]])[2]){
+            tempCols<-rep(tempCols,(dim(prepedData[[1]])[2] %% length(tempCols)) +1)
+          }
+          pointDat<-bind_cols(data=prepedData[[1]],fact=by[filter,1]) %>%
             tidyr::gather(factor_key=TRUE, key=subGroup,value=data,-.data$fact) %>%
-            mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+            mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel],colCheck=tempCols[.data$subGroup]) %>%
             group_by(.data$facetLevel) %>%
             mutate(tFilter=quantileTrim(data,threshold=outliers,returnFilter = TRUE)[[2]]==FALSE) %>%
-            filter(.data$tFilter) %>% bind_rows() %>%
-            drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
+            filter(.data$tFilter) %>% ungroup()
+          drawPoints(pointDat,highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/dataCols,col=tempCols[tempCols %in% as.character(pointDat$colCheck)],swarmOverflow=swarmOverflow)
         }
       }
     }

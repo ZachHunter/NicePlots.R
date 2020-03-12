@@ -150,9 +150,16 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
       x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
       title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$numbers)
     }
-    den2D<-bkde2D(as.matrix(x[,1:2]),bandwidth=c(dpih(x[,1],gridsize=curvePoints),dpih(x[,2],gridsize=curvePoints),gridsize=c(curvePoints,curvePoints)))
+    tryCatch({den2D<-bkde2D(as.matrix(x[,1:2]),bandwidth=c(dpih(x[,1],gridsize=curvePoints),dpih(x[,2],gridsize=curvePoints),gridsize=c(curvePoints,curvePoints)))},
+      error=function(e) {
+        warning("KernSmooth bkde2D unable to estimate kernal density.")
+        return(-1)
+      }
+    )
     if(plotType[1]=="contour") {
-      contour(den2D$x1, den2D$x2, den2D$fhat,col=theme$plotColors$lines[1],main=main,sub=sub,ylab=ylab, add=TRUE)
+      if(!is.numeric(den2D)) {
+        contour(den2D$x1, den2D$x2, den2D$fhat,col=theme$plotColors$lines[1],main=main,sub=sub,ylab=ylab, add=TRUE)
+      }
       if(drawPoints==TRUE) {
         if(is.null(by)){
           n_groups<-1
@@ -164,14 +171,13 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
           n_groups<-length(levels(factor(by[,1])))
           groups<-factor(by[,1])
         }
-        print(theme$plotColors$points)
         if(length(pointShape) < n_groups) {pointShape<-rep(pointShape,n_groups)}
         if(length(plotColors$points) < n_groups) {plotColors$points<-rep(plotColors$points,n_groups)}
         for(i in 1:n_groups){
           points(x[groups==levels(groups)[i],1],x[groups==levels(groups)[i],2],col=plotColors$points[i],cex=pointSize,pch=pointShape[i])
         }
       }
-    } else if(plotType=="surface") {
+    } else if(plotType=="surface" & !is.numeric(den2D)) {
       if(useRgl==TRUE) {
         if (! requireNamespace("rgl", quietly = TRUE)) {
           useRgl<-FALSE
@@ -210,21 +216,45 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
       if(trimCurves[1]==TRUE) {
         for(i in 1:n_groups){
           if(length(x[by==levels(by)[i]])>1) {
-            densities[[i]]<-bkde(x[by==levels(by)[i]],gridsize=curvePoints,range.x=c(min(x),max(x)))
-            densities[[i]]$x<-c(min(x),densities[[i]]$x,max(x))
-            densities[[i]]$y<-c(0,densities[[i]]$y,0)
+            tryCatch({
+                densities[[i]]<-bkde(x[by==levels(by)[i]],gridsize=curvePoints,range.x=c(min(x),max(x)))
+                densities[[i]]$x<-c(min(x),densities[[i]]$x,max(x))
+                densities[[i]]$y<-c(0,densities[[i]]$y,0)
+              },
+              warning=function(w) {
+                warning(paste0("KernSmooth bkde could not generate a kernal density estimate for ",levels(by)[i]),call.=FALSE)
+                densities[[1]]<- NA
+              },
+              error=function(e) {
+                warning(paste0("KernSmooth bkde could not generate a kernal density estimate for ",levels(by)[i]),call.=FALSE)
+                densities[[1]]<- NA
+              }
+            )
           }
         }
       } else {
         for(i in 1:n_groups){
           if(length(x[by==levels(by)[i]])>1) {
-            densities[[i]]<-bkde(x[by==levels(by)[i]],gridsize=curvePoints)
+            tryCatch({
+                densities[[i]]<-bkde(x[by==levels(by)[i]],gridsize=curvePoints)
+              },
+              warning=function(w) {
+                warning(paste0("KernSmooth bkde could not generate a kernal density estimate for ",levels(by)[i]),call.=FALSE)
+                densities[[i]]<- NA
+              },
+              error=function(e) {
+                warning(paste0("KernSmooth bkde could not generate a kernal density estimate for ",levels(by)[i]),call.=FALSE)
+                densities[[i]]<- NA
+              }
+            )
           }
         }
       }
-      maxx<-max(map_dbl(densities, function(z) max(z$x)))
-      minx<-min(map_dbl(densities, function(z) min(z$x)))
-      maxy<-max(map_dbl(densities, function(z) max(z$y)))
+      #print(paste(map_dbl(densities, function(z) if(!is.list(z)) {median(x,na.rm=T)} else {if(is.na(max(z$x))){median(x,na.rm=T)}else{max(z$x,na.rm=T)}}),sep=","))
+      maxx<-max(map_dbl(densities, function(z) if(!is.list(z)) {median(x,na.rm=T)} else {max(z$x,na.rm=T)}))
+      minx<-min(map_dbl(densities, function(z) if(!is.list(z)) {median(x,na.rm=T)} else {min(z$x,na.rm=T)}))
+      #Note that we are setting the kernal density estimate to zero if bkde failed.
+      maxy<-max(map_dbl(densities, function(z) if(!is.list(z)){0}else{if(is.na(max(z$y)) | is.infinite(max(z$y))){0}else{max(z$y)}}))
       if(add[1]==FALSE) {
         #RStudio seems not to update the graphics devices properly
         if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
