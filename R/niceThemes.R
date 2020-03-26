@@ -20,7 +20,7 @@ basicTheme<- list(
   minorTick=FALSE, #Numeric; number of minor tick marks to draw between major marks. Set to FALSE to disable
   minorTickLS=4, #Numeric; number of minor tick marks to draw between major marks if logScale is active. Set to FALSE to disable
   swarmOverflow="wrap", #Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.
-  curvePoints=500, #Number of points to sample for drawing density curves
+  curvePoints=200, #Number of points to sample for drawing density curves
 
   #Legend Settings
   LegendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
@@ -103,7 +103,7 @@ npColorTheme<- list(
   minorTick=FALSE, #Numeric; number of minor tick marks to draw between major marks. Set to FALSE to disable
   minorTickLS=FALSE, #Numeric; number of minor tick marks to draw between major marks if logScale is active. Set to FALSE to disable
   swarmOverflow="random", #Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.
-  curvePoints=500, #Number of points to sample for drawing density curves
+  curvePoints=200, #Number of points to sample for drawing density curves
 
   #Legend Settings
   LegendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
@@ -186,7 +186,7 @@ npStataTheme<- list(
   minorTick=FALSE, #Numeric; number of minor tick marks to draw between major marks. Set to FALSE to disable
   minorTickLS=FALSE, #Numeric; number of minor tick marks to draw between major marks if logScale is active. Set to FALSE to disable
   swarmOverflow="gutter", #Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.
-  curvePoints=500, #Number of points to sample for drawing density curves
+  curvePoints=200, #Number of points to sample for drawing density curves
 
   #Legend Settings
   LegendBorder="black", #Color of the border box around legend. Set to NULL to turn off
@@ -269,7 +269,7 @@ npGGTheme<- list(
   minorTick=FALSE, #Numeric; number of minor tick marks to draw between major marks. Set to FALSE to disable
   minorTickLS=4, #Numeric; number of minor tick marks to draw between major marks if logScale is active. Set to FALSE to disable
   swarmOverflow="random", #Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.
-  curvePoints=500, #Number of points to sample for drawing density curves
+  curvePoints=200, #Number of points to sample for drawing density curves
 
   #Legend Settings
   LegendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off

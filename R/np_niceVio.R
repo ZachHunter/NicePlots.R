@@ -22,7 +22,7 @@
 #' @param pointMethod character; method to be used for ploting dots. Can be set to "jitter", "linear", "beeswarm" or "distribution".
 #' @param width numeric; scaling factor controlling the width of the violins.
 #' @param theme list object; Themes are are an optional way of storing graphical preset options that are compatible with all nicePlot graphing functions.
-#' @param h numeric; Used to override the \code{h} hight of density estimator setting in \code{\link[vioplot]{vioplot}}. Default value is \code{\link{NULL}}.
+#' @param bandwidth numeric; Used to override the default bandwidth calculation in \code{\link[vioplot]{vioplot}}. Default value is \code{\link{NULL}}.
 #' @param pointShape positive integer; sets pty for plotting data points. Can be a vector to support additional graphical customization.
 #' @param showCalc logical; if a p-value can be easily calculated for your data, it will be displayed using the \code{sub} annotation setting.
 #' @param calcType character; should match one of 'none', 'wilcox', 'Tukey','t.test','anova' which will determine which, if any statistical test should be performed on the data.
@@ -62,12 +62,12 @@
 #' @importFrom tidyr gather
 #' @export
 #' @seealso \code{\link[vioplot]{vioplot}}, \code{\link{boxplot}}, \code{\link{niceBox}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{prepCategoryWindow}}
-niceVio <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=1.5, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=.7,flipFacts=FALSE, na.rm=FALSE, verbose=FALSE, legend=FALSE, trimViolins=TRUE, logAdjustment=1,...) {UseMethod("niceVio",x)}
+niceVio <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=1.5, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=.7,flipFacts=FALSE, na.rm=FALSE, verbose=FALSE, legend=FALSE, trimViolins=TRUE, logAdjustment=1,...) {UseMethod("niceVio",x)}
 
 #' @import dplyr
 #' @importFrom tidyr gather
 #' @export
-niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=FALSE, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=NULL,flipFacts=FALSE,  na.rm=FALSE, verbose=FALSE,legend=FALSE, trimViolins=TRUE,logAdjustment=1, ...) {
+niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=FALSE, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=NULL,flipFacts=FALSE,  na.rm=FALSE, verbose=FALSE,legend=FALSE, trimViolins=TRUE,logAdjustment=1, ...) {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset", call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -84,7 +84,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
 
   #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, h=h, groupNames=groupNames, main=main,sub=sub, ylab=ylab, minorTick=minorTick, guides=guides, theme=theme, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, drawBox=drawBox, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, subGroupLabels=subGroupLabels, expLabels=expLabels, sidePlot=sidePlot, drawPoints=drawPoints, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth,flipFacts=flipFacts,  na.rm=na.rm, verbose=verbose,legend=legend, trimViolins=trimViolins,logAdjustment=logAdjustment)
+  ActiveOptions<-list(x=x, by=by, bandwidth=bandwidth, groupNames=groupNames, main=main,sub=sub, ylab=ylab, minorTick=minorTick, guides=guides, theme=theme, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, drawBox=drawBox, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, subGroupLabels=subGroupLabels, expLabels=expLabels, sidePlot=sidePlot, drawPoints=drawPoints, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth,flipFacts=flipFacts,  na.rm=na.rm, verbose=verbose,legend=legend, trimViolins=trimViolins,logAdjustment=logAdjustment)
   ActiveOptions<-append(ActiveOptions,moreOptions)
 
   #Here we check to see if the user specified any options so that they not overwritten by the designated theme
@@ -108,7 +108,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
   if(!is.null(theme$vioBoxWidth)){
     vioBoxWidth<-theme$vioBoxWidth
   }
-  curvePoints<-500
+  curvePoints<-200
   if(!is.null(theme$curvePoints)){
     curvePoints<-theme$curvePoints
   }
@@ -179,7 +179,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
       plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width*vioBoxWidth,verbose=verbose)
       #cLevels<-levels(factor(by[filter]))
       legend<-FALSE
-      drawViolinPlot(prepedData[[1]][filter],groups=by,at=plotLoc,h=h, plotColors=plotColors, sidePlot=sidePlot,borderCol=plotColors$lines,
+      drawViolinPlot(prepedData[[1]][filter],groups=by,at=plotLoc,h=bandwidth, plotColors=plotColors, sidePlot=sidePlot,borderCol=plotColors$lines,
                      borderWidth=lWidth, fill=plotColors$fill, width=width, trimViolins=trimViolins, samplePoints=curvePoints)
       if(drawBox) {
         plotData %>% drawBoxPlot(side=sidePlot,col=plotColors$vioBoxLineCol,fill=plotColors$vioBoxFill,drawDot=F,drawBox=drawBox, lWidth=lWidth,whiskerLty=whiskerLineType,capWidth=capWidth)
@@ -197,7 +197,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
         plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,verbose=verbose)
         gFactor<-paste0(by[,1],by[,2],sep=".")
         cLoc<-facetLoc[plotData$facetLevel]
-        drawViolinPlot(x=prepedData[[1]][filter],groups=factor(gFactor), at=cLoc, h=h, plotColors=plotColors, sidePlot=sidePlot,
+        drawViolinPlot(x=prepedData[[1]][filter],groups=factor(gFactor), at=cLoc, h=bandwidth, plotColors=plotColors, sidePlot=sidePlot,
                        borderCol=plotColors$lines, borderWidth=lWidth, fill=plotColors$fill, width=width, trimViolins=trimViolins, samplePoints=curvePoints)
         if(drawBox) {
           plotData %>%
@@ -227,7 +227,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
         plotData<-prepNiceData(prepedData=prepedData,by=by, subGroup=subGroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width*vioBoxWidth,verbose=verbose)
         #cLevels<-groupNames
         gFactor<-by[,1]
-        drawViolinPlot(x=prepedData[[1]][filter],groups=factor(gFactor),at=plotLoc, h=h, plotColors=plotColors, sidePlot=sidePlot,
+        drawViolinPlot(x=prepedData[[1]][filter],groups=factor(gFactor),at=plotLoc, h=bandwidth, plotColors=plotColors, sidePlot=sidePlot,
                        borderCol=plotColors$lines, borderWidth=lWidth, fill=plotColors$fill, width=width, trimViolins=trimViolins, samplePoints=curvePoints)
         if(drawBox) {
           plotData %>% drawBoxPlot(side=sidePlot,col=plotColors$vioBoxLineCol,fill=plotColors$vioBoxFill,drawDot=F,drawBox=drawBox,lWidth=lWidth,whiskerLty=whiskerLineType,capWidth=capWidth)
@@ -258,7 +258,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
       cData<-bind_cols(data=prepedData[[1]][filter,],fact=by) %>%
         tidyr::gather(key=subGroup,value=data,-.data$fact) %>%
         mutate(groupingFactor=paste0(.data$fact,subGroup,sep="."))
-      drawViolinPlot(x=cData$data,groups=factor(cData$groupingFactor),at=cLoc,h=h, plotColors=plotColors, sidePlot=sidePlot,
+      drawViolinPlot(x=cData$data,groups=factor(cData$groupingFactor),at=cLoc,h=bandwidth, plotColors=plotColors, sidePlot=sidePlot,
                      borderCol=plotColors$lines, borderWidth=lWidth, fill=plotColors$fill, width=width, trimViolins=trimViolins, samplePoints=curvePoints)
       if(drawBox) {
         plotData %>% bind_cols(at=cLoc,width=rep(.25*width*vioBoxWidth,length(cLoc))) %>%
@@ -292,7 +292,7 @@ niceVio.default <- function(x, by=NULL, h=NULL, groupNames=NULL, main=NULL,sub=N
       cData<-bind_cols(data=prepedData[[1]][filter,],by) %>%
         tidyr::gather(key=subGroup,value=data,seq(1,length(x[1,])))
       cData<-mutate(cData, groupingFactor=paste0(cData[,1],subGroup,sep="."))
-      drawViolinPlot(x=cData$data,groups=factor(cData$groupingFactor),at=cLoc,h=h, plotColors=plotColors, sidePlot=sidePlot,
+      drawViolinPlot(x=cData$data,groups=factor(cData$groupingFactor),at=cLoc,h=bandwidth, plotColors=plotColors, sidePlot=sidePlot,
                      borderCol=plotColors$lines, borderWidth=lWidth, fill=plotColors$fill, width=width, trimViolins=trimViolins, samplePoints=curvePoints)
       if(drawBox) {
         plotData %>% bind_cols(at=cLoc,width=rep(.25*width*vioBoxWidth,length(cLoc))) %>%

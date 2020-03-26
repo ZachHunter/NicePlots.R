@@ -2,23 +2,35 @@
 #' @title draw a kernal density plot
 #' @description Draws a kernal density plot of one or two variables.
 #' @details
-#' TODO
+#' \code{niceDensity} is draws gernal density plots. This can be a single kernal density plot or a series of density plots overplotted
+#' on the graph based on a grouping factor from \code{by}. The \code{subGroup} option should be set to \code{\link{TRUE}} to anable this functionality.
+#' If two or more variables are passed in \code{x} in a \code{\link{data.frame}}, \code{\link{matrix}} or \code{\link[tibble]{tibble}}, then the
+#' first two columns will be used to generate a scatter plot with a 2-D scatter plot with a \code{\link[graphics]{contour}} plot overlay giving the 2D
+#' kernal density estimates. Setting \code{subGroup} to \code{\link{TRUE}} is this case will color the points by the first factor in \code{by}.
+#' Alternatively, for two column input,  \code{plotType} can be set to "suface" to draw a 3D prepresnetation of the kernal density over the x-y plane using \code{\link[graphics]{persp}}.
+#' Plotting options such as \code{theta}/\code{phi} to control rotation for \code{\link[graphics]{persp}} or \code{nlevels} for \code{\link[graphics]{contour}}, can be entered as arguments to \code{niceDensity} and will be passed along via \code{\link{do.call}}.
+#' Finally, if the \code{rgl} package is installed and \code{useRgl} is set to \code{\link{TRUE}}, the interactive \code{\link[rgl]{persp3d}} function will be used instead.
+#' All kernal densities are calculated using the \code{KernSmooth} package. The values in \code{npData} object returned by the function are slightly different.
+#' The "summary" value gives the min and max for \code{x} and optionally \code{y} along with the density estimate \code{fhat}.
+#' The "stats" value contains a \code{\link{data.frame}} the actual \code{x}, \code{y}, and \code{fhat} paired values.
+#' The theme value \code{curvePoints} is used to determine the number of line segments per curve and can be overriden in the command line like all other theme options.
+#'
+#'
 #'
 #' @inheritParams prepNiceWindow
 #' @param groupNames character vector; overrides the factor levels of \code{by} to label the groups
 #' @param drawPoints logical; draws a dot plot overlay for contour plots
 #' @param subGroup logical; Will use the factor levels in \code{by} to plot a series of distributions from the data in \code{x}.
+#' @param bandwidth numeric; Manually sets the bandwith for the kernal density estimation overiding default calculations. For 2D plots \code{bandwidth} be a vector of length 2. Set to \code{\link{NULL}} or \code{\link{NA}} to enable default calculations.
 #' @param useRgl logical; Should the library \code{\link[rgl]{rgl}} be used to make 3D surface plots.
 #' @param plotType character; Can be set to \code{contour} or \code{surface} to control the type of 2D plot.
 #' @param theme list object; Themes are are an optional way of storing graphical preset options that are compatible with all nicePlot graphing functions.
 #' @param main character; title for the graph which is supplied to the \code{main} argument.
-#' @param sub character; subtitle for the graph which is supplied to the \code{sub} argument. If \code{\link{NULL}} and \code{showCalc=\link{TRUE}} it will be used to display the output form \code{\link{calcStats}}.
+#' @param sub character; subtitle for the graph which is supplied to the \code{sub} argument.
 #' @param ylab character; y-axis label.
 #' @param xlab character; x-axis label.
 #' @param na.rm logical; Should \code{NA}s be removed from the data set? Both data input and the factor input from \code{by} with be checked.
 #' @param verbose logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.
-#' @param showCalc logical; TODO Not sure if there are calcs worth doing here... maybe normality testing?
-#' @param calcType charactar; TODO Not sure if there are calcs worth doing here...maybe normality testing?
 #' @param add logical; Adds the plot to the existing window rather the generating a new plotting enviroment
 #' @param lWidth numeric; Line width, equivelent to the cex \code{lwd} option.
 #' @param logScale numeric; A length two numeric vector indicating the log scale the x and y axis, respectively. If only one value is given, it is applied to boxth axis. Set to \code{\link{FALSE}} to disable (Default).
@@ -26,21 +38,34 @@
 #' @param ... additional options for S3 method variants
 #'
 #' @examples
-#' TODO<-1
+#' data(iris)
+#' #Basic kernal density plot
+#' niceDensity(iris[,1], main="Distrinbution of Sepal Length")
+#'
+#' #Kernal density plot subgrouped by species
+#' niceDensity(iris[,1],iris$Species, main="Sepal Length by Species", subGroup=TRUE)
+#'
+#' #2D Density of Sepal Width vs. Length
+#' niceDensity(iris[,1:2],iris$Species, main="Sepal Width vs. Length", subGroup=TRUE)
+#'
+#' #Representing the 2D contour plot in 3D
+#' niceDensity(iris[,1:2],iris$Species, main="Sepal Width vs. Length", plotType="surface", theta=-60)
+#'
 #' @seealso \code{\link[stats]{density}}, \code{\link[graphics]{contour}}, \code{\link[graphics]{persp}}, \code{\link[rgl]{persp3d}}, \code{\link[KernSmooth]{bkde}}
 #' @import dplyr
 #' @importFrom KernSmooth bkde bkde2D dpih
 #' @importFrom purrr walk2 map_dbl
 #' @importFrom graphics polygon contour lines persp
 #' @export
-niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subGroup=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", rotateLabels=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, ...) {UseMethod("niceDensity",x)}
+niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subGroup=FALSE, bandwidth=NULL, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, ...) {UseMethod("niceDensity",x)}
 
 #' @import dplyr
 #' @importFrom KernSmooth bkde bkde2D dpih
 #' @importFrom purrr walk2 map_dbl
+#' @importFrom tidyr gather
 #' @importFrom graphics polygon contour lines persp
 #' @export
-niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGroup=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), showCalc=FALSE, calcType="none", rotateLabels=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, ...)  {
+niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGroup=FALSE, bandwidth=NULL, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), rotateLabels=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, ...)  {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset",call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -51,10 +76,12 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
   if(is.data.frame(by)){
     by<-factor(by[,1])
   }
+  finalStats<-NULL
+  finalSummary<-NULL
 
   #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, drawPoints=drawPoints, groupNames=groupNames,subGroup=subGroup, useRgl=useRgl, plotType=plotType,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=showCalc, calcType=calcType, rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimCurves=trimCurves)
+  ActiveOptions<-list(x=x, by=by, drawPoints=drawPoints, groupNames=groupNames,subGroup=subGroup, useRgl=useRgl, plotType=plotType,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimCurves=trimCurves)
   ActiveOptions<-append(ActiveOptions,moreOptions)
 
   #Here we check to see if the user specified any options so that they not overwritten by the designated theme
@@ -69,9 +96,11 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
   groupNames<-finalOptions$groupNames
   pointMethod<-finalOptions$pointMethod
   theme$plotColors<-plotColors
-  curvePoints<-500
-  if(!is.null(theme$curvePoints)){
+  curvePoints<-50
+  if(!is.null(moreOptions[["curvePoints"]])) {curvePoints<-moreOptions[["curvePoints"]]}
+  else if(!is.null(theme$curvePoints)){
     curvePoints<-theme$curvePoints
+    if(is.data.frame(x) & useRgl[1]==FALSE & plotType[1]=="surface") {curvePoints<-round(curvePoints/4)}
   }
 
   if(is.data.frame(by)) {
@@ -96,7 +125,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
   #Initialize legend variables so we can update based on options
   legendLabels<-groupNames
   legendTitle<-"Legend"
-  if(!is.null(by) & subGroup==TRUE){
+  if(!is.null(by) & (subGroup==TRUE | is.data.frame(x))){
     if(legend[1]==FALSE | is.null(legend[1])) {
       legend<-TRUE
     } else if (legend[1]!=TRUE) {
@@ -105,7 +134,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
   }
   legendColors<-plotColors$points
 
-
+  #Handling log transformations for x and y
   logScaleX<-FALSE
   logScaleY<-FALSE
   if(is.null(logScale[1])){logScale[1]<-FALSE}
@@ -130,6 +159,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
     legendColors<-plotColors$fill
   }
 
+  #saving current parameters so we can restore them later
   oFont<-par()$family
   oCexMain<-par()$cex.main
   oCexlab<-par()$cex.lab
@@ -141,6 +171,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
     par(col.sub=plotColors$labels, col.lab=plotColors$labels,col.main=plotColors$labels,cex.main=theme$titleSize, cex.lab=theme$axisLabelSize, cex.sub=theme$subSize, family=theme$fontFamily)
   }
 
+  #Dealing with 2D data
   if(is.data.frame(x)){
     if(is.null(xlab)) {xlab<-colnames(x)[1]}
     if(is.null(ylab)) {ylab<-colnames(x)[2]}
@@ -150,15 +181,38 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
       x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
       title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$numbers)
     }
-    tryCatch({den2D<-bkde2D(as.matrix(x[,1:2]),bandwidth=c(dpih(x[,1],gridsize=curvePoints),dpih(x[,2],gridsize=curvePoints),gridsize=c(curvePoints,curvePoints)))},
+    #Calculate 2D Kernal Density
+
+    tryCatch({
+        #Calculate bandwidth of x and y if not specified manually
+        if(length(bandwidth)!=2) {
+          bandwidth<-c(dpih(x[,1],gridsize=curvePoints),dpih(x[,2],gridsize=curvePoints))
+        } else {
+          if (is.null(bandwidth[1]) | is.na(bandwidth[1])) {bandwidth[1]<-dpih(x[,1],gridsize=curvePoints)}
+          #Note the second element can not be set to NULL without reducing the vector to length one.
+          if (is.na(bandwidth[2])) {bandwidth[2]<-dpih(x[,2],gridsize=curvePoints)}
+        }
+        den2D<-bkde2D(as.matrix(x[,1:2]),bandwidth=bandwidth,gridsize=c(curvePoints,curvePoints))
+      },
       error=function(e) {
         warning("KernSmooth bkde2D unable to estimate kernal density.")
         return(-1)
       }
     )
+    #Saving Stats for output
+    finalSummary<-data.frame(Min=c(min(x[,1]),min(x[,2]),0),Max=c(max(x[,1]),max(x[,2]),max(den2D$fhat)),row.names = c("x","y","fhat"))
+    finalStats<-data.frame(x=den2D$x1,fhat=den2D$fhat)
+    colnames(finalStats)<-c("x",den2D$x2)
+    finalStats<-finalStats %>%
+      gather(key="y",value="fhat",-.data$x) %>%
+      mutate(y=as.numeric(.data$y)) %>%
+      arrange(.data$x,.data$y)
+
     if(plotType[1]=="contour") {
       if(!is.numeric(den2D)) {
-        contour(den2D$x1, den2D$x2, den2D$fhat,col=theme$plotColors$lines[1],main=main,sub=sub,ylab=ylab, add=TRUE)
+        myCol<-plotColors$lines[1]
+        if(!is.null(moreOptions[["col"]])){myCol<-moreOptions[["col"]]}
+        do.call("contour", append(list(x=den2D$x1,y=den2D$x2,z=den2D$fhat,col=myCol,main=main,sub=sub,ylab=ylab, add=TRUE),moreOptions[!names(moreOptions) %in% c("z","x","y","col", "curvePoints")]))
       }
       if(drawPoints==TRUE) {
         if(is.null(by)){
@@ -186,10 +240,12 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
           rgl::open3d()
           rgl::bg3d("white")
           rgl::material3d(col = "black")
-          rgl::persp3d(den2D$x1, den2D$x2, den2D$fhat, col=plotColors$fill[1],xlab = xlab,ylab=ylab,zlab = "Density")
+          myCol<-plotColors$fill[1]
+          if(!is.null(moreOptions[["col"]])){myCol<-moreOptions[["col"]]}
+          rgl::persp3d(den2D$x1, den2D$x2, den2D$fhat, col=myCol,xlab = xlab,ylab=ylab,zlab = "Density")
         }
       }
-        if(useRgl==FALSE){
+      if(useRgl==FALSE){
         legend<-FALSE
         theta <- 0
         phi <- 15
@@ -199,7 +255,8 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
         if(!is.null(moreOptions[["phi"]])) {phi<-moreOptions[["phi"]]}
         if(!is.null(moreOptions[["r"]])) {r<-moreOptions[["r"]]}
         if(!is.null(moreOptions[["d"]])) {d<-moreOptions[["d"]]}
-        persp(den2D$x1, den2D$x2, den2D$fhat,col=plotColors$fill[1],main = main,xlab = xlab,ylab=ylab,zlab = "Density",theta=theta,phi=phi,r=r,d=d)
+        if(!is.null(moreOptions[["col"]])) {col<-moreOptions[["col"]]}else{col<-plotColors$fill[1]}
+        do.call("persp", append(list(x=den2D$x1, y=den2D$x2, z=den2D$fhat,col=col,main = main,xlab = xlab,ylab=ylab,zlab = "Density",theta=theta,phi=phi,r=r,d=d),moreOptions[!names(moreOptions) %in% c("theta","phi","d","r","col","curvePoints")]))
       }
     } else {
       stop("Error: plotType should be set to either \'contour\' or \'surface\' for 2D desntsity plots")
@@ -217,8 +274,15 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
         for(i in 1:n_groups){
           if(length(x[by==levels(by)[i]])>1) {
             tryCatch({
-                densities[[i]]<-bkde(x[by==levels(by)[i]],gridsize=curvePoints,range.x=c(min(x),max(x)))
-                densities[[i]]$x<-c(min(x),densities[[i]]$x,max(x))
+                myX<-x[by==levels(by)[i]]
+                if(is.null(bandwidth)){
+                  densities[[i]]<-bkde(myX,gridsize=curvePoints,range.x=c(min(myX),max(myX)))
+                } else if (is.na(bandwidth[1]) | !is.numeric(bandwidth[1])) {
+                  densities[[i]]<-bkde(myX,gridsize=curvePoints,range.x=c(min(myX),max(myX)))
+                } else {
+                  densities[[i]]<-bkde(myX,gridsize=curvePoints,bandwidth=bandwidth[1], range.x=c(min(myX),max(myX)))
+                }
+                densities[[i]]$x<-c(min(myX),densities[[i]]$x,max(myX))
                 densities[[i]]$y<-c(0,densities[[i]]$y,0)
               },
               warning=function(w) {
@@ -236,7 +300,13 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
         for(i in 1:n_groups){
           if(length(x[by==levels(by)[i]])>1) {
             tryCatch({
-                densities[[i]]<-bkde(x[by==levels(by)[i]],gridsize=curvePoints)
+                if(is.null(bandwidth)) {
+                  densities[[i]]<-bkde(x[by==levels(by)[i]],gridsize=curvePoints)
+                } else if (is.na(bandwidth[1]) | !is.numeric(bandwidth[1])) {
+                  densities[[i]]<-bkde(x[by==levels(by)[i]],gridsize=curvePoints)
+                } else {
+                  densities[[i]]<-bkde(x[by==levels(by)[i]],bandwidth=bandwidth[1],gridsize=curvePoints)
+                }
               },
               warning=function(w) {
                 warning(paste0("KernSmooth bkde could not generate a kernal density estimate for ",levels(by)[i]),call.=FALSE)
@@ -250,7 +320,10 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
           }
         }
       }
-      #print(paste(map_dbl(densities, function(z) if(!is.list(z)) {median(x,na.rm=T)} else {if(is.na(max(z$x))){median(x,na.rm=T)}else{max(z$x,na.rm=T)}}),sep=","))
+      #Saving stats for output
+      finalSummary<-data.frame(xMin=map_dbl(densities, function(d) d$x[1]),xMax=map_dbl(densities, function(d) d$x[length(d$x)]), fhatMax=map_dbl(densities, function(d) max(d$y)),row.names=levels(by))
+      finalStats<-densities
+
       maxx<-max(map_dbl(densities, function(z) if(!is.list(z)) {median(x,na.rm=T)} else {max(z$x,na.rm=T)}))
       minx<-min(map_dbl(densities, function(z) if(!is.list(z)) {median(x,na.rm=T)} else {min(z$x,na.rm=T)}))
       #Note that we are setting the kernal density estimate to zero if bkde failed.
@@ -270,10 +343,20 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
       }
       walk2(.x=densities,.y=plotColors$lines[1:n_groups],~lines(.x,col=.y,lwd=lWidth))
     } else {
-      densities<-bkde(x,gridsize=curvePoints)
+      if(is.null(bandwidth)) {
+        densities<-bkde(x,gridsize=curvePoints)
+      } else if (is.na(bandwidth[1]) | !is.numeric(bandwidth[1])) {
+        densities<-bkde(x,gridsize=curvePoints)
+      } else {
+        densities<-bkde(x,gridsize=curvePoints, bandwidth=bandwidth[1])
+      }
       maxx<-max(densities$x)
       minx<-min(densities$x)
       maxy<-max(densities$y)
+
+      finalSummary<-data.frame(Min=c(min(x),0),Max=c(max(x),max(densities$y)),row.names=c("x","fhat"))
+      finalStats<-data.frame(x=densities$x,fhat=densities$y)
+
       if(add[1]==FALSE) {
         #RStudio seems not to update the graphics devices properly
         if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
@@ -297,7 +380,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
   par(col.sub=oSubCol, col.lab=oLabCol,col.main=oMainCol,family=oFont,cex.main=oCexMain,cex.lab=oCexlab,cex.sub=oCexSub)
 
   #formating the output list and setting class int npData
-  dataOut<-list(summary=NA,stats=NA,plotType="density",options=ActiveOptions)
+  dataOut<-list(summary=finalSummary,stats=finalStats,plotType="density",options=ActiveOptions)
   class(dataOut)<-c("npData","list")
 
   invisible(dataOut)

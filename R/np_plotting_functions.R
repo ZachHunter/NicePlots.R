@@ -307,67 +307,42 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
 #' @seealso \code{\link{niceVio}}, \code{\link[KernSmooth]{bkde}}, \code{\link[KernSmooth]{dpik}}
 drawViolinPlot <- function(x,groups,at=seq(1,length(levels(groups))),h=NULL, plotColors=basicTheme$plotColors, sidePlot=FALSE,
                            borderCol=plotColors$lines, borderWidth=1, fill=plotColors$fill, width=1, trimViolins=TRUE,samplePoints=NULL) {
-  points<-500
+  points<-250
   if(!is.null(samplePoints)){
     points<-samplePoints
   }
-
   myLevels<-levels(groups)
-
   #Make an list of kernal desinsity estimates. Each list element as x and y components for plotting
   kernals<-NULL
-  if(is.null(h)){
-    if(trimViolins) {
-      kernals<-purrr::map(myLevels, function(y) if(length(x[groups==y])>1) {
-        tryCatch(
-          {k<-KernSmooth::bkde(x[groups==y],gridsize = points,range.x = c(min(x[groups==y]),max(x[groups==y])))},
-          error = function(e) {
-            k<- -1
-            warning(paste0("KernSmooth bkde: Unable to estimate bandwith for group ",y),call.=FALSE)
-            return(k)
-          })
-        } else {-1}
-      )
-    } else {
-
-      kernals<-purrr::map(myLevels, function(y) if(length(x[groups==y])>1) {
-        tryCatch(
-          {k<-KernSmooth::bkde(x[groups==y],gridsize = points)},
-          error = function(e) {
-            k<- -1
-            warning(paste0("KernSmooth bkde: Unable to estimate bandwith for group ",y),call.=FALSE)
-            return(k)
-          })
-        }else{-1}
-      )
-    }
-
+  if(trimViolins) {
+    kernals<-purrr::map(myLevels, function(y) if(length(x[groups==y])>1) {
+      tryCatch(
+        {if(is.null(h)){k<-KernSmooth::bkde(x[groups==y],gridsize = points,range.x = c(min(x[groups==y]),max(x[groups==y])))}
+          else if(is.na(h[1]) | !is.numeric(h[1])) {k<-KernSmooth::bkde(x[groups==y],gridsize = points,range.x = c(min(x[groups==y]),max(x[groups==y])))}
+          else {k<-KernSmooth::bkde(x[groups==y],bandwidth = h[1], gridsize = points,range.x = c(min(x[groups==y]),max(x[groups==y])))}
+        },
+        error = function(e) {
+          k<- -1
+          warning(paste0("KernSmooth bkde: Unable to estimate bandwith for group ",y),call.=FALSE)
+          return(k)
+        })
+    } else {-1}
+    )
   } else {
-    for(i in 1:length(myLevels)){
-      if(length(x[groups==myLevels[i]])>1) {
-        if(trimViolins) {
-          tryCatch(
-            {kernals[i]<-KernSmooth::bkde(x[groups==myLevels[i]],gridsize=points,bandwidth = h[(i-1) %% length(h) + 1],range.x = c(min(x[groups==myLevels[i]]),max(x[x[groups==myLevels[i]]])))},
-            error = function(e) {
-              k<- -1
-              warning(paste0("KernSmooth bkde: Unable to estimate bandwith for group ",myLevels[i]),call.=FALSE)
-              return(k)
-            }
-          )
-        } else {
-          tryCatch(
-            {kernals[i]<-KernSmooth::bkde(x[groups==myLevels[i]],gridsize=points,bandwidth = h[(i-1) %% length(h) + 1])},
-            error = function(e) {
-              k<- -1
-              warning(paste0("KernSmooth bkde: Unable to estimate bandwith for group ",myLevels[i]),call.=FALSE)
-              return(k)
-            }
-          )
-        }
-      }
-    }
+    kernals<-purrr::map(myLevels, function(y) if(length(x[groups==y])>1) {
+      tryCatch(
+        {if(is.null(h)) {k<-KernSmooth::bkde(x[groups==y],gridsize = points)}
+          else if (is.na(h[1]) | !is.numeric(h[1])) {k<-KernSmooth::bkde(x[groups==y],gridsize = points)}
+          else {k<-KernSmooth::bkde(x[groups==y],bandwidth=h[1], gridsize = points)}
+        },
+        error = function(e) {
+          k<- -1
+          warning(paste0("KernSmooth bkde: Unable to estimate bandwith for group ",y),call.=FALSE)
+          return(k)
+        })
+    }else{-1}
+    )
   }
-
   #Use polygon to plot symetrical kernal densities by category to draw violins
   vioWidth<-purrr::map_dbl(kernals, function(z) if(!is.null(z) & !is.numeric(z)) {max(z$y)*2/width} else {
     return(0)

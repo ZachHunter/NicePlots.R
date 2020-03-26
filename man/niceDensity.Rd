@@ -10,6 +10,7 @@ niceDensity(
   drawPoints = TRUE,
   groupNames = NULL,
   subGroup = FALSE,
+  bandwidth = NULL,
   useRgl = FALSE,
   plotType = c("contour", "surface"),
   theme = basicTheme,
@@ -22,8 +23,6 @@ niceDensity(
   plotColors = NULL,
   logScale = FALSE,
   axisText = c(NULL, NULL),
-  showCalc = FALSE,
-  calcType = "none",
   rotateLabels = FALSE,
   add = FALSE,
   minorGuides = NULL,
@@ -52,6 +51,8 @@ niceDensity(
 
 \item{subGroup}{logical; Will use the factor levels in \code{by} to plot a series of distributions from the data in \code{x}.}
 
+\item{bandwidth}{numeric; Manually sets the bandwith for the kernal density estimation overiding default calculations. For 2D plots \code{bandwidth} be a vector of length 2. Set to \code{\link{NULL}} or \code{\link{NA}} to enable default calculations.}
+
 \item{useRgl}{logical; Should the library \code{\link[rgl]{rgl}} be used to make 3D surface plots.}
 
 \item{plotType}{character; Can be set to \code{contour} or \code{surface} to control the type of 2D plot.}
@@ -60,7 +61,7 @@ niceDensity(
 
 \item{main}{character; title for the graph which is supplied to the \code{main} argument.}
 
-\item{sub}{character; subtitle for the graph which is supplied to the \code{sub} argument. If \code{\link{NULL}} and \code{showCalc=\link{TRUE}} it will be used to display the output form \code{\link{calcStats}}.}
+\item{sub}{character; subtitle for the graph which is supplied to the \code{sub} argument.}
 
 \item{ylab}{character; y-axis label.}
 
@@ -75,10 +76,6 @@ niceDensity(
 \item{logScale}{numeric; A length two numeric vector indicating the log scale the x and y axis, respectively. If only one value is given, it is applied to boxth axis. Set to \code{\link{FALSE}} to disable (Default).}
 
 \item{axisText}{list; A named list, "x" and "y" with two optional character values to be placed before and/or after the numeric axis label, respectively.}
-
-\item{showCalc}{logical; TODO Not sure if there are calcs worth doing here... maybe normality testing?}
-
-\item{calcType}{charactar; TODO Not sure if there are calcs worth doing here...maybe normality testing?}
 
 \item{rotateLabels}{logical; sets \code{las=2} for the x-axis category labels. Will affect y-axis if \code{side=\link{TRUE}}. Note that this may not work well if long names or with subgrouped data.}
 
@@ -114,10 +111,33 @@ niceDensity(
 Draws a kernal density plot of one or two variables.
 }
 \details{
-TODO
+\code{niceDensity} is draws gernal density plots. This can be a single kernal density plot or a series of density plots overplotted
+on the graph based on a grouping factor from \code{by}. The \code{subGroup} option should be set to \code{\link{TRUE}} to anable this functionality.
+If two or more variables are passed in \code{x} in a \code{\link{data.frame}}, \code{\link{matrix}} or \code{\link[tibble]{tibble}}, then the
+first two columns will be used to generate a scatter plot with a 2-D scatter plot with a \code{\link[graphics]{contour}} plot overlay giving the 2D
+kernal density estimates. Setting \code{subGroup} to \code{\link{TRUE}} is this case will color the points by the first factor in \code{by}.
+Alternatively, for two column input,  \code{plotType} can be set to "suface" to draw a 3D prepresnetation of the kernal density over the x-y plane using \code{\link[graphics]{persp}}.
+Plotting options such as \code{theta}/\code{phi} to control rotation for \code{\link[graphics]{persp}} or \code{nlevels} for \code{\link[graphics]{contour}}, can be entered as arguments to \code{niceDensity} and will be passed along via \code{\link{do.call}}.
+Finally, if the \code{rgl} package is installed and \code{useRgl} is set to \code{\link{TRUE}}, the interactive \code{\link[rgl]{persp3d}} function will be used instead.
+All kernal densities are calculated using the \code{KernSmooth} package. The values in \code{npData} object returned by the function are slightly different.
+The "summary" value gives the min and max for \code{x} and optionally \code{y} along with the density estimate \code{fhat}.
+The "stats" value contains a \code{\link{data.frame}} the actual \code{x}, \code{y}, and \code{fhat} paired values.
+The theme value \code{curvePoints} is used to determine the number of line segments per curve and can be overriden in the command line like all other theme options.
 }
 \examples{
-TODO<-1
+data(iris)
+#Basic kernal density plot
+niceDensity(iris[,1], main="Distrinbution of Sepal Length")
+
+#Kernal density plot subgrouped by species
+niceDensity(iris[,1],iris$Species, main="Sepal Length by Species", subGroup=TRUE)
+
+#2D Density of Sepal Width vs. Length
+niceDensity(iris[,1:2],iris$Species, main="Sepal Width vs. Length", subGroup=TRUE)
+
+#Representing the 2D contour plot in 3D
+niceDensity(iris[,1:2],iris$Species, main="Sepal Width vs. Length", plotType="surface", theta=-60)
+
 }
 \seealso{
 \code{\link[stats]{density}}, \code{\link[graphics]{contour}}, \code{\link[graphics]{persp}}, \code{\link[rgl]{persp3d}}, \code{\link[KernSmooth]{bkde}}
