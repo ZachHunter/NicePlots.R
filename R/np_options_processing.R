@@ -195,25 +195,34 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
       #Note we are only implmenting this for when a valid theme has been selected.
       #Themes let you make different settings for different plot types but since this is a one off
       #We check to see if the shorter version of the settting was used and update all the settings for all plot types
+      themeNames<-names(theme)
       for(i in 1:length(CLOptions)){
-        if(names(CLOptions)[i] %in% names(theme)){
+        if(names(CLOptions)[i] %in% themeNames){
           theme[[names(CLOptions)[i]]]<-CLOptions[[i]]
         } else if(names(CLOptions)[i]=="pointSize"){
-          theme[grep("pointSize[BV|VP|DP]",names(theme))]<-CLOptions[[i]]
+          loc<-grep("pointSize[BV|VP|DP|2D]",themeNames)
+          theme[loc]<-rep(list(CLOptions[[i]]),length(loc))
         } else if(names(CLOptions)[i]=="width"){
-          theme[grep("width[BV|VP|DP|Bar]",names(theme))]<-CLOptions[[i]]
+          loc<-grep("width[BV|VP|DP|Bar|2D]",themeNames)
+          theme[loc]<-rep(list(CLOptions[[i]]),length(loc))
         } else if(names(CLOptions)[i]=="pointShape"){
-          theme[grep("pointShape[BV|VP|DP]",names(theme))]<-CLOptions[[i]]
+          loc<-grep("pointShape[BV|VP|DP|2D]",themeNames)
+          theme[loc]<-rep(list(CLOptions[[i]]),length(loc))
         } else if(names(CLOptions)[i]=="pointLaneWidth"){
-          theme[grep("pointLaneWidth[BV|VP|DP]",names(theme))]<-CLOptions[[i]]
+          loc<-grep("pointLaneWidth[BV|VP|DP|2D]",themeNames)
+          theme[loc]<-rep(list(CLOptions[[i]]),length(loc))
         } else if(names(CLOptions)[i]=="pointMethod"){
-          theme[grep("pointMethod[BV|VP|DP]",names(theme))]<-CLOptions[[i]]
+          loc<-grep("pointMethod[BV|VP|DP|2D]",themeNames)
+          theme[loc]<-rep(list(CLOptions[[i]]),length(loc))
         } else if(names(CLOptions)[i]=="lWidth"){
-          theme[grep("lWidth[BV|VP|DP|Bar]",names(theme))]<-CLOptions[[i]]
+          loc<-grep("lWidth[BV|VP|DP|Bar|2D]",themeNames)
+          theme[loc]<-rep(list(CLOptions[[i]]),length(loc))
         } else if(names(CLOptions)[i]=="errorBarLineType"){
-          theme[grep("errorBarLineType[BV|VP|DP|Bar]",names(theme))]<-CLOptions[[i]]
+          loc<-grep("errorBarLineType[BV|VP|DP|Bar|2D]",themeNames)
+          theme[loc]<-rep(list(CLOptions[[i]]),length(loc))
         } else if(names(CLOptions)[i]=="errorBarCapWidth"){
-          theme[grep("errorBarCapWidth[BV|VP|DP|Bar]",names(theme))]<-CLOptions[[i]]
+          loc<-grep("errorBarCapWidth[BV|VP|DP|Bar|2D]",themeNames)
+          theme[loc]<-rep(list(CLOptions[[i]]),length(loc))
         }
       }
     }

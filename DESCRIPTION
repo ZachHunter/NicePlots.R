@@ -12,7 +12,7 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.0.2
 Depends: dplyr
-Imports: boot,tidyr,tibble,RColorBrewer,purrr,KernSmooth,beeswarm,ggplot2
+Imports: boot,tidyr,tibble,RColorBrewer,purrr,KernSmooth,beeswarm,ggplot2,scatterplot3d,broom
 Suggests: shiny,rgl
 Collate: 
     'np_utility.R'
@@ -25,4 +25,5 @@ Collate:
     'np_niceBox.R'
     'np_niceDensity.R'
     'np_niceDots.R'
+    'np_niceScatter.R'
     'np_niceVio.R'

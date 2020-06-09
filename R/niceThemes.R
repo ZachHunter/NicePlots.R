@@ -33,6 +33,7 @@ basicTheme<- list(
   pointSizeBP=.7, #cex-like Numeric; size of points in overlay for boxplots
   pointSizeVP=.6, #cex-like Numeric; size of points in overlay for violin plots
   pointSizeDP=.5, #cex-like Numeric; size of points in overlay for dot plots
+  pointSize2D=.5, #cex-like Numeric; size of points in overlay for scatter plots
   widthBP=.85, #Relative box width of each category for box plots
   widthVP=.85, #Relative violin width of each category for violin plots
   widthDP=.45, #Relative category width of each category for dot plots
@@ -40,6 +41,7 @@ basicTheme<- list(
   pointShapeBP=16, #Numeric vector; point shapes for box plots
   pointShapeVP=16, #Numeric vector; point shapes for vioin plots
   pointShapeDP=1, #Numeric vector; point shapes for dot plots
+  pointShape2D=c(16:18,15,19), #Numeric vector; point shapes for dot plots
   pointLaneWidthBP=.4, #Restricts the point overlay to a fraction of the box width
   pointLaneWidthDP=4, #Restricts the point overlay to a fraction of the category width
   pointLaneWidthVP=1, #Restricts the point overlay to a fraction of the violin width
@@ -50,10 +52,12 @@ basicTheme<- list(
   lWidthDP=1, #Line width (lwd) for dot plots
   lWidthVP=1, #Line width (lwd) for violin plots
   lWidthBar=1, #Line width (lwd) for violin plots
+  lWidth2D=1,  #Line width (lwd) for scatter plots
   errorBarLineTypeBP=2, #Line type (lty) for boxplot wiskers
   errorBarLineTypeBar=1, #Line type (lty) for bar plot error bars
   errorBarLineTypeDP=1, #Line type (lty) for dot plot error bars
   errorBarLineTypeVP=1, #Whisker line type (lty) for box plot overlay in violin plots
+  errorBarLineType2D=1, #used to determine line types for trend lines in scatter plots.
   errorBarCapWidthBP=.25, #relative width of cap on box plot wiskers
   errorBarCapWidthBar=.33, #relative width of cap on bar plot error bars
   errorBarCapWidthDP=.25, #relative width of cap on dot plot error bars
@@ -116,6 +120,7 @@ npColorTheme<- list(
   pointSizeBP=.7, #cex-like Numeric; size of points in overlay for boxplots
   pointSizeVP=.6, #cex-like Numeric; size of points in overlay for violin plots
   pointSizeDP=.5, #cex-like Numeric; size of points in overlay for dot plots
+  pointSize2D=.5, #cex-like Numeric; size of points in scatter plots
   widthBP=.8, #Relative box width of each category for box plots
   widthVP=.8, #Relative violin width of each category for violin plots
   widthDP=.75, #Relative category width of each category for dot plots
@@ -123,6 +128,7 @@ npColorTheme<- list(
   pointShapeBP=1:10, #Numeric vector; point shapes for box plots
   pointShapeVP=1:10, #Numeric vector; point shapes for vioin plots
   pointShapeDP=1:10, #Numeric vector; point shapes for dot plots
+  pointShape2D=1:10, #Numeric vector; point shapes for scatter plots
   pointLaneWidthBP=.65, #Restricts the point overlay to a fraction of the box width
   pointLaneWidthDP=4, #Restricts the point overlay to a fraction of the category width
   pointLaneWidthVP=2.9, #Restricts the point overlay to a fraction of the violin width
@@ -132,11 +138,13 @@ npColorTheme<- list(
   lWidthBP=1, #Line width (lwd) for box plots
   lWidthDP=3, #Line width (lwd) for dot plots
   lWidthVP=1, #Line width (lwd) for violin plots
-  lWidthBar=1.5, #Line width (lwd) for violin plots
+  lWidthBar=1.5, #Line width (lwd) for bar plots
+  lWidth2D=1.5, #Line width (lwd) for scatter plots
   errorBarLineTypeBP=2, #Line type (lty) for boxplot wiskers
   errorBarLineTypeBar=1, #Line type (lty) for bar plot error bars
   errorBarLineTypeVP=2, #Whisker line type (lty) for box plot overlay in violin plots
-  errorBarLineTypeVP=2,  #Line type (lty) for dot plot error bars
+  errorBarLineTypeDP=2,  #Line type (lty) for dot plot error bars
+  errorBarLineType2D=1:6,  #Line type (lty) for scatter plot trend lines
   errorBarCapWidthBP=.25, #relative width of cap on box plot wiskers
   errorBarCapWidthDP=.25, #relative width of cap on dot plots
   errorBarCapWidthBar=1, #relative width of cap on bar plot error bars
@@ -282,6 +290,7 @@ npGGTheme<- list(
   pointSizeBP=.6, #cex-like Numeric; size of points in overlay for boxplots
   pointSizeVP=.6, #cex-like Numeric; size of points in overlay for violin plots
   pointSizeDP=.5, #cex-like Numeric; size of points in overlay for dot plots
+  pointSize2D=.4, #cex-like Numeric; size of points in overlay for scatter plots
   widthBP=.85, #Relative box width of each category for box plots
   widthVP=.85, #Relative violin width of each category for violin plots
   widthDP=.9, #Relative category width of each category for dot plots
@@ -289,6 +298,7 @@ npGGTheme<- list(
   pointShapeBP=15:25, #Numeric vector; point shapes for box plots
   pointShapeVP=15:25, #Numeric vector; point shapes for vioin plots
   pointShapeDP=15:25, #Numeric vector; point shapes for dot plots
+  pointShape2D=c(16:18,15,19), #Numeric vector; point shapes for dot plots
   pointLaneWidthBP=.7, #Restricts the point overlay to a fraction of the box width
   pointLaneWidthDP=5, #Restricts the point overlay to a fraction of the category width
   pointLaneWidthVP=3, #Restricts the point overlay to a fraction of the violin width
@@ -298,11 +308,13 @@ npGGTheme<- list(
   lWidthBP=1, #Line width (lwd) for box plots
   lWidthDP=3, #Line width (lwd) for dot plots
   lWidthVP=1, #Line width (lwd) for violin plots
-  lWidthBar=1.5, #Line width (lwd) for violin plots
+  lWidthBar=1.5, #Line width (lwd) for bar plots
+  lWidth2D=1.5, #Line width (lwd) for scatter plots
   errorBarLineTypeBP=1, #Line type (lty) for boxplot wiskers
   errorBarLineTypeBar=1, #Line type (lty) for bar plot error bars
   errorBarLineTypeDP=1, #Line type (lty) for dot plot error bars
   errorBarLineTypeVP=1, #Whisker line type (lty) for box plot overlay in violin plots
+  errorBarLineType2D=1:6, #Whisker line type (lty) for box plot overlay in scatter plots
   errorBarCapWidthDP=0, #relative width of error cap on dot plots
   errorBarCapWidthBP=0, #relative width of cap on box plot wiskers
   errorBarCapWidthBar=0, #relative width of cap on bar plot error bars

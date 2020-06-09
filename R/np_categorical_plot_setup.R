@@ -461,7 +461,7 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
   return(list(data=tData,labels=groupNames))
 }
 
-#' @title prepare a plotting environment for non-categorical data such as bar plots or box plots
+#' @title prepare a plotting environment for non-categorical data such as scatter plots
 #' @description
 #' takes untransformed data and draws the x and y axis with support for log transformation and outlier trimming.
 #'

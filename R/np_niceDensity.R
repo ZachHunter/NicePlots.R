@@ -21,7 +21,7 @@
 #' @param groupNames character vector; overrides the factor levels of \code{by} to label the groups
 #' @param drawPoints logical; draws a dot plot overlay for contour plots
 #' @param subGroup logical; Will use the factor levels in \code{by} to plot a series of distributions from the data in \code{x}.
-#' @param bandwidth numeric; Manually sets the bandwith for the kernal density estimation overiding default calculations. For 2D plots \code{bandwidth} be a vector of length 2. Set to \code{\link{NULL}} or \code{\link{NA}} to enable default calculations.
+#' @param bandwidth numeric; Manually sets the bandwith for the kernal density estimation overiding default calculations. For 2D plots \code{bandwidth} should be a vector of length 2. Set to \code{\link{NULL}} or \code{\link{NA}} to enable default calculations.
 #' @param useRgl logical; Should the library \code{\link[rgl]{rgl}} be used to make 3D surface plots.
 #' @param plotType character; Can be set to \code{contour} or \code{surface} to control the type of 2D plot.
 #' @param theme list object; Themes are are an optional way of storing graphical preset options that are compatible with all nicePlot graphing functions.
@@ -43,13 +43,20 @@
 #' niceDensity(iris[,1], main="Distrinbution of Sepal Length")
 #'
 #' #Kernal density plot subgrouped by species
-#' niceDensity(iris[,1],iris$Species, main="Sepal Length by Species", subGroup=TRUE)
+#' niceDensity(iris[,1],iris$Species, main="Sepal Length by Species",
+#' subGroup=TRUE)
+#'
+#' #Same thing with trimCurves=FALSE
+#' niceDensity(iris[,1],iris$Species, main="Sepal Length by Species",
+#' subGroup=TRUE, trimCurves=FALSE)
 #'
 #' #2D Density of Sepal Width vs. Length
-#' niceDensity(iris[,1:2],iris$Species, main="Sepal Width vs. Length", subGroup=TRUE)
+#' niceDensity(iris[,1:2],iris$Species, main="Sepal Width vs. Length",
+#' subGroup=TRUE)
 #'
 #' #Representing the 2D contour plot in 3D
-#' niceDensity(iris[,1:2],iris$Species, main="Sepal Width vs. Length", plotType="surface", theta=-60)
+#' niceDensity(iris[,1:2],iris$Species, main="Sepal Width vs. Length",
+#' plotType="surface", theta=-60)
 #'
 #' @seealso \code{\link[stats]{density}}, \code{\link[graphics]{contour}}, \code{\link[graphics]{persp}}, \code{\link[rgl]{persp3d}}, \code{\link[KernSmooth]{bkde}}
 #' @import dplyr

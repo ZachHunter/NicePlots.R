@@ -2,7 +2,7 @@
 % Please edit documentation in R/np_categorical_plot_setup.R
 \name{prepNiceWindow}
 \alias{prepNiceWindow}
-\title{prepare a plotting environment for non-categorical data such as bar plots or box plots}
+\title{prepare a plotting environment for non-categorical data such as scatter plots}
 \usage{
 prepNiceWindow(
   x,
