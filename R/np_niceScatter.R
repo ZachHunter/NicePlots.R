@@ -3,9 +3,6 @@
 #' @description Draws a 2D or 3D scatter plot with optional regression lines.
 #' @details
 #' Something goes here
-#'
-#'
-#'
 #' @inheritParams prepNiceWindow
 #' @param color factor or logical; if by is NULL, a factor suppolied to this option will populate by to color points by the factor levels. If by is defined then color should be set to TRUE or FALSE.
 #' @param shape factor or logical; if by is NULL, a factor suppolied to this option will populate by to control the shape of the points points by the factor levels. If by is defined then shape should be set to TRUE or FALSE.
@@ -29,29 +26,30 @@
 #' @param add logical; Adds the plot to the existing window rather the generating a new plotting enviroment
 #' @param lWidth numeric; Line width, equivelent to the cex \code{lwd} option.
 #' @param logScale numeric; A length two numeric vector indicating the log scale the x and y axis, respectively. If only one value is given, it is applied to boxth axis. Set to \code{\link{FALSE}} to disable (Default).
-#' @param trimCurves logical; Should the density curves be restricted to the min and max of the data.
+#' @param trimTrendLines logical; Limits trend line to the min and max data points if set to \code{\link{TRUE}}.
+#' @param showTrendConfidence logical; Shows the 95\% CI of the model tend line if set to \code{\link{TRUE}}.
 #' @param ... additional options for S3 method variants
 #'
 #' @examples
 #' ToDo<-1
-#'
 #' @seealso
 #' @import dplyr
 #' @importFrom purrr map_lgl map_dbl map
 #' @importFrom graphics points
 #' @importFrom tibble is.tibble
-#' @impartFrom broom tidy
+#' @importFrom broom tidy
+#' @importFrom stats lm predict
 #' @export
 #' @seealso \code{\link{niceDensity}}
-niceScatter<-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=3, sizeLevels=6, groupNames=NULL, subGroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL,  minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL,zLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, ...) {UseMethod("niceScatter",x)}
+niceScatter<-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=3, sizeLevels=6, groupNames=NULL, subGroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL,  minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL,zLim=NULL, strictLimits=FALSE, legend=FALSE ,trimTrendLines=TRUE, showTrendConfidence=TRUE, ...) {UseMethod("niceScatter",x)}
 
 #' @import dplyr
-#' @importFrom purrr map_lgl map_dbl map
+#' @importFrom purrr map_lgl map_dbl map walk
 #' @importFrom graphics points
 #' @importFrom tibble is.tibble
 #' @importFrom scatterplot3d scatterplot3d
 #' @export
-niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=3, sizeLevels=6, groupNames=NULL, subGroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, zLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, ...) {
+niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=3, sizeLevels=6, groupNames=NULL, subGroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, zLim=NULL, strictLimits=FALSE, legend=FALSE, trimTrendLines=TRUE, showTrendConfidence=TRUE, ...) {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset",call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -148,7 +146,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
 
   #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, drawPoints=TRUE, groupNames=groupNames,subGroup=subGroup, useRgl=useRgl, type=type,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimCurves=trimCurves)
+  ActiveOptions<-list(x=x, by=by, drawPoints=TRUE, groupNames=groupNames,subGroup=subGroup, useRgl=useRgl, type=type,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimCurves=TRUE)
   ActiveOptions<-append(ActiveOptions,moreOptions)
 
   #Here we check to see if the user specified any options so that they not overwritten by the designated theme
@@ -162,6 +160,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
   plotColors<-finalOptions$plotColors
   groupNames<-finalOptions$groupNames
   pointMethod<-finalOptions$pointMethod
+  lineType<-finalOptions$errorBarLineType
   theme$plotColors<-plotColors
   curvePoints<-50
   if(!is.null(moreOptions[["curvePoints"]])) {curvePoints<-moreOptions[["curvePoints"]]}
@@ -408,32 +407,79 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
 
   #Add line fitting
   modelStats<-list()
-  if(trendline!=FALSE & !is.null(trendline) & ! in.na(trendline)) {
+  myFill<-plotColors$fill
+  myLineType<-lineType
+  myLineCol<-plotColors$lines
+  myModels<-NULL
+  groupLevels<-NULL
+  if(trendline!=FALSE & !is.null(trendline) & ! is.na(trendline)) {
     if(grepl("col", trendline, ignore.case = T & color[1]==TRUE)) {
+      groupLevels<-length(unique(myColors))
       myModels<-map(levels(by$color), function(l) lm(y~x,data=data.frame(x=x[by$color==l,1],y=x[by$color==l,2])))
       newX<-map(levels(by$color), function(l) seq(min(x[by$color==l,1]), max(x[by$color==l,1]),length.out = curvePoints))
       confModels<-map(seq(length(newX)), function(i) predict(myModels[[i]], newdata=data.frame(x=newX[[i]]), interval = "confidence", level=.95))
-      walk(seq(length(newX)), function(i) polygon(c(newX[[i]],rev(newX[[i]])),c(confModels[[1]][,2],rev(confModels[[i]][,3])),border = NA,col=myFill[i],lty=myLineType[i]))
-      walk(seq(length(newX)), function(i) {lines(newX[[i]], confModels[[i]][,2], col=myLineCol[i], lty=myLineType[i]); lines(newX[[i]], confModels[[i]][,3], col=myLineCol[i], lty=myLineType[i])})
       modelStats<-map(myModels,tidy)
       names(modelStats)<-levels(by$color)
-    } else if (grepl("shape", trendline, ignore.case = T)) {
-
-    } else if(grepl("group", trendline, ignore.case = T) & !is.null(by)){
-
-    } else {
-      dataModel<-lm(y~x,data=data.frame(x=x[[1]], y=x[[2]]))
-      newX=seq(min(x[[1]]),max(x[[2]]),length.out = curvePoints)
-      modelConf <- predict(dataModel, newdata=data.frame(newX), interval = "confidence", level=.95)
-      polygon(c(newX,rev(newX)),c(modelConf[,2],rev(modelConf[,3])),border = NA,col=plotColors$fill[1])
-      walk(list(conf[,2],conf[,3]),function(y) lines(newX,y), lty=finalOptions$whiskerLineType[1],col=plotColors$lines[1])
-      abline(dataModel,lwd=lWidth*2,col=plotColors$lines[1])
-      modelStats<-tidy(dataModel)
       if(verbose==TRUE){
-        cat(dataModel)
+        walk(seq(groupLevels), function(p) cat(paste0(levels(by$color)[p],":\n",myModels[[p]])))
       }
-      lm.out <- lm(y ~ x)
+    } else if (grepl("shape", trendline, ignore.case = T)) {
+      groupLevels<-length(unique(myShapes))
+      myModels<-map(levels(by$shape), function(l) lm(y~x,data=data.frame(x=x[by$shape==l,1],y=x[by$shape==l,2])))
+      newX<-map(levels(by$shape), function(l) seq(min(x[by$shape==l,1]), max(x[by$shape==l,1]),length.out = curvePoints))
+      confModels<-map(seq(length(newX)), function(i) predict(myModels[[i]], newdata=data.frame(x=newX[[i]]), interval = "confidence", level=.95))
+      modelStats<-map(myModels,tidy)
+      names(modelStats)<-levels(by$shape)
+      if(verbose==TRUE){
+        walk(seq(groupLevels), function(p) cat(paste0(levels(by$shape)[p],":\n",myModels[[p]])))
+      }
+    } else if(grepl("group", trendline, ignore.case = T) & !is.null(by)){
+      if(!is.data.frame(by)){
+        by<-data.frame(group=by)
+      }
+      groupLevels<-length(levels(factor(by)))
+      myModels<-map(groupLevels, function(l) lm(y~x,data=data.frame(x=x[by[,1]==l,1],y=x[by[,1]==l,2])))
+      newX<-list(x=seq(min(x[[1]]),max(x[[1]]),length.out = curvePoints))
+      confModels <- list(m=predict(myModels, newdata=data.frame(x=newX), interval = "confidence", level=.95))
+      #walk(seq(length(newX)), function(i) polygon(c(newX[[i]],rev(newX[[i]])),c(confModels[[i]][,2],rev(confModels[[i]][,3])),border = NA,col=myFill[i],lty=myLineType[i]))
+      #walk(seq(length(newX)), function(i) {lines(newX[[i]], confModels[[i]][,2], col=myLineCol[i], lty=myLineType[i]); lines(newX[[i]], confModels[[i]][,3], col=myLineCol[i], lty=myLineType[i])})
+      #walk(seq(length(myModels)), function(m) abline(myModels[[m]],lwd=lWidth*1.5,col=myColors[m],lty=myLineType[m]))
+    } else {
+      groupLevels<-1
+      myModels<-list(m=lm(y~x,data=data.frame(x=x[[1]], y=x[[2]])))
+      newX<-list(x=seq(min(x[[1]]),max(x[[1]]),length.out = curvePoints))
+      confModels <- list(m=predict(myModels[[1]], newdata=data.frame(x=newX), interval = "confidence", level=.95))
+      #polygon(c(newX,rev(newX)),c(modelConf[,2],rev(modelConf[,3])),border = NA,col=plotColors$fill[1])
+      #walk(list(modelConf[,2],modelConf[,3]),function(y) lines(newX,y, lty=lineType[1],col=plotColors$lines[1]))
+      #abline(dataModel,lwd=lWidth*1.5,col=myColors[1],lty=lineType[1])
+      modelStats<-tidy(myModels[[1]])
+      if(verbose==TRUE){
+        cat(myModels[[1]])
+      }
+      #lm.out <- lm(y ~ x)
     }
+    if (length(myFill)<groupLevels) {
+      warning("Not enough fill values to uniquely define all levels!\nUse 'plotColors=list(fill=c('color1','color2',...)) to define an alternate fill color vector.\nSee the help section on themes and formating for more information.\n", call. = FALSE)
+      myFill<-rep(plotColors$fill,trunc(groupLevels/length(plotColors$fill))+1)
+    }
+    if (length(myLineCol)<groupLevels) {
+      warning("Not enough line color values to uniquely define all levels!\nUse 'plotColors=list(fill=c('color1','color2',...)) to define an alternate fill color vector.\nSee the help section on themes and formating for more information.\n", call. = FALSE)
+      myLineCol<-rep(plotColors$lines,trunc(groupLevels/length(plotColors$lines))+1)
+    }
+    if (length(myLineType)<groupLevels) {
+      #warning("Not enough line type values to uniquely define all levels!\nUse 'plotColors=list(fill=c('color1','color2',...)) to define an alternate fill color vector.\nSee the help section on themes and formating for more information.\n", call. = FALSE)
+      myLineType<-rep(myLineType,trunc(groupLevels/length(myLineType))+1)
+    }
+    if(showTrendConfidence==TRUE) {
+      walk(seq(length(newX)), function(i) polygon(c(newX[[i]],rev(newX[[i]])),c(confModels[[i]][,2],rev(confModels[[i]][,3])),border = NA,col=myFill[i]))
+      walk(seq(length(newX)), function(i) {lines(newX[[i]], confModels[[i]][,2], col=myLineCol[i], lty=myLineType[i]); lines(newX[[i]], confModels[[i]][,3], col=myLineCol[i], lty=myLineType[i])})
+    }
+    if(trimTrendLines==TRUE) {
+      walk(seq(length(myModels)), function(m) segments(min(newX[[m]]),predict(myModels[[m]],newdata=data.frame(x=min(newX[[m]]))),max(newX[[m]]),predict(myModels[[m]],newdata=data.frame(x=max(newX[[m]]))),lwd=lWidth*1.5,col=myLineCol[m],lty=myLineType[m]))
+    } else {
+      walk(seq(length(myModels)), function(m) abline(myModels[[m]],lwd=lWidth*1.5,col=myColors[m],lty=myLineType[m]))
+    }
+
   }
   points(x[[1]],x[[2]],
     col=myColors,
@@ -452,7 +498,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
   }
   par(col.sub=oSubCol, col.lab=oLabCol,col.main=oMainCol,family=oFont,cex.main=oCexMain,cex.lab=oCexlab,cex.sub=oCexSub)
 
-  #formating the output list and setting class int npData
+  #formatting the output list and setting class int npData
   dataOut<-list(summary=finalSummary,stats=modelStats,plotType="scatter",options=ActiveOptions)
   class(dataOut)<-c("npData","list")
 

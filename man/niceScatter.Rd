@@ -43,7 +43,8 @@ niceScatter(
   zLim = NULL,
   strictLimits = FALSE,
   legend = FALSE,
-  trimCurves = TRUE,
+  trimTrendLines = TRUE,
+  showTrendConfidence = TRUE,
   ...
 )
 }
@@ -124,7 +125,9 @@ niceScatter(
 
 \item{legend}{logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.}
 
-\item{trimCurves}{logical; Should the density curves be restricted to the min and max of the data.}
+\item{trimTrendLines}{logical; Limits trend line to the min and max data points if set to \code{\link{TRUE}}.}
+
+\item{showTrendConfidence}{logical; Shows the 95\% CI of the model tend line if set to \code{\link{TRUE}}.}
 
 \item{...}{additional options for S3 method variants}
 }
@@ -136,7 +139,6 @@ Something goes here
 }
 \examples{
 ToDo<-1
-
 }
 \seealso{
 
