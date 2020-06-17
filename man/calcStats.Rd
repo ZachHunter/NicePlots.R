@@ -31,8 +31,9 @@ This is designed to be used in conjunction with data visualization plots to help
 }
 \examples{
 data(iris)
-\donttest{pv<-calcStats(iris$Petal.Length,by=iris$Species,type="anova")}
-\donttest{boxplot(iris$Petal.Length~iris$Species,main="Petal Length by Species",sub=pv)}
+#calcStats is not exported but you can invoke it using the calcType options:
+test<-niceBox(iris$Sepal.Length, by=iris$Species, calcType="anova", showCalc=TRUE)
+test$stats
 
 }
 \seealso{

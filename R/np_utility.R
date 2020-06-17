@@ -139,8 +139,9 @@ setAlpha<-function(x,alpha=.2){
 #' @importFrom stats t.test wilcox.test anova TukeyHSD pairwise.wilcox.test pairwise.t.test aov median
 #' @examples
 #' data(iris)
-#' \donttest{pv<-calcStats(iris$Petal.Length,by=iris$Species,type="anova")}
-#' \donttest{boxplot(iris$Petal.Length~iris$Species,main="Petal Length by Species",sub=pv)}
+#' #calcStats is not exported but you can invoke it using the calcType options:
+#' test<-niceBox(iris$Sepal.Length, by=iris$Species, calcType="anova", showCalc=TRUE)
+#' test$stats
 #'
 #' @seealso \code{\link[stats]{wilcox.test}}, \code{\link[stats]{pairwise.wilcox.test}}, \code{\link[stats]{t.test}}, \code{\link[stats]{pairwise.t.test}}, \code{\link[stats]{anova}}, \code{\link[stats]{TukeyHSD}}
 calcStats<-function(x,by,type=c("Wilcox","Tukey","T.Test","ANOVA"),verbose=FALSE){

@@ -2,7 +2,19 @@
 #' @title draw a scatter plot
 #' @description Draws a 2D or 3D scatter plot with optional regression lines.
 #' @details
-#' Something goes here
+#' The niceScatter function operates a little differently from the rest of the functions in this package.
+#' While it can accept a \code{\link{data.frame}} or a \code{\link{vector}} for \code{x} and \code{by} values,
+#' it is also possible to construct the \code{by} \code{\link{data.frame}} implicitly by supplying an actual \code{\link{factor}}/numeric vector to
+#' to the options like \code{color}, \code{shape}, and \code{size} instead of \code{\link{TRUE}} or \code{\link{FALSE}}. These approaches can not be mixed and matched.
+#' If a value is given to \code{by} directly then the other active options are just set to \code{\link{TRUE}}.
+#' If a numeric \code{\link{vector}} or single column \code{\link{data.frame}} is given to \code{x}, the x-axis is automatically assigned to the row numbers of the data.
+#' The standard options for \code{type} in the base R \code{\link{plot}} function can be given here to determine the plotting method.
+#' If three or more columns of data are supplied to \code{x}, \code{niceScatter} will switch to 3D plotting mode with \code{\link[scatterplot3d]{scatterplot3d}}.
+#' The options \code{color}, \code{size} and \code{shape} can be used in this mode. The \code{\link[scatterplot3d]{scatterplot3d}} options \code{grid}, \code{angle} and \code{box} can be given as
+#' arguments to be passed to \code{\link[scatterplot3d]{scatterplot3d}}. If \code{useRgl} is \code{\link{TRUE}}, then it will attempt to load the \code{rgl} package and use \code{rgl's} interactive graphics instead.
+#' Note that the \code{shape} option does not work in with \code{rgl's} \code{\link[rgl]{plot3d}}. However, the \code{size} option will scale the radius of the spheres in \code{rgl} correctly.
+#' When \code{useRgl} is active, the \code{\link[rgl]{plot3d}} options \code{axes} and \code{box} can be endtered as arguments to niceScatter to format the graph.
+#' Finally, in 2D mode, linear trend lines with 95\% confidence intervals can be drawn for the data or for each factor level of an option such as \code{color} or \code{shape}.
 #' @inheritParams prepNiceWindow
 #' @param color factor or logical; if by is NULL, a factor suppolied to this option will populate by to color points by the factor levels. If by is defined then color should be set to TRUE or FALSE.
 #' @param shape factor or logical; if by is NULL, a factor suppolied to this option will populate by to control the shape of the points points by the factor levels. If by is defined then shape should be set to TRUE or FALSE.
@@ -31,12 +43,27 @@
 #' @param ... additional options for S3 method variants
 #'
 #' @examples
-#' ToDo<-1
-#' @seealso
+#' data(iris)
+#' #Construct the by data.frame implicitly by supplying values to the options
+#' niceScatter(iris[,1:2], color=iris$Species, shape=iris$Species,
+#'    size=iris[,3], trendline = "color",theme=npColorTheme)
+#'
+#' #Same thing but defining the by input explicitly and makeing a single trandlline for the group.
+#' #Note that seting trendline to color as before would produce a exact replica of the first graph.
+#' niceScatter(iris[,1:2],by=data.frame(iris$Species,iris$Species,iris[,3]),
+#'    color=TRUE, shape=TRUE, size=TRUE, theme=npColorTheme, trendline = TRUE)
+#'
+#' #Using 3D
+#' niceScatter(iris[,1:3], color=iris$Species, size=iris[,4], shape=iris$Species, angle=140)
+#'
+#' #3D with rgl
+#' niceScatter(iris[,1:3], color=iris$Species, size=iris[,4], useRgl=TRUE,type="s")
+#'
+#' @seealso \code{\link[scatterplot3d]{scatterplot3d}}, \code{\link[rgl]{plot3d}}, \code{\link{plot}}, \code{\link{niceDensity}}
 #' @import dplyr
 #' @importFrom purrr map_lgl map_dbl map
 #' @importFrom graphics points
-#' @importFrom tibble is.tibble
+#' @importFrom tibble is_tibble
 #' @importFrom broom tidy
 #' @importFrom stats lm predict
 #' @export
@@ -46,7 +73,7 @@ niceScatter<-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FA
 #' @import dplyr
 #' @importFrom purrr map_lgl map_dbl map walk
 #' @importFrom graphics points
-#' @importFrom tibble is.tibble
+#' @importFrom tibble is_tibble
 #' @importFrom scatterplot3d scatterplot3d
 #' @export
 niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=3, sizeLevels=6, groupNames=NULL, subGroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, zLim=NULL, strictLimits=FALSE, legend=FALSE, trimTrendLines=TRUE, showTrendConfidence=TRUE, ...) {
@@ -97,7 +124,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
     } else {
       size<-TRUE
     }
-    if(is.data.frame(by) | is.tibble(by)) {
+    if(is.data.frame(by) | is_tibble(by)) {
       if(color[1]==TRUE) {
         colnames(by)[1]<-"color"
         if(shape[1]==TRUE) {
@@ -310,7 +337,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
           if(!is.null(moreOptions[["box"]])){box<-moreOptions[["box"]]}
           axes<-TRUE
           if(!is.null(moreOptions[["axes"]])){axes<-moreOptions[["axes"]]}
-          rgl::plot3d(x[,1:3],pch=myShapes,col=myColors,type=type, main=main,sub=sub,ylab=ylab,xlab=xlab,zlab=zlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$numbers,yLim=yLim, xLim=xLim,zlim=zLim,radius=mySize/10, box=box, axes=axes,size=pointSize[1])
+          rgl::plot3d(x[,1:3],pch=myShapes,col=myColors,type="s", main=main,sub=sub,ylab=ylab,xlab=xlab,zlab=zlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$numbers,yLim=yLim, xLim=xLim,zlim=zLim,radius=mySize/10, box=box, axes=axes,size=pointSize[1])
         }
       }
       if(useRgl==FALSE) {
