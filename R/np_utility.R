@@ -347,21 +347,25 @@ plot.npData <- function(x,plotType=NULL, ...) {
     }
   }
   if(!is.null(plotType)) {
-    if(plotType %in% c("bar", "box", "dot", "violin", "density")) {
-      x$plotType<-plotType
-    } else {
-      warning("Invalid plotType options.\nValid options include,'bar', 'box', 'dot', 'violin' and 'density'.\nProceeding with default...",call.=FALSE)
-    }
+    x$plotType<-plotType
   }
-  niceFun<-"niceBox"
-  if(x$plotType=="bar"){
+  niceFun<-NA
+  if(grepl("bar", x$plotType[1], ignore.case = TRUE)){
     niceFun<-"niceBar"
-  } else if (x$plotType=="dot") {
+  } else if (grepl("dot", x$plotType[1], ignore.case = TRUE)) {
     niceFun<-"niceDots"
-  } else if (x$plotType=="violin"){
+  } else if (grepl("vio", x$plotType[1], ignore.case = TRUE)){
     niceFun<-"niceVio"
-  } else if (x$plotType=="density"){
+  } else if (grepl("den", x$plotType[1], ignore.case = TRUE)){
     niceFun<-"niceDensity"
+  } else if (grepl("den", x$plotType[1], ignore.case = TRUE)){
+    niceFun<-"niceDensity"
+  } else if (grepl("box", x$plotType[1], ignore.case = TRUE)){
+    niceFun<-"niceBox"
+  } else if (grepl("scat", x$plotType[1], ignore.case = TRUE)){
+    niceFun<-"niceScatter"
+  } else {
+    warning("Invalid plotType options.\nValid options include,'bar', 'box', 'dot', 'violin' and 'density'.\nProceeding with default...",call.=FALSE)
   }
   dataOut<-do.call(niceFun,x$options)
   invisible(dataOut)

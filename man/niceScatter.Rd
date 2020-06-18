@@ -45,6 +45,8 @@ niceScatter(
   legend = FALSE,
   trimTrendLines = TRUE,
   showTrendConfidence = TRUE,
+  drawPoints = TRUE,
+  corMethod = "pearson",
   ...
 )
 }
@@ -129,6 +131,10 @@ niceScatter(
 
 \item{showTrendConfidence}{logical; Shows the 95\% CI of the model tend line if set to \code{\link{TRUE}}.}
 
+\item{drawPoints}{logical; Should the points be drawn. Defaults to \code{\link{TRUE}}. Only useful for drawing an empty graph or only the trend lines.}
+
+\item{corMethod}{character; This should be a valid argument to \code{method} from \code{\link[stats]{cor.test}}. Calculated only when trendlines are requested, the values be seen using \code{verbose} and in the \code{stats} section of the output list.}
+
 \item{...}{additional options for S3 method variants}
 }
 \description{
@@ -144,15 +150,16 @@ If a numeric \code{\link{vector}} or single column \code{\link{data.frame}} is g
 The standard options for \code{type} in the base R \code{\link{plot}} function can be given here to determine the plotting method.
 If three or more columns of data are supplied to \code{x}, \code{niceScatter} will switch to 3D plotting mode with \code{\link[scatterplot3d]{scatterplot3d}}.
 The options \code{color}, \code{size} and \code{shape} can be used in this mode. The \code{\link[scatterplot3d]{scatterplot3d}} options \code{grid}, \code{angle} and \code{box} can be given as
-arguments to be passed to \code{\link[scatterplot3d]{scatterplot3d}}. If \code{useRgl} is \code{\link{TRUE}}, then it will attempt to load the \code{rgl} package and use \code{rgl's} interactive graphics instead.
-Note that the \code{shape} option does not work in with \code{rgl's} \code{\link[rgl]{plot3d}}. However, the \code{size} option will scale the radius of the spheres in \code{rgl} correctly.
+arguments to be passed to \code{\link[scatterplot3d]{scatterplot3d}}. If \code{useRgl} is \code{\link{TRUE}}, then it will attempt to load the \code{rgl} package and use \code{rgl} interactive graphics instead.
+Note that the \code{shape} option does not work in with \code{rgl} \code{\link[rgl]{plot3d}}. However, the \code{size} option will scale the radius of the spheres in \code{rgl} correctly.
 When \code{useRgl} is active, the \code{\link[rgl]{plot3d}} options \code{axes} and \code{box} can be endtered as arguments to niceScatter to format the graph.
 Finally, in 2D mode, linear trend lines with 95\% confidence intervals can be drawn for the data or for each factor level of an option such as \code{color} or \code{shape}.
 }
 \examples{
 data(iris)
 #Construct the by data.frame implicitly by supplying values to the options
-niceScatter(iris[,1:2], color=iris$Species, shape=iris$Species, size=iris[,3], trendline = "color",theme=npColorTheme)
+niceScatter(iris[,1:2], color=iris$Species, shape=iris$Species,
+   size=iris[,3], trendline = "color",theme=npColorTheme)
 
 #Same thing but defining the by input explicitly and makeing a single trandlline for the group.
 #Note that seting trendline to color as before would produce a exact replica of the first graph.
@@ -163,11 +170,9 @@ niceScatter(iris[,1:2],by=data.frame(iris$Species,iris$Species,iris[,3]),
 niceScatter(iris[,1:3], color=iris$Species, size=iris[,4], shape=iris$Species, angle=140)
 
 #3D with rgl
-niceScatter(iris[,1:3], color=iris$Species, size=iris[,4], useRgl=TRUE,type="s")
+niceScatter(iris[,1:3], color=iris$Species, size=iris[,4], useRgl=TRUE)
 
 }
 \seealso{
 \code{\link[scatterplot3d]{scatterplot3d}}, \code{\link[rgl]{plot3d}}, \code{\link{plot}}, \code{\link{niceDensity}}
-
-\code{\link{niceDensity}}
 }
