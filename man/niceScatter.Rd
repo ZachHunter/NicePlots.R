@@ -115,7 +115,7 @@ niceScatter(
 
 \item{verbose}{logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.}
 
-\item{logAdjustment}{= numeric; This number is added to the input data prior to log transformation. Default value is 1.}
+\item{logAdjustment}{numeric; This number is added to the input data prior to log transformation. Default value is 1.}
 
 \item{xLim}{numeric vector; manually set the limits of the plotting area (eg. \code{xLim=c(min,max)}). Used to format the x-axis. by default but will modify the x-axis if \code{side=\link{TRUE}}.}
 

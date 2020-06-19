@@ -11,7 +11,8 @@ prepLegendMarigins(
   legend,
   pointHighlights = FALSE,
   subGroup = TRUE,
-  stack = FALSE
+  stack = FALSE,
+  is2D = FALSE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ prepLegendMarigins(
 \item{subGroup}{subGroup logical; use additional column in \code{by} to group the data within each level of the major factor.}
 
 \item{stack}{logical; Used for stack stacked bar plots. Used exclusively by \code{\link{niceBar}}.}
+
+\item{is2D}{logical; Is this for a 2D scatterplot or density plot? The first column of \code{by} will be use if set to \code{\link{TRUE}}.}
 }
 \value{
 Does not return a value but changes the global \code{par(mai)} settings.

@@ -58,13 +58,14 @@ makeLogTicks<-function(dataRange,minorCount=10,logScale=2,axisText=c(NULL,NULL),
 #' @param subGroup subGroup logical; use additional column in \code{by} to group the data within each level of the major factor.
 #' @param stack logical; Used for stack stacked bar plots. Used exclusively by \code{\link{niceBar}}.
 #' @param legend character; Title for the legend collumn. Set to \code{\link{TRUE}} if no header is desired.
+#' @param is2D logical; Is this for a 2D scatterplot or density plot? The first column of \code{by} will be use if set to \code{\link{TRUE}}.
 #'
 #' @return Does not return a value but changes the global \code{par(mai)} settings.
 #' @examples
 #' TODO<-1
 #' @import dplyr
 #' @importFrom purrr map_dbl
-prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TRUE,stack=FALSE){
+prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TRUE,stack=FALSE, is2D=FALSE){
   legendIndex<-1
   legendTitle<-""
   legendLevels<-NULL
@@ -116,6 +117,12 @@ prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TR
         legendTitle<-"Legend"
         legendLevels<-levels(by)
       }
+    }
+    #Note that this should be updated to allow for multiple legend if necessary.
+    if(is2D==TRUE) {
+      legendTitle<-"Legend"
+      if(is.factor(by)){legendLevels<-levels(by)}
+      else {legendLevels<-levels(by[,1])}
     }
     if(!(is.na(legend) | is.null(legend) | legend==TRUE)) {
       legendTitle<-legend
@@ -485,7 +492,8 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
 #' @param expLabels logical; prints the major tick labels is \eqn{logScale^{x}}{logScale^x} instead of the raw value
 #' @param strictLimits logical; eliminates padding on the value axis so 0 can be flush with the x-axis. Defaults to \code{\link{FALSE}}.
 #' @param legend logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.
-#' @param logAdjustment = numeric; This number is added to the input data prior to log transformation. Default value is 1.
+#' @param logAdjustment numeric; This number is added to the input data prior to log transformation. Default value is 1.
+#' @param makePlot logical; This format the data and ploting area without drawing anything if set to \code{\link{FALSE}}.
 #'
 #' @return formats the plotting area and returns a named list with 'data' and 'labels' corresponding to the trimmed and/or transformed data and the labels for the primary factors, respectively.
 #' @examples
@@ -498,7 +506,7 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
 #' @importFrom utils data str
 #'
 #' @seealso \code{\link[grDevices]{axisTicks}}, \code{\link[graphics]{axis}}, \code{\link{makeLogTicks}}, \code{\link{facetSpacing}}
-prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLim=NULL,rotateLabels=FALSE, theme=NA, plotColors=if(is.na(theme)){list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white")}else{theme$plotColors}, logScaleX=FALSE,logScaleY=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), minorGuides=FALSE, extendTicks=F,subGroup=FALSE, expLabels=TRUE,strictLimits=F, legend=FALSE, logAdjustment=1) {
+prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLim=NULL,rotateLabels=FALSE, theme=NA, plotColors=if(is.na(theme)){list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white")}else{theme$plotColors}, logScaleX=FALSE,logScaleY=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), minorGuides=FALSE, extendTicks=F,subGroup=FALSE, expLabels=TRUE,strictLimits=F, legend=FALSE, logAdjustment=1,makePlot=TRUE) {
   levelCount<-1
   xData<-x[,1]
   yData<-x[,2]
@@ -511,7 +519,7 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
   }
 
   #Set margins for legends now
-  prepLegendMarigins(x=yData,by=by,theme=theme,legend=legend,pointHighlights=FALSE,subGroup=TRUE)
+  prepLegendMarigins(x=x,by=by,theme=theme,legend=legend,pointHighlights=FALSE,subGroup=TRUE, is2D=TRUE)
 
   #Calculate the data ranges for x and y
   dataRange<-list(x=c(NULL,NULL),y=c(NULL,NULL))
@@ -567,19 +575,21 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
   oBg<-par("bg")
   par(bg=plotColors$marginBg)
   plot.new()
-  if(strictLimits) {
-    plot.window(xlim=dataRange$x, ylim=dataRange$y, xaxs="i", yaxs="i")
-  } else {
-    plot.window(xlim=dataRange$x, ylim=dataRange$y)
+  if(makePlot) {
+    if(strictLimits) {
+      plot.window(xlim=dataRange$x, ylim=dataRange$y, xaxs="i", yaxs="i")
+    } else {
+      plot.window(xlim=dataRange$x, ylim=dataRange$y)
+    }
+    par(xpd=FALSE)
+    if(plotColors$bg=="open" | plotColors$bg=="Open") {
+      abline(v=par("usr")[1],lwd=2.5,col=plotColors$axis)
+      abline(h=par("usr")[3],lwd=2.5,col=plotColors$axis)
+    } else {
+      rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col=plotColors$bg, lwd=2.5,border=plotColors$axis)
+    }
   }
-  par(xpd=FALSE)
-  if(plotColors$bg=="open" | plotColors$bg=="Open") {
-    abline(v=par("usr")[1],lwd=2.5,col=plotColors$axis)
-    abline(h=par("usr")[3],lwd=2.5,col=plotColors$axis)
-  } else {
-    rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col=plotColors$bg, lwd=2.5,border=plotColors$axis)
-  }
-  par(bg=oBg)
+    par(bg=oBg)
 
   #Formating the axis labels
   labelCex<-.9
@@ -677,22 +687,26 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
     }
 
     #Draw minor guides and tick marks for x and y axis
-    if(minorGuides != FALSE){
-      abline(h= minorLocY[minorLocY!=lowerLimY],lwd=.33,col=plotColors$minorGuides)
-      abline(v= minorLocX[minorLocX!=lowerLimX],lwd=.33,col=plotColors$minorGuides)
+    if(makePlot==TRUE) {
+      if(minorGuides != FALSE){
+        abline(h= minorLocY[minorLocY!=lowerLimY],lwd=.33,col=plotColors$minorGuides)
+        abline(v= minorLocX[minorLocX!=lowerLimX],lwd=.33,col=plotColors$minorGuides)
+      }
+      axis(side = 1, at = minorLocX, labels = FALSE, tcl = -0.2,col=plotColors$axis,col.ticks=plotColors$minorTicks)
+      axis(side = 2, at = minorLocY, labels = FALSE, tcl = -0.2,col=plotColors$axis,col.ticks=plotColors$minorTicks)
     }
-    axis(side = 1, at = minorLocX, labels = FALSE, tcl = -0.2,col=plotColors$axis,col.ticks=plotColors$minorTicks)
-    axis(side = 2, at = minorLocY, labels = FALSE, tcl = -0.2,col=plotColors$axis,col.ticks=plotColors$minorTicks)
   }
 
   #Draw major ticks and labels for back x and y
   clCex<-par()$cex.axis
   par(cex.axis=labelCex)
-  axis(side=1,labels=myLabelsX,at= myMajorTicksX,las=rotateLabels,col=plotColors$axis,col.ticks=plotColors$majorTicks)
-  axis(side=2,labels=myLabelsY,at= myMajorTicksY,las=rotateLabels,col=plotColors$axis,col.ticks=plotColors$majorTicks)
+  if(makePlot==TRUE) {
+    axis(side=1,labels=myLabelsX,at= myMajorTicksX,las=rotateLabels,col=plotColors$axis,col.ticks=plotColors$majorTicks)
+    axis(side=2,labels=myLabelsY,at= myMajorTicksY,las=rotateLabels,col=plotColors$axis,col.ticks=plotColors$majorTicks)
+  }
   par(cex.axis=clCex)
 
-  if(guides[1]!=FALSE){
+  if(guides[1]!=FALSE & makePlot==TRUE){
     abline(v=myMajorTicksX[myMajorTicksX!=par("usr")[1]],col=plotColors$guides,lwd=1)
     abline(h=myMajorTicksY[myMajorTicksY!=par("usr")[2]],col=plotColors$guides,lwd=1)
   }

@@ -24,7 +24,8 @@ prepNiceWindow(
   expLabels = TRUE,
   strictLimits = F,
   legend = FALSE,
-  logAdjustment = 1
+  logAdjustment = 1,
+  makePlot = TRUE
 )
 }
 \arguments{
@@ -64,7 +65,9 @@ prepNiceWindow(
 
 \item{legend}{logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.}
 
-\item{logAdjustment}{= numeric; This number is added to the input data prior to log transformation. Default value is 1.}
+\item{logAdjustment}{numeric; This number is added to the input data prior to log transformation. Default value is 1.}
+
+\item{makePlot}{logical; This format the data and ploting area without drawing anything if set to \code{\link{FALSE}}.}
 }
 \value{
 formats the plotting area and returns a named list with 'data' and 'labels' corresponding to the trimmed and/or transformed data and the labels for the primary factors, respectively.

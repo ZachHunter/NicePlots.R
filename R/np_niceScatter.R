@@ -221,7 +221,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
   #Initialize legend variables so we can update based on options
   legendLabels<-groupNames
   legendTitle<-"Legend"
-  if(!is.null(by) & (subGroup==TRUE | is.data.frame(x))){
+  if(!is.null(by)){
     if(legend[1]==FALSE | is.null(legend[1])) {
       legend<-TRUE
     } else if (legend[1]!=TRUE) {
@@ -233,13 +233,15 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
   #Handling log transformations for x and y
   logScaleX<-FALSE
   logScaleY<-FALSE
+  logScaleZ<-NULL
   if(is.null(logScale[1])){logScale[1]<-FALSE}
   if(length(logScale)>1 & is.null(logScale[2])) {logScale[2]<-FALSE}
-  if((length(logScale)>1 & sum(logScale[1:2])>0) | logScale[1]!=FALSE) {
+  if((length(logScale)>1 & sum(logScale[1:3])>0) | logScale[1]!=FALSE) {
     if(length(logScale)==1) {
       if(logScale[1]!=FALSE){
         logScaleX<-logScale
         logScaleY<-logScale
+        logScaleZ<-logScale
       }
     } else {
       if(logScale[1]!=FALSE) {
@@ -249,8 +251,20 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
         logScaleY<-logScale[2]
       }
     }
+    #special case of 3D plots
+    if(length(logScale)>=3 & is.null(logScaleZ)) {
+      if(is.null(logScale[3])) {
+        logScaleZ<-FALSE
+      } else if (is.na(logScale[3]) | logScale[3]==TRUE) {
+        logScaleZ<-FALSE
+      } else if(is.numeric(logScale[3]) & logScale[3] > 1) {
+        logScaleZ<-logScale[3]
+      }
+    }
   }
-  #Handles cases where users want the points overlay to be consistant and the fill to change.
+  if(is.null(logScaleZ)) {logScaleZ<-FALSE}
+
+  #Handles cases where users want the points overlay to be consistent and the fill to change.
   if(length(legendColors)<=1 & length(plotColors$fill)>1){
     legendColors<-plotColors$fill
   }
@@ -331,6 +345,11 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
       }
     }
     if (dim(x)[2]>2){
+      x_temp<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment, strictLimits=strictLimits, makePlot=FALSE)
+      if(logScaleZ!=FALSE) {
+        x[,3]<-log(x[,3] + logAdjustment,logScaleZ)
+      }
+      x[,1:2]<-x_temp
       #3D plot handling
       if(useRgl==TRUE) {
         if (! requireNamespace("rgl", quietly = TRUE)) {
@@ -360,7 +379,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
       if(add[1]==FALSE) {
         #RStudio seems not to update the graphics devices properly
         if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
-        x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
+        x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment, strictLimits=strictLimits)
         title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$numbers)
       }
     }
@@ -521,7 +540,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
         walk(seq(length(newX)), function(i) {lines(newX[[i]], confModels[[i]][,2], col=myLineCol[i], lty=myLineType[i]); lines(newX[[i]], confModels[[i]][,3], col=myLineCol[i], lty=myLineType[i])})
       }
       if(trimTrendLines==TRUE) {
-        walk(seq(length(myModels)), function(m) segments(min(newX[[m]]),predict(myModels[[m]],newdata=data.frame(x=min(newX[[m]]))),max(newX[[m]]),predict(myModels[[m]],newdata=data.frame(x=max(newX[[m]]))),lwd=lWidth*1.5,col=myLineCol[m],lty=myLineType[m]))
+        walk(seq(length(myModels)), function(m) segments(min(newX[[m]]),predict(myModels[[m]],newdata=data.frame(x=min(newX[[m]]))),max(newX[[m]]),predict(myModels[[m]],newdata=data.frame(x=max(newX[[m]]))),lwd=lWidth*1.5,col=myLineCol[m]))
       } else {
         walk(seq(length(myModels)), function(m) abline(myModels[[m]],lwd=lWidth*1.5,col=myLineCol[m],lty=myLineType[m]))
       }
