@@ -169,5 +169,5 @@ niceVio(iris$Sepal.Length, by=factorFrame, minorTick=4,subGroup=TRUE,
     ylab=Lab,main=Title,plotColors=myCols)
 }
 \seealso{
-\code{\link[vioplot]{vioplot}}, \code{\link{boxplot}}, \code{\link{niceBox}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{prepCategoryWindow}}
+\code{\link{boxplot}}, \code{\link{niceBox}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{prepCategoryWindow}}
 }

@@ -62,7 +62,7 @@
 #' niceScatter(iris[,1:3], color=iris$Species, size=iris[,4], useRgl=TRUE)
 #'
 #' @seealso \code{\link[scatterplot3d]{scatterplot3d}}, \code{\link[rgl]{plot3d}}, \code{\link{plot}}, \code{\link{niceDensity}}
-#' @import dplyr
+#' @importFrom magrittr %>%
 #' @importFrom purrr map_lgl map_dbl map walk
 #' @importFrom graphics points
 #' @importFrom tibble is_tibble
@@ -72,7 +72,7 @@
 #' @export
 niceScatter<-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=3, sizeLevels=6, groupNames=NULL, subGroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL,  minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL,zLim=NULL, strictLimits=FALSE, legend=FALSE ,trimTrendLines=TRUE, showTrendConfidence=TRUE, drawPoints=TRUE, corMethod="pearson", ...) {UseMethod("niceScatter",x)}
 
-#' @import dplyr
+#' @importFrom magrittr %>%
 #' @importFrom purrr map_lgl map_dbl map walk
 #' @importFrom graphics points
 #' @importFrom tibble is_tibble

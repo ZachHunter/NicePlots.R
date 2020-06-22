@@ -63,7 +63,7 @@ makeLogTicks<-function(dataRange,minorCount=10,logScale=2,axisText=c(NULL,NULL),
 #' @return Does not return a value but changes the global \code{par(mai)} settings.
 #' @examples
 #' TODO<-1
-#' @import dplyr
+#' @importFrom magrittr %>%
 #' @importFrom purrr map_dbl
 prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TRUE,stack=FALSE, is2D=FALSE){
   legendIndex<-1
@@ -175,7 +175,7 @@ prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TR
 #'
 #' @import graphics
 #' @import grDevices
-#' @import dplyr
+#' @importFrom magrittr %>%
 #' @importFrom purrr map_dbl
 #' @importFrom utils data str
 #'
@@ -501,7 +501,7 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
 #'
 #' @import graphics
 #' @import grDevices
-#' @import dplyr
+#' @importFrom magrittr %>%
 #' @importFrom purrr map_dbl
 #' @importFrom utils data str
 #'
@@ -733,7 +733,7 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
 #' @param size numeric; Sets the legend font cex sizing.
 #' @param spacing numeric; Determins the total amount of padding (sum of upper and lower padding) surrounding each line. in the legend in units of font line hight.
 #'
-#' @import dplyr
+#' @importFrom magrittr %>%
 #' @importFrom graphics rect text
 #' @importFrom purrr map_dbl
 #' @seealso \code{\link{legend}}, \code{\link{prepCategoryWindow}}, \code{\link{niceBox}}, \code{\link{niceDots}}, \code{\link{niceBar}}, \code{\link{niceVio}}

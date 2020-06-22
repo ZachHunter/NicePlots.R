@@ -76,6 +76,7 @@ quantileTrim<-function(x,threshold=3,na.rm=FALSE,returnFilter=FALSE){
 #' plot(myData,col=makeColorMatrix()[fact,3])
 #' @export
 #' @importFrom grDevices col2rgb rgb rainbow
+#' @importFrom dplyr bind_cols
 #' @import RColorBrewer
 #' @seealso \code{\link[grDevices]{rainbow}}, \code{\link[grDevices]{col2rgb}}, \code{\link[grDevices]{rgb}}.
 makeColorMatrix<-function(){
@@ -96,7 +97,7 @@ makeColorMatrix<-function(){
     myColors[[i+1]]<-c(r,b,g,gr,p,gl)
   }
   names(myColors)[2:5]<-paste0("alpha",seq(.2,.8,by=.2))
-  as.matrix(bind_cols(myColors))
+  as.matrix(dplyr::bind_cols(myColors))
 }
 
 #' @title add alpha transparency to a named color

@@ -15,9 +15,10 @@
 #' @examples
 #'	todo<-1
 #'
-#' @import dplyr
+#' @importFrom magrittr %>%
 #' @importFrom tibble is_tibble
 #' @importFrom tidyr gather
+#' @importFrom dplyr bind_cols
 dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
   if(is.vector(data)){
     if(is.list(data)){
@@ -158,8 +159,9 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
 #' @param flipFacts logical; When a dataframe of values is given, column names are used as a secondary grouping factor by default. Setting \code{flipFacts=\link{TRUE}} makes the column names the primary factor and \code{by} the secondary factor.
 #' @param verbose logical; Will print summary statistics to the screen if set to \code{\link{TRUE}}. The function will return the calculations either way.
 #'
-#' @import dplyr
-#' @import tidyr
+#' @importFrom magrittr %>%
+#' @importFrom dplyr bind_cols group_by ungroup select mutate do
+#' @importFrom tidyr gather
 #' @importFrom grDevices boxplot.stats
 #' @seealso \code{\link{niceBox}}, \code{\link{niceVio}}, \code{\link{niceDots}}, \code{\link[grDevices]{boxplot.stats}}
 prepNiceData<- function(prepedData,by, subGroup=FALSE,outliers=TRUE,filter,groupNames,plotLoc,width=1,flipFacts=FALSE,verbose=FALSE){
@@ -249,8 +251,9 @@ prepNiceData<- function(prepedData,by, subGroup=FALSE,outliers=TRUE,filter,group
 #' @param aggFunction character string; An string naming the function to be used to aggregate the grouped data. Typically should be either \code{\link[stats]{median}} or \code{\link[base]{mean}}.
 #' @param stack logical; Should one of the factors in \code{by} be used make a stacked bar plot. Note that this sort of analysis is nonsensical for many data sets.
 #'
-#' @import dplyr
-#' @import tidyr
+#' @importFrom magrittr %>%
+#' @importFrom dplyr group_by summarize bind_cols mutate ungroup
+#' @importFrom tidyr gather
 #' @importFrom purrr invoke
 #' @seealso \code{\link{niceBar}}, \code{\link{boot95ci}}, \code{\link{drawBar}}
 prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=upperErrorFun,aggFunction="mean",stack=FALSE,subGroup=FALSE){

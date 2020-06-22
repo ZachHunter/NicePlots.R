@@ -59,14 +59,16 @@
 #' plotType="surface", theta=-60)
 #'
 #' @seealso \code{\link[stats]{density}}, \code{\link[graphics]{contour}}, \code{\link[graphics]{persp}}, \code{\link[rgl]{persp3d}}, \code{\link[KernSmooth]{bkde}}
-#' @import dplyr
+#' @importFrom magrittr %>%
+#' @importFrom dplyr bind_cols mutate arrange
 #' @importFrom KernSmooth bkde bkde2D dpih
 #' @importFrom purrr walk2 map_dbl
 #' @importFrom graphics polygon contour lines persp
 #' @export
 niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subGroup=FALSE, bandwidth=NULL, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, ...) {UseMethod("niceDensity",x)}
 
-#' @import dplyr
+#' @importFrom dplyr bind_cols mutate arrange
+#' @importFrom magrittr %>%
 #' @importFrom KernSmooth bkde bkde2D dpih
 #' @importFrom purrr walk2 map_dbl
 #' @importFrom tidyr gather

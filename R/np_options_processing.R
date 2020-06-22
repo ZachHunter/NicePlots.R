@@ -18,6 +18,7 @@
 #' myCols<-list(bg="lightgrey",fill=c("red","green","blue"),lines="darkgrey")
 #' \donttest{myCols<-formatPlotColors(myCols)}
 #' print(myCols)
+#' @importFrom dplyr bind_cols
 formatPlotColors<-function(plotColors, theme=NA){
   moreOptions<-makeColorMatrix()
   if(is.null(plotColors$bg)){
@@ -143,6 +144,7 @@ formatPlotColors<-function(plotColors, theme=NA){
 #' @param CLOptions list; A list of command line options captured by \code{...} being passed along to allow for theme values to be set directly from the function call even if it is not an explicit option.
 #'
 #' @return Named listed of graphical options
+#' @importFrom magrittr %>%
 #' @importFrom purrr reduce map map_lgl map_dbl
 #' @seealso \code{\link{formatPlotColors}}, \code{\link{niceBox}}, \code{\link{niceDots}}, \code{\link{niceVio}}, \code{\link{niceBar}}
 procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWidth,pointLaneWidth,width,guides,pointSize,subGroup=FALSE,stack=F,pointHighlights=F,type=c("BP","VP","DP","Bar"),theme,plotColors,pointMethod,logScale,drawPoints,groupNames,swarmOverflow,errorCap=NULL,CLOptions=NULL){

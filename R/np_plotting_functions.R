@@ -391,7 +391,8 @@ drawViolinPlot <- function(x,groups,at=seq(1,length(levels(groups))),h=NULL, plo
 #' plot(type="n",xlim=c(0,4),ylim=c(0,max(iris$Sepal.Length)),-1,xaxt="n")
 #' \donttest{drawBar(data,plotColors=list())}
 #'
-#' @import dplyr
+#' @importFrom magrittr %>%
+#' @importFrom dplyr select mutate
 #' @importFrom graphics rect
 #' @seealso \code{\link[graphics]{barplot}}, \code{\link{niceBar}}, \code{\link{errorBars}}
 drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineType=1, width=.5, sidePlot=FALSE, stacked=FALSE,capSize=2,lineWidth=1,normalize=FALSE, logScale=FALSE, logAdjustment=1) {
@@ -528,7 +529,7 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
 #' @param swarmOverflow character; How to handle beeswarms that would normally overflow the \code{pointLaneWidth} argument. Valid options are "random", "gutter", "wrap", "omit", and "none".
 #'
 #' @importFrom stats sd start
-#' @import dplyr
+#' @importFrom dplyr group_by ungroup mutate select filter
 #' @importFrom tidyr gather
 #'
 #' @export
