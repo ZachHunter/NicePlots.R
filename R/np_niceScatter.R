@@ -287,6 +287,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
   myShapes<-NULL
   mySize<-NULL
   if(is.data.frame(x)){
+
     if(is.null(xlab)) {xlab<-colnames(x)[1]}
     if(is.null(ylab)) {ylab<-colnames(x)[2]}
     if(is.null(zlab) & dim(x)[2]>2) {zlab<-colnames(x)[3]}
@@ -360,7 +361,8 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
           if(!is.null(moreOptions[["box"]])){box<-moreOptions[["box"]]}
           axes<-TRUE
           if(!is.null(moreOptions[["axes"]])){axes<-moreOptions[["axes"]]}
-          rgl::plot3d(x[,1:3],pch=myShapes,col=myColors,type="s", main=main,sub=sub,ylab=ylab,xlab=xlab,zlab=zlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$numbers,yLim=yLim, xLim=xLim,zlim=zLim,radius=mySize/10, box=box, axes=axes,size=pointSize[1])
+          rgl::plot3d(x[,1:3],col=myColors,type="s", main=main,sub=sub,ylab=ylab,xlab=xlab,zlab=zlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$numbers,ylim=yLim, xlim=xLim,zlim=zLim, box=box, axes=axes,size=mySize)
+          #rgl::plot3d(x[,1:3],col=myColors,type="s", main=main,sub=sub,ylab=ylab,xlab=xlab,zlab=zlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$numbers,ylim=yLim, xlim=xLim,zlim=zLim,radius=mySize, box=box, axes=axes,size=pointSize[1])
         }
       }
       if(useRgl==FALSE) {
@@ -385,9 +387,13 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
     }
   } else {
     #Handle if x is a vector
-    x<-data.frame(x=seq(length(x)),y=x)
+    yData<-x
+    x<-data.frame(x=seq(length(x)),y=yData)
     if(is.null(xlab)) {xlab<-colnames(x)[1]}
     if(is.null(ylab)) {ylab<-colnames(x)[2]}
+    myShapes<-pointShape[1]
+    mySize<-pointSize[1]
+    myColors<-plotColors$points[1]
     if(add[1]==FALSE) {
       #RStudio seems not to update the graphics devices properly
       if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
