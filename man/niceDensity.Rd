@@ -11,6 +11,7 @@ niceDensity(
   groupNames = NULL,
   subGroup = FALSE,
   bandwidth = NULL,
+  drawRug = FALSE,
   useRgl = FALSE,
   plotType = c("contour", "surface"),
   theme = basicTheme,
@@ -37,6 +38,7 @@ niceDensity(
   strictLimits = FALSE,
   legend = FALSE,
   trimCurves = TRUE,
+  sidePlot = FALSE,
   ...
 )
 }
@@ -52,6 +54,8 @@ niceDensity(
 \item{subGroup}{logical; Will use the factor levels in \code{by} to plot a series of distributions from the data in \code{x}.}
 
 \item{bandwidth}{numeric; Manually sets the bandwith for the kernal density estimation overiding default calculations. For 2D plots \code{bandwidth} should be a vector of length 2. Set to \code{\link{NULL}} or \code{\link{NA}} to enable default calculations.}
+
+\item{drawRug}{logical; adds a \code{\link[graphics]{rug}} plot overlay to a kernel density plot. Default is FALSE.}
 
 \item{useRgl}{logical; Should the library \code{\link[rgl]{rgl}} be used to make 3D surface plots.}
 
@@ -104,6 +108,8 @@ niceDensity(
 \item{legend}{logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.}
 
 \item{trimCurves}{logical; Should the density curves be restricted to the min and max of the data.}
+
+\item{sidePlot}{logical; Swaps the x and y axis for ploting. Does not apply to 2D and 3D plots.}
 
 \item{...}{additional options for S3 method variants}
 }

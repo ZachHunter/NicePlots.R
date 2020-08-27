@@ -380,3 +380,36 @@ plot.npData <- function(x,plotType=NULL, ...) {
   invisible(dataOut)
 }
 
+#Extends the print function to give summary data on npData class objects
+#' @export
+print.npData <- function(x) {
+  l<-1
+  cn<-1
+  if(is.data.frame(x$options$x)) {
+    l<-dim(x$options$x)[1]
+    cn<-colnames(x$options$x)
+  } else {
+    l<-length(x$options$x)
+  }
+  fl<-0
+  fn<-0
+  if(is.data.frame(x$options$by)){
+    fn <- colnames(x$options$by)
+    fl<-length(fn)
+    fn<-paste0(" (",paste0(fn,collapse = ", "),")")
+  } else if(!is.null(x$options$by)) {
+    fn<-NULL
+    fl<-1
+  }
+  cat(paste0("A nicePlots data object with ",l," observations of ",length(cn), " variables.\n"))
+  cat(paste0("  Plot Type: ",x$plotType,"\n"))
+  if(cn>1){
+    cat(paste0("  Variable names: ",paste0(cn,collapse = ", "),"\n"))
+  }
+  cat(paste0("  Plot Type: ",x$plotType,"\n"))
+  if(fl > 0){
+    cat(paste0("  Available plotting factors: ",fl,fn,"\n"))
+  } else {
+    cat("Available plotting factors: None")
+  }
+}

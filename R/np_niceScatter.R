@@ -578,3 +578,18 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
   invisible(dataOut)
 }
 
+#' @export
+niceScatter.npData <- function(x,  ...) {
+  clOptions<-list(...)
+  for(opt in names(clOptions)) {
+    if(is.null(x$options[opt])){
+      append(x$options,list(opt=clOptions[[opt]]))
+    }else{
+      x$options[[opt]]<-clOptions[[opt]]
+    }
+  }
+
+  dataOut<-do.call("niceScatter",x$options)
+  invisible(dataOut)
+}
+

@@ -22,6 +22,7 @@
 #' @param drawPoints logical; draws a dot plot overlay for contour plots
 #' @param subGroup logical; Will use the factor levels in \code{by} to plot a series of distributions from the data in \code{x}.
 #' @param bandwidth numeric; Manually sets the bandwith for the kernal density estimation overiding default calculations. For 2D plots \code{bandwidth} should be a vector of length 2. Set to \code{\link{NULL}} or \code{\link{NA}} to enable default calculations.
+#' @param drawRug logical; adds a \code{\link[graphics]{rug}} plot overlay to a kernel density plot. Default is FALSE.
 #' @param useRgl logical; Should the library \code{\link[rgl]{rgl}} be used to make 3D surface plots.
 #' @param plotType character; Can be set to \code{contour} or \code{surface} to control the type of 2D plot.
 #' @param theme list object; Themes are are an optional way of storing graphical preset options that are compatible with all nicePlot graphing functions.
@@ -32,6 +33,7 @@
 #' @param xLim numeric vector; lower a upper limits for the x-axis.
 #' @param na.rm logical; Should \code{NA}s be removed from the data set? Both data input and the factor input from \code{by} with be checked.
 #' @param verbose logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.
+#' @param sidePlot logical; Swaps the x and y axis for ploting. Does not apply to 2D and 3D plots.
 #' @param add logical; Adds the plot to the existing window rather the generating a new plotting enviroment
 #' @param lWidth numeric; Line width, equivelent to the cex \code{lwd} option.
 #' @param logScale numeric; A length two numeric vector indicating the log scale the x and y axis, respectively. If only one value is given, it is applied to boxth axis. Set to \code{\link{FALSE}} to disable (Default).
@@ -64,18 +66,18 @@
 #' @importFrom dplyr bind_cols mutate arrange
 #' @importFrom KernSmooth bkde bkde2D dpih
 #' @importFrom purrr walk2 map_dbl
-#' @importFrom graphics polygon contour lines persp
+#' @importFrom graphics polygon contour lines persp rug
 #' @export
-niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subGroup=FALSE, bandwidth=NULL, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, ...) {UseMethod("niceDensity",x)}
+niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subGroup=FALSE, bandwidth=NULL, drawRug=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, sidePlot=FALSE, ...) {UseMethod("niceDensity",x)}
 
 #' @importFrom dplyr bind_cols mutate arrange
 #' @importFrom magrittr %>%
 #' @importFrom KernSmooth bkde bkde2D dpih
-#' @importFrom purrr walk2 map_dbl
+#' @importFrom purrr walk2 map_dbl map
 #' @importFrom tidyr gather
-#' @importFrom graphics polygon contour lines persp
+#' @importFrom graphics polygon contour lines persp rug
 #' @export
-niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGroup=FALSE, bandwidth=NULL, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), rotateLabels=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, ...)  {
+niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGroup=FALSE, bandwidth=NULL, drawRug=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), rotateLabels=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, sidePlot=FALSE, ...)  {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset",call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -272,6 +274,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
       stop("Error: plotType should be set to either \'contour\' or \'surface\' for 2D desntsity plots")
     }
   } else {
+  #Dealing with typical 1D densties
     if(logScaleX+logScaleY!=0) {
        x<-log(x + logAdjustment, logScaleX)
     }
@@ -343,17 +346,31 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
         if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
         if(is.null(xLim)){xLim<-c(minx,maxx)}
         if(is.null(yLim)){yLim<-c(0,maxy)}
+        if(sidePlot[1]==TRUE) {
+          temp<-xLim
+          xLim<-yLim
+          yLim<-temp
+          temp<-xlab
+          xlab<-ylab
+          ylab<-temp
+        }
         test<-prepNiceWindow(data.frame(x=x,y=x), by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=FALSE, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
         title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$numbers)
       }
       #plot(-1,-1,type="n",xlim=c(minx,maxx),ylim=c(0,maxy),main=main,sub=sub,ylab=ylab)
+      densities2<-densities
+      if(sidePlot[1]==TRUE)
+        densities2<-map(densities, function(d) data.frame(x=d$y, y=d$x))
       if(!is.na(plotColors$fill[1]) & !is.null(plotColors$fill[1])){
-        walk2(.x=densities,.y=plotColors$fill[1:n_groups],~polygon(.x,col=.y,border=0))
+        walk2(.x=densities2,.y=plotColors$fill[1:n_groups],~polygon(.x,col=.y,border=0))
       }
       if(length(plotColors$lines)<n_groups){
         plotColors$lines<-rep(plotColors$lines,trunc(n_groups/length(plotColors$lines))+1)
       }
-      walk2(.x=densities,.y=plotColors$lines[1:n_groups],~lines(.x,col=.y,lwd=lWidth))
+      walk2(.x=densities2,.y=plotColors$lines[1:n_groups],~lines(.x,col=.y,lwd=lWidth))
+      if(drawRug[1]==TRUE){
+        walk(1:n_groups,~rug(x[as.character(by)==levels(by)[.x]], col=plotColors$fill[.x], side=(1+sidePlot[1]),ticksize=0.05*pointSize[1],lwd=lWidth*.8))
+      }
     } else {
       if(is.null(bandwidth)) {
         densities<-bkde(x,gridsize=curvePoints)
@@ -361,6 +378,10 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
         densities<-bkde(x,gridsize=curvePoints)
       } else {
         densities<-bkde(x,gridsize=curvePoints, bandwidth=bandwidth[1])
+      }
+      densities2<-densities
+      if(sidePlot==TRUE) {
+        densities2<-data.frame(x=densities$y,y=densities$x)
       }
       maxx<-max(densities$x)
       minx<-min(densities$x)
@@ -374,12 +395,23 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
         if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
         if(is.null(xLim)){xLim<-c(minx,maxx)}
         if(is.null(yLim)){yLim<-c(0,maxy)}
+        if(sidePlot[1]==TRUE) {
+          temp<-xLim
+          xLim<-yLim
+          yLim<-temp
+          temp<-xlab
+          xlab<-ylab
+          ylab<-temp
+        }
         test<-prepNiceWindow(data.frame(x=x,y=x), by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
         title(main=main,sub=sub,ylab=ylab,xlab=xlab)
       }
       #plot(-1,-1,type="n",xlim=c(minx,maxx),ylim=c(0,maxy),main=main,sub=sub,ylab=ylab)
-      polygon(densities,col=theme$plotColors$fill[1],border=0)
-      lines(densities,col=theme$plotColors$lines[1])
+      polygon(densities2,col=theme$plotColors$fill[1],border=0)
+      lines(densities2,col=theme$plotColors$lines[1])
+      if(drawRug[1]==TRUE){
+        rug(x,col=theme$plotColors$lines[1], side=1+sidePlot[1],ticksize=0.05*pointSize[1],lwd=lWidth*.8)
+      }
     }
   }
   #Draw legend and set associated options if indicated
