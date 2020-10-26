@@ -144,9 +144,9 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
 #' filter<-rep(TRUE,length(iris$Species))
 #' loc<-seq(1,length(levels(iris$Species)))
 #' data<-list(data=iris[,1:4])
-#' \donttest{myData<-prepNiceData(data,by=iris$Species,filter=filter,plotLoc=loc,
-#'     groupNames=levels(iris$Species),outliers=FALSE)}
-#' \donttest{print(myData)}
+#' #\donttest{myData<-prepNiceData(data,by=iris$Species,filter=filter,plotLoc=loc,
+#' #     groupNames=levels(iris$Species),outliers=FALSE)}
+#' #\donttest{print(myData)}
 #'
 #' @param prepedData list; a list object returned by \code{\link{prepCategoryWindow}}
 #' @param by factor or dataframe of factors; One or more factors that control how the data is grouped. The first column is the primary grouping factor and the second and thrid columns are used for sub-grouping and highlighting as needed.

@@ -16,10 +16,11 @@
 #'
 #' @return a list with the following elements: major tick marks locations [[1]], major tick labels [[2]], minor tick mark locations [[3]].
 #' @examples
-#' plot(1:10,log(1:10,2),yaxt="n",ylab="")
-#' \donttest{majorTicks<-makeLogTicks(c(0,10),minorCount= 4,logScale=2, axisText=c("","mg"), expLabels=TRUE)}
-#' \donttest{axis(side=2,lab=majorTicks[[2]],at=majorTicks[[1]],las=2)}
-#' \donttest{axis(side = 2, at = majorTicks[[3]], labels = FALSE, tcl = -0.2)}
+#' #plot(1:10,log(1:10,2),yaxt="n",ylab="")
+#' #\donttest{majorTicks<-makeLogTicks(c(0,10),minorCount= 4,logScale=2,
+#' #   axisText=c("","mg"), expLabels=TRUE)}
+#' #\donttest{axis(side=2,lab=majorTicks[[2]],at=majorTicks[[1]],las=2)}
+#' #\donttest{axis(side = 2, at = majorTicks[[3]], labels = FALSE, tcl = -0.2)}
 #' @importFrom grDevices axisTicks
 #' @seealso \code{\link[grDevices]{axisTicks}}, \code{\link[graphics]{axis}}, \code{\link{prepCategoryWindow}}
 makeLogTicks<-function(dataRange,minorCount=10,logScale=2,axisText=c(NULL,NULL), expLabels=TRUE, logAdjustment=1) {
@@ -271,18 +272,22 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
   if (is.null(groupNames)) {groupNames<-seq(1:levelCount)}
   oBg<-par("bg")
   par(bg=plotColors$marginBg)
-  plot.new()
+  #plot.new()
   if(sidePlot) {
     if(strictLimits) {
-      plot.window(ylim=c(.5,levelCount+0.5),xlim=dataRange, xaxs="i")
+      plot(1,1,ylim=c(.5,levelCount+0.5),xlim=dataRange,type="n", xaxs="i", xaxt='n',yaxt='n', ylab="", xlab="",bty="n")
+      #plot.window(ylim=c(.5,levelCount+0.5),xlim=dataRange, xaxs="i")
     } else {
-      plot.window(ylim=c(.5,levelCount+0.5),xlim=dataRange)
+      plot(1,1,ylim=c(.5,levelCount+0.5),xlim=dataRange,type="n", xaxt='n',yaxt='n', ylab="", xlab="",bty="n")
+      #plot.window(ylim=c(.5,levelCount+0.5),xlim=dataRange)
     }
   } else {
     if(strictLimits) {
-      plot.window(xlim=c(.5,levelCount+0.5),ylim=dataRange,yaxs="i")
+      plot(1,1,ylim=dataRange,xlim=c(.5,levelCount+0.5),type="n", xaxs="i", xaxt='n',yaxt='n', ylab="", xlab="",bty="n")
+      #plot.window(xlim=c(.5,levelCount+0.5),ylim=dataRange,yaxs="i")
     } else {
-      plot.window(xlim=c(.5,levelCount+0.5),ylim=dataRange)
+      plot(1,1,ylim=dataRange,xlim=c(.5,levelCount+0.5),type="n", xaxt='n',yaxt='n', ylab="", xlab="",bty="n")
+      #plot.window(xlim=c(.5,levelCount+0.5),ylim=dataRange)
     }
   }
   if(plotColors$bg=="open" | plotColors$bg=="Open") {

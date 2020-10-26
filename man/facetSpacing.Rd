@@ -23,8 +23,8 @@ The spacing assumes that each primary factor levels is plot on positive integers
 For a primary factor at position \code{i} with \code{f} subgroup levels, the subgrouping comes from generating equally spaced intervals starting at \eqn{i-\frac{1}{2}+\frac{1}{f+1}}{i-.5+1/(f+1)} and ending at \eqn{i+\frac{1}{2}-\frac{1}{f+1}}{i+.5-1/(f+1)}. Simply put: \deqn{Spacing = \frac{1}{NSubGroups-1}}
 }
 \examples{
-\donttest{boxplot(CNA$BM~ CNA$Status,border="white")}
-\donttest{stripchart(CNA$BM~factor(paste0(CNA$Status,CNA$Sex)),add=T,at=facetSpacing(2,2))}
+#\donttest{boxplot(CNA$BM~ CNA$Status,border="white")}
+#\donttest{stripchart(CNA$BM~factor(paste0(CNA$Status,CNA$Sex)),add=T,at=facetSpacing(2,2))}
 }
 \seealso{
 \code{\link{prepCategoryWindow}}

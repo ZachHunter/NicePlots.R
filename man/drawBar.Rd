@@ -58,13 +58,14 @@ by \code{\link{niceBar}}.
 }
 \examples{
 data(iris)
+library(dplyr)
 data<-iris  \%>\% group_by(Species) \%>\%
     summarize(yt=mean(Sepal.Length),yb=0,UpperError=sd(Sepal.Length),
     LowerError=sd(Sepal.Length)) \%>\%
     ungroup() \%>\% select(yt,yb,UpperError,LowerError,Group=Species) \%>\%
     bind_cols(at=1:3,fact=1:3)
 plot(type="n",xlim=c(0,4),ylim=c(0,max(iris$Sepal.Length)),-1,xaxt="n")
-\donttest{drawBar(data,plotColors=list())}
+# drawBar(data,plotColors=list())
 
 }
 \seealso{

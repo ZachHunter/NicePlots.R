@@ -51,9 +51,9 @@ data(iris)
 filter<-rep(TRUE,length(iris$Species))
 loc<-seq(1,length(levels(iris$Species)))
 data<-list(data=iris[,1:4])
-\donttest{myData<-prepNiceData(data,by=iris$Species,filter=filter,plotLoc=loc,
-    groupNames=levels(iris$Species),outliers=FALSE)}
-\donttest{print(myData)}
+#\donttest{myData<-prepNiceData(data,by=iris$Species,filter=filter,plotLoc=loc,
+#     groupNames=levels(iris$Species),outliers=FALSE)}
+#\donttest{print(myData)}
 
 }
 \seealso{

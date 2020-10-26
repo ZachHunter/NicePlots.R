@@ -45,12 +45,13 @@ If \code{side=TRUE} then the x and y axises are swapped to support horizontal pl
 }
 \examples{
 data(iris)
+library(dplyr)
 iData<-iris \%>\% group_by(Species) \%>\%
    summarize(median=median(Sepal.Length),min=min(Sepal.Length),max=max(Sepal.Length),
    q1=quantile(Sepal.Length)[2],q3=quantile(Sepal.Length)[4]) \%>\%
    bind_cols(at=c(1:3),width=c(.2,.3,.4))
 plot(1,1,type="n",xlim=c(0,4),ylim=c(0,9))
-\donttest{drawBoxPlot(iData)}
+#\donttest{drawBoxPlot(iData)}
 }
 \seealso{
 \code{\link[graphics]{boxplot}}, \code{\link{niceBox}}

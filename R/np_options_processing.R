@@ -16,7 +16,7 @@
 #' @return a formated NicePlots color list.
 #' @examples
 #' myCols<-list(bg="lightgrey",fill=c("red","green","blue"),lines="darkgrey")
-#' \donttest{myCols<-formatPlotColors(myCols)}
+#' #\donttest{myCols<-formatPlotColors(myCols)}
 #' print(myCols)
 #' @importFrom dplyr bind_cols
 formatPlotColors<-function(plotColors, theme=NA){

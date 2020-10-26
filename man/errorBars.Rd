@@ -37,6 +37,7 @@ The input data frame \code{x} should have columns labels 'at','start',and 'stop'
 }
 \examples{
 data(iris)
+library(dplyr)
 iData<-iris \%>\% group_by(Species) \%>\%
    summarize(Average=mean(Sepal.Length),SD=sd(Sepal.Length))
 barplot(iData$Average,ylim=c(0,10),names=levels(iris$Species),ylab="sepal length")

@@ -15,6 +15,7 @@
 #' @param width positive numeric; corresponds to lwd line width setting in base R.\#'
 #' @examples
 #' data(iris)
+#' library(dplyr)
 #' iData<-iris %>% group_by(Species) %>%
 #'    summarize(Average=mean(Sepal.Length),SD=sd(Sepal.Length))
 #' barplot(iData$Average,ylim=c(0,10),names=levels(iris$Species),ylab="sepal length")
@@ -64,12 +65,13 @@ errorBars<-function(x,capType=c("none","bar","ball"),capSize=NULL,side=FALSE,col
 #'
 #' @examples
 #' data(iris)
+#' library(dplyr)
 #' iData<-iris %>% group_by(Species) %>%
 #'    summarize(median=median(Sepal.Length),min=min(Sepal.Length),max=max(Sepal.Length),
 #'    q1=quantile(Sepal.Length)[2],q3=quantile(Sepal.Length)[4]) %>%
 #'    bind_cols(at=c(1:3),width=c(.2,.3,.4))
 #' plot(1,1,type="n",xlim=c(0,4),ylim=c(0,9))
-#' \donttest{drawBoxPlot(iData)}
+#' #\donttest{drawBoxPlot(iData)}
 #' @importFrom graphics segments rect points
 #' @seealso \code{\link[graphics]{boxplot}}, \code{\link{niceBox}}
 drawBoxPlot<-function(x,col="black",fill=NULL,drawBox=T,drawDot=F, whiskerLty =2,side=FALSE,lWidth=1,capWidth=.25){
@@ -299,8 +301,6 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
 #' @param trimViolins logical; Should the violins be truncated at the edges of the data range.
 #' @param samplePoints integer; The number of points used to draw each side of the violin. This is generally obtained from \code{theme$curvePoints}.
 #'
-#' @examples
-#' todo<-1
 #' @importFrom KernSmooth bkde
 #' @importFrom purrr map map_dbl
 #' @importFrom graphics polygon
@@ -383,13 +383,14 @@ drawViolinPlot <- function(x,groups,at=seq(1,length(levels(groups))),h=NULL, plo
 #'
 #' @examples
 #' data(iris)
+#' library(dplyr)
 #' data<-iris  %>% group_by(Species) %>%
 #'     summarize(yt=mean(Sepal.Length),yb=0,UpperError=sd(Sepal.Length),
 #'     LowerError=sd(Sepal.Length)) %>%
 #'     ungroup() %>% select(yt,yb,UpperError,LowerError,Group=Species) %>%
 #'     bind_cols(at=1:3,fact=1:3)
 #' plot(type="n",xlim=c(0,4),ylim=c(0,max(iris$Sepal.Length)),-1,xaxt="n")
-#' \donttest{drawBar(data,plotColors=list())}
+#' # drawBar(data,plotColors=list())
 #'
 #' @importFrom magrittr %>%
 #' @importFrom dplyr select mutate
@@ -709,7 +710,7 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
           }
         } else {
           #draws outliers if drawPoints is off
-          #This gets thrown off if there are levels with no outliers so there is some addtional handling of color levels here.
+          #This gets thrown off if there are levels with no outliers so there is some additional handling of color levels here.
           tempCols<-plotColors$points
           if(length(tempCols)<dim(prepedData[[1]])[2]){
             tempCols<-rep(tempCols,(dim(prepedData[[1]])[2] %% length(tempCols)) +1)

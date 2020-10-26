@@ -102,7 +102,7 @@ makeColorMatrix<-function(){
 
 #' @title add alpha transparency to a named color
 #' @description
-#' Takes a named color such as "red" or "darkgreen" and adds a level of transparancy based on the alpha setting.
+#' Takes a named color such as "red" or "darkgreen" and adds a level of transparency based on the alpha setting.
 #'
 #' @details
 #' \code{setAlpha} is a convenience function that uses the \code{\link[grDevices]{col2rgb}} and \code{\link[grDevices]{rgb}} to add transparancy to named colors.
@@ -224,8 +224,8 @@ calcStats<-function(x,by,type=c("Wilcox","Tukey","T.Test","ANOVA"),verbose=FALSE
 #'
 #' @return a numeric vector of where to plot the subgrouped data. Can be supplied to that \code{at=} option in plotting functions
 #' @examples
-#' \donttest{boxplot(CNA$BM~ CNA$Status,border="white")}
-#' \donttest{stripchart(CNA$BM~factor(paste0(CNA$Status,CNA$Sex)),add=T,at=facetSpacing(2,2))}
+#' #\donttest{boxplot(CNA$BM~ CNA$Status,border="white")}
+#' #\donttest{stripchart(CNA$BM~factor(paste0(CNA$Status,CNA$Sex)),add=T,at=facetSpacing(2,2))}
 #' @seealso \code{\link{prepCategoryWindow}}
 facetSpacing<-function(subGroup,labels) {
   subLabLoc<-NULL
@@ -254,7 +254,11 @@ facetSpacing<-function(subGroup,labels) {
 #' @seealso \code{\link[stats]{sd}}
 #'@importFrom stats sd
 se<-function(x) {
-  sd(x)/sqrt(length(x))
+  if(length(x)>0) {
+    sd(x)/sqrt(length(x))
+  } else {
+    0
+  }
 }
 
 #' @title Calculate a 95\% confidence interval from the t-distribution
@@ -276,7 +280,11 @@ se<-function(x) {
 #' @seealso \code{\link[stats]{sd}}
 #'@importFrom stats qt
 t95ci<-function(x) {
-  qt(0.975,df=length(x)-1)*sd(x)/sqrt(length(x))
+  if(length(x) >0) {
+    qt(0.975,df=length(x)-1)*sd(x)/sqrt(length(x))
+  } else {
+    0
+  }
 }
 
 #' @title Confidence interval helper function
@@ -382,7 +390,7 @@ plot.npData <- function(x,plotType=NULL, ...) {
 
 #Extends the print function to give summary data on npData class objects
 #' @export
-print.npData <- function(x) {
+print.npData <- function(x, ...) {
   l<-1
   cn<-1
   if(is.data.frame(x$options$x)) {
@@ -401,13 +409,16 @@ print.npData <- function(x) {
     fn<-NULL
     fl<-1
   }
-  cat(paste0("A nicePlots data object with ",l," observations of ",length(cn), " variables.\n"))
+  cat(paste0("A nicePlots data object with ",l," observations of ",length(cn), " variable"))
+  if(length(cn)>1) {
+    cat("s")
+  }
+  cat(".\n")
   cat(paste0("  Plot Type: ",x$plotType,"\n"))
-  if(cn>1){
+  if(cn[1]>1){
     cat(paste0("  Variable names: ",paste0(cn,collapse = ", "),"\n"))
   }
-  cat(paste0("  Plot Type: ",x$plotType,"\n"))
-  if(fl > 0){
+  if(fl[1] > 0){
     cat(paste0("  Available plotting factors: ",fl,fn,"\n"))
   } else {
     cat("Available plotting factors: None")

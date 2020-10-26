@@ -177,7 +177,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
 
   #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, groupNames=groupNames,subGroup=subGroup, useRgl=useRgl, type=type,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimTrendLines=trimTrendLines, showTrendConfidence=showTrendConfidence, drawPoints=drawPoints, corMethod=corMethod)
+  ActiveOptions<-list(x=x, by=by, groupNames=groupNames,subGroup=subGroup,color=color,shape=shape,size=size, useRgl=useRgl, type=type,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimTrendLines=trimTrendLines, showTrendConfidence=showTrendConfidence, drawPoints=drawPoints, corMethod=corMethod)
   ActiveOptions<-append(ActiveOptions,moreOptions)
 
   #Here we check to see if the user specified any options so that they not overwritten by the designated theme

@@ -15,7 +15,7 @@ setAlpha(x, alpha = 0.2)
 An rbg color with transparancy \code{alpha}.
 }
 \description{
-Takes a named color such as "red" or "darkgreen" and adds a level of transparancy based on the alpha setting.
+Takes a named color such as "red" or "darkgreen" and adds a level of transparency based on the alpha setting.
 }
 \details{
 \code{setAlpha} is a convenience function that uses the \code{\link[grDevices]{col2rgb}} and \code{\link[grDevices]{rgb}} to add transparancy to named colors.

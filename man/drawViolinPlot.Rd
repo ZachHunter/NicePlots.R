@@ -54,9 +54,6 @@ to better charactarize the quartile distributon. Likewise, a strip chart of indi
 can be added on top of these two plots to full charactarize the data distribution. This uses \code{\link{niceBox}} to handle
 the box plot and strip chart overlays.
 }
-\examples{
-todo<-1
-}
 \seealso{
 \code{\link{niceVio}}, \code{\link[KernSmooth]{bkde}}, \code{\link[KernSmooth]{dpik}}
 }

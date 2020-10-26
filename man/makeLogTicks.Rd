@@ -37,10 +37,11 @@ Base R does not have great visual queues to indicate when data is being plotted 
 It is worth stressing again that the input values to dataRange are assumed to be raw values prior to log transformation. If log transformed values are given, the axis will be drawn correctly.
 }
 \examples{
-plot(1:10,log(1:10,2),yaxt="n",ylab="")
-\donttest{majorTicks<-makeLogTicks(c(0,10),minorCount= 4,logScale=2, axisText=c("","mg"), expLabels=TRUE)}
-\donttest{axis(side=2,lab=majorTicks[[2]],at=majorTicks[[1]],las=2)}
-\donttest{axis(side = 2, at = majorTicks[[3]], labels = FALSE, tcl = -0.2)}
+#plot(1:10,log(1:10,2),yaxt="n",ylab="")
+#\donttest{majorTicks<-makeLogTicks(c(0,10),minorCount= 4,logScale=2,
+#   axisText=c("","mg"), expLabels=TRUE)}
+#\donttest{axis(side=2,lab=majorTicks[[2]],at=majorTicks[[1]],las=2)}
+#\donttest{axis(side = 2, at = majorTicks[[3]], labels = FALSE, tcl = -0.2)}
 }
 \seealso{
 \code{\link[grDevices]{axisTicks}}, \code{\link[graphics]{axis}}, \code{\link{prepCategoryWindow}}

@@ -26,6 +26,6 @@ If a theme is given, any option not set by the user will be set by the theme.
 }
 \examples{
 myCols<-list(bg="lightgrey",fill=c("red","green","blue"),lines="darkgrey")
-\donttest{myCols<-formatPlotColors(myCols)}
+#\donttest{myCols<-formatPlotColors(myCols)}
 print(myCols)
 }
