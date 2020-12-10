@@ -13,7 +13,7 @@
 #'For most data this would be nonsensical but if you data is say store profits by goods by region one could group by region (first)
 #' @inheritParams prepCategoryWindow
 #' @param aggFun character; Determines how the data is summarized by factor level. Valid options are \code{mean}, \code{median} or \code{none}.
-#' @param errFun character; How the data spread is charactarized by the error bars. Valid options are \code{sd} (standard deviation), \code{se} (standard error of the mean) or \code{range}.
+#' @param errFun character; How the data spread is charactarized by the error bars. Valid options are \code{sd} (standard deviation), \code{se} (standard error of the mean, \code{range}, \code{t95ci} (t-distributoin 95\% CI), or \code{boot95ci} (empirical bootstrap 95\%ci).
 #' @param stack logical; Should one of the factors in \code{by} be used make a stacked bar plot. Note that this sort of analysis is nonsensical for many data sets.
 #' @param theme list object; Themes are are an optional way of storing graphical preset options that are compatible with all nicePlot graphing functions.
 #' @param width numeric; cex-like scaling factor controlling the width of the bars.
@@ -135,7 +135,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
     stop(paste0("The aggFun option needs to be equal to either 'mean' or 'median'.\nCurrently aggFun = ",aggFun,"."))
   }
   if(!(errFun[1] %in% c("sd", "se", "range", "t95ci", "boot95ci"))) {
-    stop(paste0("The errFun option needs to be equal to either 'se', 'se', 'range' or 'boot95ci'.\nCurrently errFun = ",aggFun,".\nSee documentation for details."))
+    stop(paste0("The errFun option needs to be equal to either 'se', 'se', 'range', 't95ci' or 'boot95ci'.\nCurrently errFun = ",aggFun,".\nSee documentation for details."))
   }
 
   #Capturing default group names
@@ -229,7 +229,8 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       strictBase<-FALSE
     }
     #RStudio seems not to update the graphics devices properly
-    if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
+    if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOveride"]])) {graphics.off()}
+
     prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels,strictLimits=strictBase,theme=theme,legend=legend,logAdjustment=logAdjustment, stack=stack, pointHighlights=stack)
   }
   pvalue<-NULL

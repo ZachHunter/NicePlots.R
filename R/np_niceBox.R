@@ -349,7 +349,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
   }
   par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)
   ActiveOptions$xypos<-xypos
-  #formating the output list and setting class int npData
+  #formatting the output list and setting class int npData
   dataOut<-list(summary=plotData,stats=pvalue,plotType="box",options=ActiveOptions)
   class(dataOut)<-c("npData","list")
 

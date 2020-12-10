@@ -59,7 +59,7 @@ niceBar(
 
 \item{aggFun}{character; Determines how the data is summarized by factor level. Valid options are \code{mean}, \code{median} or \code{none}.}
 
-\item{errFun}{character; How the data spread is charactarized by the error bars. Valid options are \code{sd} (standard deviation), \code{se} (standard error of the mean) or \code{range}.}
+\item{errFun}{character; How the data spread is charactarized by the error bars. Valid options are \code{sd} (standard deviation), \code{se} (standard error of the mean, \code{range}, \code{t95ci} (t-distributoin 95\% CI), or \code{boot95ci} (empirical bootstrap 95\%ci).}
 
 \item{theme}{list object; Themes are are an optional way of storing graphical preset options that are compatible with all nicePlot graphing functions.}
 

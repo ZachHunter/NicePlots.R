@@ -63,12 +63,14 @@
 #'
 #' @importFrom dplyr mutate
 #' @importFrom magrittr %>%
+#' @importFrom purrr reduce
 #' @export
 #' @seealso \code{\link[graphics]{stripchart}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{quantileTrim}}, \code{\link{prepCategoryWindow}}, \code{\link[base]{jitter}}
 niceDots <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawBar=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {UseMethod("niceDots",x)}
 
 #' @importFrom dplyr mutate
 #' @importFrom magrittr %>%
+#' @importFrom purrr reduce
 #' @export
 #'@author Zachary Hunter
 niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawBar=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {
@@ -190,7 +192,8 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
     }
 
     #RStudio seems not to update the graphics devices properly
-    if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
+    #RStudio seems not to update the graphics devices properly
+    if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOveride"]])) {graphics.off()}
     prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels,strictLimits=FALSE,theme=theme,legend=legend,logAdjustment=logAdjustment, pointHighlights=pointHighlights)
   }
   pvalue<-NULL
@@ -218,7 +221,10 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
   #Here we calculated all the data to print
   pData<-prepBarData(x=prepedData[[1]],by=by,errorMultiple=errorMultiple,upperErrorFun=upperErrorFun,lowerErrorFun=lowerErrorFun,aggFunction=aggFun,stack=FALSE,subGroup=subGroup)
 
-  #Now we just need to perform some slight customizations to legend and width options based on inputs.
+  #Data is set and ready to go. Plotting is handled based on cases handling if 'x' and 'by' are vectors or dataframes
+  xypos<-c(1,1)
+
+  #Now we just need to perform some slight customization to legend and width options based on inputs.
   if(is.numeric(prepedData[[1]])){
     #CASE: by is a factor data is a numeric vector
     if(is.factor(by)) {
@@ -227,6 +233,13 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
       facetLoc<-seq(1,length(groupNames),by=1)
       names(facetLoc)<-groupNames
       width<-.25*width
+      IDS<-as.character(seq(length(ActiveOptions$x)))
+      IDfilter<-!is.na(ActiveOptions$x) & !is.na(ActiveOptions$by)
+      if(sidePlot[1]==TRUE) {
+        xypos<-data.frame(x=x,y=facetLoc[as.character(by)],group=by, ID=IDS[IDfilter])
+      } else {
+        xypos<-data.frame(x=facetLoc[as.character(by)],y=x,group=by, ID=IDS[IDfilter])
+      }
     } else {
       if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[,1],calcType[1],verbose=verbose)}
       #CASE: by is not a factor data is a numeric vector and subGroup is TRUE
@@ -234,6 +247,13 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
         facetLoc<-facetSpacing(length(levels(by[,2])),length(groupNames))
         names(facetLoc)<-unlist(lapply(levels(by[,1]),FUN=function(x) paste0(x,levels(by[,2]),sep=".")))
         width<-width*(facetLoc[2]-facetLoc[1])/4
+        IDS<-as.character(seq(length(ActiveOptions$x)))
+        IDfilter<-!is.na(ActiveOptions$x) & (rowSums(is.na(ActiveOptions$by))==0)
+        if(sidePlot[1]==TRUE) {
+          xypos<-data.frame(x=x,y=facetLoc[as.character(by[,1])],group=by[,1], ID=IDS[IDfilter])
+        } else {
+          xypos<-data.frame(x=facetLoc[as.character(by[,1])],y=x,group=by[,1], ID=IDS[IDfilter])
+        }
       } else {
         #CASE: by is not a factor, data is a numeric vector and subGroup is FALSE
         facetLoc<-seq(1,length(groupNames),by=1)
@@ -268,6 +288,14 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
           }
         }
       }
+      IDS<-as.character(seq(length(ActiveOptions$x)))
+      IDfilter<-!is.na(ActiveOptions$x) & (rowSums(is.na(ActiveOptions$by))==0)
+      fLevels<-paste0(by[,1],by[,2],".")
+      if(sidePlot[1]==TRUE) {
+        xypos<-data.frame(x=x,y=facetLoc[fLevels],group=paste0(by[,1],".",by[,2]), ID=IDS[IDfilter])
+      } else {
+        xypos<-data.frame(x=facetLoc[fLevels],y=x,group=paste0(by[,1],".",by[,2]), ID=IDS[IDfilter])
+      }
     }
   } else {
     #CASE: data is a dataframe, by is a factor, subGroup is ignored
@@ -287,6 +315,17 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
           }
           legendLabels<-colnames(prepedData[[1]])
         }
+      }
+      longX<-purrr::reduce(x,c)
+      longGroup<-NULL
+      for(n in colnames(x)) {longGroup<-c(longGroup,paste0(n,as.character(by),"."))}
+      longY<-facetLoc[longGroup]
+      IDS<-as.character(seq(length(ActiveOptions$x)))
+      IDfilter<-(rowSums(is.na(ActiveOptions$x))==0) & !is.na(ActiveOptions$by)
+      if(sidePlot[1]==TRUE) {
+        xypos<-data.frame(x=longX,y=longY,group=longGroup, ID=rep(IDS[IDfilter],dim(x)[2]))
+      } else {
+        xypos<-data.frame(x=longY,y=longX,group=longGroup, ID=rep(IDS[IDfilter],dim(x)[2]))
       }
     } else {
       #CASE: data is a dataframe, by is a dataframe, subGroup is ignored
@@ -312,6 +351,17 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
             legendLabels<-colnames(prepedData[[1]])
           }
         }
+      }
+      longX<-purrr::reduce(x,c)
+      longGroup<-NULL
+      for(n in colnames(x)) {longGroup<-c(longGroup,paste0(n,as.character(by[,1]),"."))}
+      longY<-facetLoc[longGroup]
+      IDS<-as.character(seq(length(ActiveOptions$x)))
+      IDfilter<-(rowSums(is.na(ActiveOptions$x))==0) & (rowSums(is.na(ActiveOptions$by))==0)
+      if(sidePlot[1]==TRUE) {
+        xypos<-data.frame(x=longX,y=longY,group=longGroup, ID=rep(IDS[IDfilter],dim(x)[2]))
+      } else {
+        xypos<-data.frame(x=longY,y=longX,group=longGroup, ID=rep(IDS[IDfilter],dim(x)[2]))
       }
     }
   }
@@ -377,7 +427,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
     }
   }
   par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)
-
+  ActiveOptions$xypos<-xypos
   #formating the output list and setting class int npData
   dataOut<-list(summary=pData[[2]],stats=pvalue,plotType="dot",options=ActiveOptions)
   class(dataOut)<-c("npData","list")

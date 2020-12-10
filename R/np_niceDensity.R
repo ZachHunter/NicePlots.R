@@ -189,7 +189,8 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
     if(is.null(ylab)) {ylab<-colnames(x)[2]}
     if(add[1]==FALSE) {
       #RStudio seems not to update the graphics devices properly
-      if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
+      if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOveride"]])) {graphics.off()}
+
       x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
       title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$numbers)
     }
@@ -343,7 +344,8 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
       maxy<-max(map_dbl(densities, function(z) if(!is.list(z)){0}else{if(is.na(max(z$y)) | is.infinite(max(z$y))){0}else{max(z$y)}}))
       if(add[1]==FALSE) {
         #RStudio seems not to update the graphics devices properly
-        if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
+        if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOveride"]])) {graphics.off()}
+
         if(is.null(xLim)){xLim<-c(minx,maxx)}
         if(is.null(yLim)){yLim<-c(0,maxy)}
         if(sidePlot[1]==TRUE) {
@@ -392,7 +394,8 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
 
       if(add[1]==FALSE) {
         #RStudio seems not to update the graphics devices properly
-        if(Sys.getenv("RSTUDIO") == "1") {graphics.off()}
+        if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOveride"]])) {graphics.off()}
+
         if(is.null(xLim)){xLim<-c(minx,maxx)}
         if(is.null(yLim)){yLim<-c(0,maxy)}
         if(sidePlot[1]==TRUE) {
