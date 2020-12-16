@@ -313,7 +313,7 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
   }
   sideGroupLine<-groupLine+.33
   sideSubGroupLine<-subGroupLine+.33
-  axisNumCol<-plotColors$label
+  axisNumCol<-plotColors$numbers
   if(!is.na(theme[1])){
     if(is.numeric(theme$groupLabSize)){
       groupCex<-theme$groupLabSize
