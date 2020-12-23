@@ -64,12 +64,12 @@ This function prepares data based on settings from \code{\link{niceBox}}, \code{
 and passes the data on to \code{\link{drawPoints}}.
 }
 \details{
-This funciton takes in cleaned data from \code{\link{prepCategoryWindow}} and reorganizes to to create a dot plot overlay for a graph.
-This code is used by both \code{\link{niceBox}} and \code{\link{niceVio}} and has been moved to an independant funciton to make the code more compact and easier to maintain.
+This function takes in cleaned data from \code{\link{prepCategoryWindow}} and reorganizes to to create a dot plot overlay for a graph.
+This code is used by both \code{\link{niceBox}} and \code{\link{niceVio}} and has been moved to an independent function to make the code more compact and easier to maintain.
 This code is also used to draw the outlier dots in a boxplot by setting \code{drawPoints = \link{FALSE}}.
 }
 \examples{
-#Add a beeswarm plot overlay to a boxplot in the iris dataset:
+#Add a beeswarm plot overlay to a boxplot in the iris data set:
 data(iris)
 data<-list(data=iris$Sepal.Length)
 boxplot(iris$Sepal.Length~iris$Species)

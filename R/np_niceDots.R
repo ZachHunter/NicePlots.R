@@ -7,7 +7,7 @@
 #' This is really two different plotting functions merged together. First, the data points can be plotted individually using a \code{distribution} waterfall, \code{jitter}, \code{beeswarm}, just \code{linear} or not plotted at all.
 #' A signle data vector can be subset (eg using multiple factors with \code{by} and optionally \code{subGroup==\link{TRUE}}) using up to two factors. If a multi-column tibble, matrix or dataframe is used for data input, then can be grouped by a single factor from \code{by} with the column names used for factor subgroups.
 #' The option \code{flipFacts} can be used in this case to make the data columns the primary grouping factor and the first factor in \code{by} used for subgroups.
-#' On top of this, the \code{\link[base]{mean}}/\code{\link[stats]{median}} values can be overplotted using \code{drawBar==\link{TRUE}} and error or distribution (eg. \code{\link[stats]{sd}}, \code{\link{se}} \code{\link[base]{range}}, etc.) can be also be shown as errorbars. The error bars can be multiplied by \code{errorMultiple} and supressed if \code{errorMultiple=0}.
+#' On top of this, the \code{\link[base]{mean}}/\code{\link[stats]{median}} values can be overplotted using \code{errorBars==\link{TRUE}} and error or distribution (eg. \code{\link[stats]{sd}}, \code{\link{se}} \code{\link[base]{range}}, etc.) can be also be shown as errorbars. The error bars can be multiplied by \code{errorMultiple} and supressed if \code{errorMultiple=0}.
 #'
 #' The complicated part of using this function is handling its many options. A wrapper function to set up and run it with preset options may be a good idea if you are using it alot.
 #' Briefly put, the \code{by} argument can be a data frame of factors and the function will  work through the columns in order as needed.
@@ -44,7 +44,7 @@
 #' @param na.rm logical; Should \code{NA}s be removed from the data set? Both data input and the factor input from \code{by} with be checked.
 #' @param legend logical/character; if not equal to \code{\link{FALSE}} with cause a legend to be drawn in the margins. If set to a character string instead of a logical value, the string will be used as the legend title insteas of the factor column name from \code{by}.
 #' @param verbose logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.
-#' @param drawBar logical; Determins if the aggregate data and error (if any) is displayed
+#' @param errorBars logical; Determins if the aggregate data and error (if any) is displayed
 #' @param outliers positive numeric; number of interquartile ranges (IQR) past the Q1 (25\%) and Q3 (75\%) cumulative distribution values. Outliers are often defined as \eqn{1.5 \times IQR}{1.5 * IQR} and extreme outliers are more than \eqn{3 \times IQR}{3 * IQR} away from the inner 50\% data range.
 #' @param pointSize positive integer; sets the cex multiplier for point size.
 #' @param pointMethod character; method to be used for ploting dots. Can be set to "jitter", "linear", "beeswarm" or "distribution".
@@ -66,14 +66,14 @@
 #' @importFrom purrr reduce
 #' @export
 #' @seealso \code{\link[graphics]{stripchart}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{quantileTrim}}, \code{\link{prepCategoryWindow}}, \code{\link[base]{jitter}}
-niceDots <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawBar=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {UseMethod("niceDots",x)}
+niceDots <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, errorBars=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {UseMethod("niceDots",x)}
 
 #' @importFrom dplyr mutate
 #' @importFrom magrittr %>%
 #' @importFrom purrr reduce
 #' @export
 #'@author Zachary Hunter
-niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawBar=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {
+niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, errorBars=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset", call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -90,7 +90,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
 
   #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, groupNames=groupNames, drawPoints=drawPoints, drawBar=drawBar,barWidth=barWidth, barType=barType, barThickness=barThickness, aggFun=aggFun,errFun=errFun, errorMultiple=errorMultiple, main=main,sub=sub, ylab=ylab, minorTick=minorTick, theme=theme, guides=guides, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, subGroupLabels=subGroupLabels, expLabels=expLabels, sidePlot=sidePlot, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth, na.rm=na.rm, flipFacts=flipFacts, verbose=verbose, legend=legend,logAdjustment=logAdjustment,errorCap=errorCap, errorLineType=errorLineType,capWidth=capWidth, lWidth=lWidth)
+  ActiveOptions<-list(x=x, by=by, groupNames=groupNames, drawPoints=drawPoints, errorBars=errorBars,barWidth=barWidth, barType=barType, barThickness=barThickness, aggFun=aggFun,errFun=errFun, errorMultiple=errorMultiple, main=main,sub=sub, ylab=ylab, minorTick=minorTick, theme=theme, guides=guides, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, subGroupLabels=subGroupLabels, expLabels=expLabels, sidePlot=sidePlot, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth, na.rm=na.rm, flipFacts=flipFacts, verbose=verbose, legend=legend,logAdjustment=logAdjustment,errorCap=errorCap, errorLineType=errorLineType,capWidth=capWidth, lWidth=lWidth)
   ActiveOptions<-append(ActiveOptions,moreOptions)
 
   #Here we check to see if the user specified any options so that they not overwritten by the designated theme
@@ -113,6 +113,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
   if(grepl("ball",errorCap,ignore.case = TRUE)) {
     capWidth<-capWidth*6
   }
+
   #If fill colors are needed to distinguish groups but are of length 1, point colors will be used if it has more levels.
   if(length(plotColors$fill)<=1 & length(plotColors$lines)<=1 & length(plotColors$points)>1 & subGroup==T) {
     plotColors$fill<-plotColors$points
@@ -169,7 +170,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
     if(errFun[1]=="range"){errorMultiple<-1}
     pData<-prepBarData(x=prepedData,by=by,errorMultiple=errorMultiple,upperErrorFun=upperErrorFun,lowerErrorFun=lowerErrorFun,aggFunction=aggFun,stack=FALSE,subGroup=subGroup)
     dRange<-1
-    if(drawBar[1]==TRUE) {
+    if(errorBars[1]==TRUE) {
       dRange<-c(min(c(min(pData$plot$AData-pData$plot$lowerError),min(x))),max(c(max(pData$plot$AData+pData$plot$upperError),max(x))))
       if(logScale>0 & dRange[1]<.04*(abs(dRange[2]-dRange[1]))) {
         dRange[1]<-.04*(abs(dRange[2]-dRange[1]))
@@ -370,31 +371,30 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
     print(pData[[2]])
   }
 
-  #updating preping the plot data from pData to be compatible with drawBar
+  #updating preping the plot data from pData to be compatible with errorBars
   if(drawPoints[1]==TRUE) {
     addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subGroup=subGroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
   }
-  if(drawBar[1]==TRUE) {
-    plotThis<-pData[[1]] %>%
-      mutate(barHight=.data$AData,width1=.data$at-width*barWidth,width2=.data$at + width*barWidth)
-    if(sidePlot[1]==TRUE){
-      if(grepl("dot",barType[1],ignore.case = T)) {
-        points(x=plotThis$barHight,y=plotThis$at,pch=16,col=plotColors$lines, cex=lWidth*barThickness)
-      } else {
-        segments(x0=plotThis$barHight,y0 = plotThis$width1,x1 = plotThis$barHight,y1 = plotThis$width2,col = plotColors$lines, lwd=lWidth*barThickness)
-      }
-    } else {
-      if(grepl("dot",barType[1],ignore.case = T)) {
-        points(x=plotThis$at,y=plotThis$barHight,pch=16,col=plotColors$lines, cex=lWidth*barThickness)
-      } else {
-        segments(x0=plotThis$width1,y0 =plotThis$barHight ,x1 =plotThis$width2, y1 =plotThis$barHight,col = plotColors$lines, lwd=lWidth*barThickness)
-      }
+  plotThis<-pData[[1]] %>%
+    mutate(barHight=.data$AData,width1=.data$at-width*barWidth,width2=.data$at + width*barWidth)
+  if(sidePlot[1]==TRUE){
+    if(grepl("dot",barType[1],ignore.case = T)) {
+      points(x=plotThis$barHight,y=plotThis$at,pch=16,col=plotColors$lines, cex=lWidth*barThickness)
+    } else if (grepl("bar",barType[1],ignore.case = T)) {
+      segments(x0=plotThis$barHight,y0 = plotThis$width1,x1 = plotThis$barHight,y1 = plotThis$width2,col = plotColors$lines, lwd=lWidth*barThickness)
     }
+  } else {
+    if(grepl("dot",barType[1],ignore.case = T)) {
+      points(x=plotThis$at,y=plotThis$barHight,pch=16,col=plotColors$lines, cex=lWidth*barThickness)
+    } else if (grepl("bar",barType[1],ignore.case = T)) {
+      segments(x0=plotThis$width1,y0 =plotThis$barHight ,x1 =plotThis$width2, y1 =plotThis$barHight,col = plotColors$lines, lwd=lWidth*barThickness)
+    }
+  }
+  if(errorBars[1]==TRUE) {
     if(errorMultiple>0) {
-      errorBars(data.frame(at=plotThis$at,start=plotThis$barHight,stop=plotThis$barHight+plotThis$upperError),capType = errorCap,lType = errorLineType,side=sidePlot,capSize=width*barWidth*capWidth,col=plotColors$lines,width=lWidth)
-      errorBars(data.frame(at=plotThis$at,start=plotThis$barHight,stop=plotThis$barHight-plotThis$lowerError),capType = errorCap,lType = errorLineType,side=sidePlot,capSize=width*barWidth*capWidth,col=plotColors$lines, width=lWidth)
+      errorBars(data.frame(at=plotThis$at,start=plotThis$barHight,stop=plotThis$barHight+plotThis$upperError),capType = errorCap,lType = errorLineType,side=sidePlot,capSize=barWidth*capWidth,col=plotColors$lines,width=lWidth)
+      errorBars(data.frame(at=plotThis$at,start=plotThis$barHight,stop=plotThis$barHight-plotThis$lowerError),capType = errorCap,lType = errorLineType,side=sidePlot,capSize=barWidth*capWidth,col=plotColors$lines, width=lWidth)
     }
-
   }
   #Draw legend and set associated options if indicated
   if(length(legendColors)<length(legendLabels) & legend!=FALSE){
@@ -412,7 +412,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
     if(is.na(legendTitle) | legendTitle=="factTwo") {
       legendTitle<="Legend"
     }
-    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=theme$LegendBorder, lineCol=theme$LegendLineCol, bg=theme$LegendBG, col=legendColors, shape="rect",size=theme$LegendSize,spacing=theme$LegendSpacing)
+    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=plotColors$legendBorder, lineCol=plotColors$LegendLineCol, bg=plotColors$LegendBG, col=legendColors, shape="rect",size=theme$legendSize,spacing=theme$legendSpacing)
   }
 
   #Add titles, sub and ylab
@@ -421,9 +421,9 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, drawB
       sub<-pvalue
     }
     if(sidePlot) {
-      title(main=main,col.main=plotColors$title,sub=sub,col.sub=plotColors$subtext,xlab=ylab,col.lab=plotColors$numbers)
+      title(main=main,col.main=plotColors$title,sub=sub,col.sub=plotColors$subtext,xlab=ylab,col.lab=plotColors$axisLabels)
     } else {
-      title(main=main,col.main=plotColors$title,sub=sub,col.sub=plotColors$subtext,ylab=ylab,col.lab=plotColors$numbers)
+      title(main=main,col.main=plotColors$title,sub=sub,col.sub=plotColors$subtext,ylab=ylab,col.lab=plotColors$axisLabels)
     }
   }
   par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)

@@ -58,10 +58,11 @@ errorBars<-function(x,capType=c("none","bar","ball"),capSize=NULL,side=FALSE,col
 #' @param fill character; color vector that determines the interior color of the box.
 #' @param drawBox logical; draws the box and whiskers if set to \code{\link{TRUE}}. The median line will be drawn regardless.
 #' @param drawDot logical; draws a circle at the center of the median bar if set to \code{\link{TRUE}}.
-#' @param whiskerLty positive integer; sets the line type or \code{lty} option for plotting the wiskers.
+#' @param whiskerLty positive integer; sets the line type or \code{lty} option for plotting the whiskers.
 #' @param side logical; if set to \code{\link{TRUE}}, the box plots will be drawn horizontally.
 #' @param lWidth positive integer; corresponds to lwd line width setting in base R.
 #' @param capWidth numeric; size of the error bar cap relative to the box width.
+#' @param capType character; should be equal to \code{none}, \code{bar}, or \code{ball}. Controls how the caps are drawn for the box plot whiskers.
 #'
 #' @examples
 #' data(iris)
@@ -74,12 +75,12 @@ errorBars<-function(x,capType=c("none","bar","ball"),capSize=NULL,side=FALSE,col
 #' #\donttest{drawBoxPlot(iData)}
 #' @importFrom graphics segments rect points
 #' @seealso \code{\link[graphics]{boxplot}}, \code{\link{niceBox}}
-drawBoxPlot<-function(x,col="black",fill=NULL,drawBox=T,drawDot=F, whiskerLty =2,side=FALSE,lWidth=1,capWidth=.25){
+drawBoxPlot<-function(x,col="black",fill=NULL,drawBox=T,drawDot=F, whiskerLty =2,side=FALSE,lWidth=1,capWidth=.25,capType="bar"){
   if(side) {
     if(drawBox){
       rect(x$q1,x$at-x$width,x$q3,x$at+x$width,col=fill,lwd=lWidth,border=col)
-      errorBars(bind_cols(at=x$at,start=x$q1,stop=x$min),capType="bar",capSize=capWidth*x$width,col=col,lType= whiskerLty,width=lWidth,side=side)
-      errorBars(bind_cols(at=x$at,start=x$q3,stop=x$max),capType="bar",capSize=capWidth*x$width,col=col,lType= whiskerLty,width=lWidth,side=side)
+      errorBars(bind_cols(at=x$at,start=x$q1,stop=x$min),capType=capType,capSize=capWidth*x$width,col=col,lType= whiskerLty,width=lWidth,side=side)
+      errorBars(bind_cols(at=x$at,start=x$q3,stop=x$max),capType=capType,capSize=capWidth*x$width,col=col,lType= whiskerLty,width=lWidth,side=side)
     }
     segments(x$median,x$at-x$width,x$median,x$at+x$width,col=col,lwd=lWidth*2)
     if(drawDot){
@@ -88,8 +89,8 @@ drawBoxPlot<-function(x,col="black",fill=NULL,drawBox=T,drawDot=F, whiskerLty =2
   } else {
     if(drawBox){
       rect(x$at-x$width,x$q1,x$at+x$width,x$q3,col=fill,lwd=lWidth,border=col)
-      errorBars(bind_cols(at=x$at,start=x$q1,stop=x$min),capType="bar",capSize=capWidth*x$width,col=col,lType= whiskerLty,width=lWidth)
-      errorBars(bind_cols(at=x$at,start=x$q3,stop=x$max),capType="bar",capSize=capWidth*x$width,col=col,lType= whiskerLty,width=lWidth)
+      errorBars(bind_cols(at=x$at,start=x$q1,stop=x$min),capType=capType,capSize=capWidth*x$width,col=col,lType= whiskerLty,width=lWidth)
+      errorBars(bind_cols(at=x$at,start=x$q3,stop=x$max),capType=capType,capSize=capWidth*x$width,col=col,lType= whiskerLty,width=lWidth)
     }
     segments(x$at-x$width,x$median,x$at+x$width,x$median,col=col,lwd=lWidth*2)
     if(drawDot){
@@ -107,6 +108,7 @@ drawBoxPlot<-function(x,col="black",fill=NULL,drawBox=T,drawDot=F, whiskerLty =2
 #' This function adds data points to a chart. These can be organized exactly as specified (linear), as a jitter cloud (jitter), as a waterfall plot (distribution) or as a swarm (beeswarm).
 #' A factor labeled pfact can be included in \code{x} and used to highlight individual data points by setting \code{subGroup=\link{TRUE}}. All graphic customization options can given as vectors and will be iterated over during plotting.
 #' Note that the size/cex option can not be used to highlight pfact levels in a beeswarm plot and only the first element of the vector will be used.
+#' The function silently returns the final xy positions.
 #'
 #' @param x named list or data frame; \code{x$at}, \code{x$data} and \code{x$pfact} (optional) should all be defined. These vectors are used to place the the point on the chart and determine the point level grouping (highlighting)
 #' @param type character; determines how the points are arranged. Options are 'jitter', 'linear', 'beeswarm' and 'distribution'.
@@ -131,6 +133,7 @@ drawBoxPlot<-function(x,col="black",fill=NULL,drawBox=T,drawDot=F, whiskerLty =2
 drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE,width=.2, sidePlot=FALSE,swarmOverflow="random") {
   #Process color options
   gfact<-NULL
+  xypos<-NULL
   if(any(names(x)=="subGroup")) {
     gfact<-factor(x$subGroup)
   } else {
@@ -207,15 +210,21 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
   #Jitter ploting
   if(type=="jitter" | type=="Jitter") {
     if(sidePlot) {
-      points(y=jitter(x$at,amount=width),x=x$data,pch=shape,col=col,cex=size)
+      jdat<-jitter(x$at,amount=width)
+      xypos<-data.frame(x=x$data,y=jdat)
+      points(y=jdat,x=x$data,pch=shape,col=col,cex=size)
     } else {
-      points(x=jitter(x$at,amount=width),y=x$data,pch=shape,col=col,cex=size)
+      jdat<-jitter(x$at,amount=width)
+      xypos<-data.frame(x=jdat,y=x$data)
+      points(x=jdat,y=x$data,pch=shape,col=col,cex=size)
     }
     #Linear plotting
   } else if (type=="linear" | type=="Linear") {
     if(sidePlot) {
+      xypos<-data.frame(x=x$data,y=x$at)
       points(y=x$at,x=x$data,pch=shape,col=col,cex=size)
     } else {
+      xypos<-data.frame(x=x$at,y=x$data)
       points(x=x$at,y=x$data,pch=shape,col=col,cex=size)
     }
     #Beeswarm plotting
@@ -246,10 +255,12 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
     #print(str(filter))
     for(i in 1:length(filter)){
       if(!is.null(filter[[i]])) {
-        #Note that the col option has been factorized and needs an as.character wrapper to function propperly
+        #Note that the col option has been factorized and needs an as.character wrapper to function properly
         if(sidePlot) {
+          xypos<-data.frame(x=filter[[i]]$y,y=filter[[i]]$x)
           points(y=filter[[i]]$x,x=filter[[i]]$y,pch=filter[[i]]$shape,col=as.character(filter[[i]]$color),cex=filter[[i]]$size)
         } else {
+          xypos<-data.frame(x=filter[[i]]$x,y=filter[[i]]$y)
           points(x=filter[[i]]$x,y=filter[[i]]$y,pch=filter[[i]]$shape,col=as.character(filter[[i]]$color),cex=filter[[i]]$size)
         }
       }
@@ -269,35 +280,38 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
     if(length(shape)>1){shapeSelector<-distData$rowNum}
     if(length(size)>1){sizeSelector<-distData$rowNum}
     if(sidePlot) {
+      xypos<-data.frame(x=distData$data,y=distData$spread)
       points(y=distData$spread,x=distData$data,pch=shape[shapeSelector],col=col[colSelector],cex=size[sizeSelector])
     } else {
+      xypos<-data.frame(x=distData$spread,y=distData$data)
       points(x=distData$spread,y=distData$data,pch=shape[shapeSelector],col=col[colSelector],cex=size[sizeSelector])
     }
   } else {
     warning(paste0("drawPoints argument type=",type," is not a recognized option.\nPlease set to either 'jitter', 'linear', 'beeswarm', or 'distribution'"), call.=FALSE)
   }
+  invisible(xypos)
 }
 
 #' @title draw a violin plot
 #' @description Produce a violin plot with optional box plot and strip plot overlays
 #'
 #' @details
-#' This uses  \code{\link[KernSmooth]{bkde}} from the \code{KernSmooth} package to calculated kernal desnisty estimates and estimate the
+#' This uses  \code{\link[KernSmooth]{bkde}} from the \code{KernSmooth} package to calculated kernel density estimates and estimate the
 #' optimal bandwidth \code{h} setting. This data is then used to draw a violin plot with an optional boxplot drawn as an overlay
-#' to better charactarize the quartile distributon. Likewise, a strip chart of individual data points
-#' can be added on top of these two plots to full charactarize the data distribution. This uses \code{\link{niceBox}} to handle
+#' to better characterize the quartile distribution. Likewise, a strip chart of individual data points
+#' can be added on top of these two plots to full characterize the data distribution. This uses \code{\link{niceBox}} to handle
 #' the box plot and strip chart overlays.
 #'
 #' @param x numeric; A vector of numeric values that will be subset and formated by the factor(s) in \code{by}.
 #' @param groups factor; A factor used to subset \code{x} to draw the violins.
 #' @param at numeric; a numeric vector of where each factor level should be plotted
-#' @param h numeric; Bandwidth for the kernal desnisty estimates. Will cycle over values if multiple bandwidths are given
+#' @param h numeric; Bandwidth for the kernel density estimates. Will cycle over values if multiple bandwidths are given
 #' @param plotColors list; a named list of vectors of colors that set the color options for all NicePlot functions.
 #' @param sidePlot logical; If \code{\link{TRUE}}, the x and y ploting axis are swapped
 #' @param borderCol R color string; Color of the border of the violins
 #' @param borderWidth numeric; Thickness of the violin borders (lwd)
 #' @param fill R color string; Color of the interior of the violins
-#' @param width numeric; Relative width of the violins. A value of 1 will cause the violins to cover thier entire lane and potentially just touch.
+#' @param width numeric; Relative width of the violins. A value of 1 will cause the violins to cover their entire lane and potentially just touch.
 #' @param trimViolins logical; Should the violins be truncated at the edges of the data range.
 #' @param samplePoints integer; The number of points used to draw each side of the violin. This is generally obtained from \code{theme$curvePoints}.
 #'
@@ -495,12 +509,12 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
 #' @title Add a datapoint overlay to a box or violin plot
 #' @description This function prepares data based on settings from \code{\link{niceBox}}, \code{\link{niceDots}}, or \code{\link{niceVio}}
 #' and passes the data on to \code{\link{drawPoints}}.
-#' @details This funciton takes in cleaned data from \code{\link{prepCategoryWindow}} and reorganizes to to create a dot plot overlay for a graph.
-#' This code is used by both \code{\link{niceBox}} and \code{\link{niceVio}} and has been moved to an independant funciton to make the code more compact and easier to maintain.
+#' @details This function takes in cleaned data from \code{\link{prepCategoryWindow}} and reorganizes to to create a dot plot overlay for a graph.
+#' This code is used by both \code{\link{niceBox}} and \code{\link{niceVio}} and has been moved to an independent function to make the code more compact and easier to maintain.
 #' This code is also used to draw the outlier dots in a boxplot by setting \code{drawPoints = \link{FALSE}}.
 #'
 #' @examples
-#' #Add a beeswarm plot overlay to a boxplot in the iris dataset:
+#' #Add a beeswarm plot overlay to a boxplot in the iris data set:
 #' data(iris)
 #' data<-list(data=iris$Sepal.Length)
 #' boxplot(iris$Sepal.Length~iris$Species)

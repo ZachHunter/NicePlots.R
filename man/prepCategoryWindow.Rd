@@ -29,7 +29,8 @@ prepCategoryWindow(
   legend = FALSE,
   pointHighlights = FALSE,
   logAdjustment = 1,
-  stack = FALSE
+  stack = FALSE,
+  ...
 )
 }
 \arguments{
@@ -80,6 +81,8 @@ prepCategoryWindow(
 \item{logAdjustment}{= numeric; This number is added to the input data prior to log transformation. Default value is 1.}
 
 \item{stack}{logical; Used for stack stacked bar plots. Used exclusively by \code{\link{niceBar}}.}
+
+\item{...}{additional options mostly to be passed along to subsequent functions}
 }
 \value{
 formats the plotting area and returns a named list with 'data' and 'labels' corresponding to the trimmed and/or transformed data and the labels for the primary factors, respectively.

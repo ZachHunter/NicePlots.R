@@ -9,7 +9,7 @@ niceDots(
   by = NULL,
   groupNames = NULL,
   drawPoints = TRUE,
-  drawBar = TRUE,
+  errorBars = TRUE,
   barWidth = 0.33,
   barType = c("bar", "dot"),
   barThickness = 2,
@@ -66,7 +66,7 @@ niceDots(
 
 \item{drawPoints}{logical; draws a dot plot overlay of the data.}
 
-\item{drawBar}{logical; Determins if the aggregate data and error (if any) is displayed}
+\item{errorBars}{logical; Determins if the aggregate data and error (if any) is displayed}
 
 \item{barWidth}{numeric; cex like scaling factor for percentage of the column width the \code{mean}/\code{median} bar will span if drawn.}
 
@@ -165,7 +165,7 @@ draws a categorical dot plot with optional data highlighting, log scale support 
 This is really two different plotting functions merged together. First, the data points can be plotted individually using a \code{distribution} waterfall, \code{jitter}, \code{beeswarm}, just \code{linear} or not plotted at all.
 A signle data vector can be subset (eg using multiple factors with \code{by} and optionally \code{subGroup==\link{TRUE}}) using up to two factors. If a multi-column tibble, matrix or dataframe is used for data input, then can be grouped by a single factor from \code{by} with the column names used for factor subgroups.
 The option \code{flipFacts} can be used in this case to make the data columns the primary grouping factor and the first factor in \code{by} used for subgroups.
-On top of this, the \code{\link[base]{mean}}/\code{\link[stats]{median}} values can be overplotted using \code{drawBar==\link{TRUE}} and error or distribution (eg. \code{\link[stats]{sd}}, \code{\link{se}} \code{\link[base]{range}}, etc.) can be also be shown as errorbars. The error bars can be multiplied by \code{errorMultiple} and supressed if \code{errorMultiple=0}.
+On top of this, the \code{\link[base]{mean}}/\code{\link[stats]{median}} values can be overplotted using \code{errorBars==\link{TRUE}} and error or distribution (eg. \code{\link[stats]{sd}}, \code{\link{se}} \code{\link[base]{range}}, etc.) can be also be shown as errorbars. The error bars can be multiplied by \code{errorMultiple} and supressed if \code{errorMultiple=0}.
 
 The complicated part of using this function is handling its many options. A wrapper function to set up and run it with preset options may be a good idea if you are using it alot.
 Briefly put, the \code{by} argument can be a data frame of factors and the function will  work through the columns in order as needed.

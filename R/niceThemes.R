@@ -23,11 +23,11 @@ basicTheme<- list(
   curvePoints=200, #Number of points to sample for drawing density curves
 
   #Legend Settings
-  LegendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
-  LegendLineCol=NA, #Border color for the legend color boxes
-  LegendBG=NA, #Legend background color
-  LegendSize=.66, #overall legend cex
-  LegendSpacing=.2, #Relative spacing padding legend entries
+  # legendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
+  # legendLineCol=NA, #Border color for the legend color boxes
+  # legendBG=NA, #Legend background color
+  legendSize=.66, #overall legend cex
+  legendSpacing=.2, #Relative spacing padding legend entries
 
   #Plot Specific Defaults
   pointSizeBP=.7, #cex-like Numeric; size of points in overlay for boxplots
@@ -80,8 +80,12 @@ basicTheme<- list(
     title="black", #Title color
     numbers="black", #Color of y-axis numbers
     subtext="black", #Color of sub text
-    labels="black", #label color
+    labels="black", #label color,
+    axisLabels="black", #axis label color
     subGroupLabels="black", #color of subgroups
+    legendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
+    legendLineCol=NA, #Border color for the legend color boxes
+    legendBG=NA, #Legend background color
     vioBoxFill=setAlpha("black",.8), #Color of interquartile box for violin plots
     vioBoxLineCol="black" #Line color for boxplot overlay in violin plots
   ))
@@ -110,11 +114,11 @@ npColorTheme<- list(
   curvePoints=200, #Number of points to sample for drawing density curves
 
   #Legend Settings
-  LegendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
-  LegendLineCol=NA, #Border color for the legend color boxes
-  LegendBG=NA, #Legend background color
-  LegendSize=.85, #overall legend cex
-  LegendSpacing=.3, #Relative spacing padding legend entries
+  # legendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
+  # legendLineCol=NA, #Border color for the legend color boxes
+  # legendBG=NA, #Legend background color
+  legendSize=.85, #overall legend cex
+  legendSpacing=.3, #Relative spacing padding legend entries
 
   #Plot Specific Defaults
   pointSizeBP=.7, #cex-like Numeric; size of points in overlay for boxplots
@@ -169,6 +173,9 @@ npColorTheme<- list(
     subtext="black", #Color of sub text
     labels="black", #label color
     subGroupLabels="black", #color of subgroups
+    legendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
+    legendLineCol=NA, #Border color for the legend color boxes
+    legendBG=NA, #Legend background color
     vioBoxFill=purrr::map_chr(RColorBrewer::brewer.pal(9,"Set1"),function(x) setAlpha(x,.3)), #Color of interquartile box for violin plots
     vioBoxLineCol=RColorBrewer::brewer.pal(9,"Set1") #Line color for boxplot overlay in violin plots
   ))
@@ -197,11 +204,11 @@ npStataTheme<- list(
   curvePoints=200, #Number of points to sample for drawing density curves
 
   #Legend Settings
-  LegendBorder="black", #Color of the border box around legend. Set to NULL to turn off
-  LegendLineCol=NA, #Border color for the legend color boxes
-  LegendBG="white", #Legend background color
-  LegendSize=.75, #overall legend cex
-  LegendSpacing=.3, #Relative spacing padding legend entries
+  # legendBorder="black", #Color of the border box around legend. Set to NULL to turn off
+  # legendLineCol=NA, #Border color for the legend color boxes
+  # legendBG="white", #Legend background color
+  legendSize=.75, #overall legend cex
+  legendSpacing=.3, #Relative spacing padding legend entries
 
   #Plot Specific Defaults
   pointSizeBP=.6, #cex-like Numeric; size of points in overlay for boxplots
@@ -252,6 +259,9 @@ npStataTheme<- list(
     subtext="black", #Color of sub text
     labels="black", #label color
     subGroupLabels="black", #color of subgroups
+    legendBorder="black", #Color of the border box around legend. Set to NULL to turn off
+    legendLineCol=NA, #Border color for the legend color boxes
+    legendBG="white", #Legend background color
     vioBoxFill=setAlpha("black",.8), #Color of interquartile box for violin plots
     vioBoxLineCol="black" #Line color for boxplot overlay in violin plots
   ))
@@ -280,11 +290,11 @@ npGGTheme<- list(
   curvePoints=200, #Number of points to sample for drawing density curves
 
   #Legend Settings
-  LegendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
-  LegendLineCol="lightgrey", #Border color for the legend color boxes
-  LegendBG=NULL, #Legend background color
-  LegendSize=.75, #overall legend cex
-  LegendSpacing=.3, #Relative spacing padding legend entries
+  # legendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
+  # legendLineCol="lightgrey", #Border color for the legend color boxes
+  # legendBG=NULL, #Legend background color
+  legendSize=.75, #overall legend cex
+  legendSpacing=.3, #Relative spacing padding legend entries
 
   #Plot Specific Defaults
   pointSizeBP=.6, #cex-like Numeric; size of points in overlay for boxplots
@@ -339,6 +349,9 @@ npGGTheme<- list(
     subtext="black", #Color of sub text
     labels="black", #label color
     subGroupLabels="black", #color of subgroups
+    legendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
+    legendLineCol="lightgrey", #Border color for the legend color boxes
+    legendBG=NA, #Legend background color
     vioBoxFill=setAlpha("black",.8), #Color of interquartile box for violin plots
     vioBoxLineCol="black" #Line color for boxplot overlay in violin plots
   ))

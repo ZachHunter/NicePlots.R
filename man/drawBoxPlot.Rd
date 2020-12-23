@@ -13,7 +13,8 @@ drawBoxPlot(
   whiskerLty = 2,
   side = FALSE,
   lWidth = 1,
-  capWidth = 0.25
+  capWidth = 0.25,
+  capType = "bar"
 )
 }
 \arguments{
@@ -27,13 +28,15 @@ drawBoxPlot(
 
 \item{drawDot}{logical; draws a circle at the center of the median bar if set to \code{\link{TRUE}}.}
 
-\item{whiskerLty}{positive integer; sets the line type or \code{lty} option for plotting the wiskers.}
+\item{whiskerLty}{positive integer; sets the line type or \code{lty} option for plotting the whiskers.}
 
 \item{side}{logical; if set to \code{\link{TRUE}}, the box plots will be drawn horizontally.}
 
 \item{lWidth}{positive integer; corresponds to lwd line width setting in base R.}
 
 \item{capWidth}{numeric; size of the error bar cap relative to the box width.}
+
+\item{capType}{character; should be equal to \code{none}, \code{bar}, or \code{ball}. Controls how the caps are drawn for the box plot whiskers.}
 }
 \description{
 takes a date frame with columns labeled 'at', 'q1', 'q3', 'min', 'max', 'median' and 'width' to draw a series of boxplots.

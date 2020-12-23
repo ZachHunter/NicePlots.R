@@ -106,6 +106,26 @@ formatPlotColors<-function(plotColors, theme=NA){
     else if (is.null(theme$subtext)) {plotColors$subtext<-"black"}
     else {plotColors$subtext<-theme$subtext}
   }
+  if(is.null(plotColors$axisLabels)){
+    if(is.na(theme[1])) {plotColors$axisLabels<-"black"}
+    else if (is.null(theme$axisLabels)) {plotColors$axisLabels<-"black"}
+    else {plotColors$axisLabels<-theme$axisLabels}
+  }
+  if(is.null(plotColors$legendBorder)){
+    if(is.na(theme[1])) {plotColors$legendBorder<-NULL}
+    else if (is.null(theme$legendBorder)) {plotColors$legendBorder<-NULL}
+    else {plotColors$legendBorder<-theme$legendBorder}
+  }
+  if(is.null(plotColors$legendBG)){
+    if(is.na(theme[1])) {plotColors$legendBG<-NA}
+    else if (is.null(theme$legendBG)) {plotColors$legendBG<-NA}
+    else {plotColors$legendBG<-theme$legendBG}
+  }
+  if(is.null(plotColors$legendLineCol)){
+    if(is.na(theme[1])) {plotColors$legendLineCol<-NA}
+    else if (is.null(theme$legendLineCol)) {plotColors$legendLineCol<-NA}
+    else {plotColors$legendLineCol<-theme$legendLineCol}
+  }
   plotColors
 }
 

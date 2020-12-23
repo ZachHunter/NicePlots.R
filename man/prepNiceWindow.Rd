@@ -25,7 +25,8 @@ prepNiceWindow(
   strictLimits = F,
   legend = FALSE,
   logAdjustment = 1,
-  makePlot = TRUE
+  makePlot = TRUE,
+  ...
 )
 }
 \arguments{
@@ -68,6 +69,8 @@ prepNiceWindow(
 \item{logAdjustment}{numeric; This number is added to the input data prior to log transformation. Default value is 1.}
 
 \item{makePlot}{logical; This format the data and ploting area without drawing anything if set to \code{\link{FALSE}}.}
+
+\item{...}{additional options mostly to be passed along to subsequent functions}
 }
 \value{
 formats the plotting area and returns a named list with 'data' and 'labels' corresponding to the trimmed and/or transformed data and the labels for the primary factors, respectively.

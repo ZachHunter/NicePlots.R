@@ -26,7 +26,7 @@ drawViolinPlot(
 
 \item{at}{numeric; a numeric vector of where each factor level should be plotted}
 
-\item{h}{numeric; Bandwidth for the kernal desnisty estimates. Will cycle over values if multiple bandwidths are given}
+\item{h}{numeric; Bandwidth for the kernel density estimates. Will cycle over values if multiple bandwidths are given}
 
 \item{plotColors}{list; a named list of vectors of colors that set the color options for all NicePlot functions.}
 
@@ -38,7 +38,7 @@ drawViolinPlot(
 
 \item{fill}{R color string; Color of the interior of the violins}
 
-\item{width}{numeric; Relative width of the violins. A value of 1 will cause the violins to cover thier entire lane and potentially just touch.}
+\item{width}{numeric; Relative width of the violins. A value of 1 will cause the violins to cover their entire lane and potentially just touch.}
 
 \item{trimViolins}{logical; Should the violins be truncated at the edges of the data range.}
 
@@ -48,10 +48,10 @@ drawViolinPlot(
 Produce a violin plot with optional box plot and strip plot overlays
 }
 \details{
-This uses  \code{\link[KernSmooth]{bkde}} from the \code{KernSmooth} package to calculated kernal desnisty estimates and estimate the
+This uses  \code{\link[KernSmooth]{bkde}} from the \code{KernSmooth} package to calculated kernel density estimates and estimate the
 optimal bandwidth \code{h} setting. This data is then used to draw a violin plot with an optional boxplot drawn as an overlay
-to better charactarize the quartile distributon. Likewise, a strip chart of individual data points
-can be added on top of these two plots to full charactarize the data distribution. This uses \code{\link{niceBox}} to handle
+to better characterize the quartile distribution. Likewise, a strip chart of individual data points
+can be added on top of these two plots to full characterize the data distribution. This uses \code{\link{niceBox}} to handle
 the box plot and strip chart overlays.
 }
 \seealso{

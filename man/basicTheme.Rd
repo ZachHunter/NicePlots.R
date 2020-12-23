@@ -5,7 +5,7 @@
 \alias{basicTheme}
 \title{NicePlots Theme: Basic}
 \format{
-An object of class \code{npTheme} (inherits from \code{list}) of length 54.
+An object of class \code{npTheme} (inherits from \code{list}) of length 51.
 }
 \usage{
 basicTheme
