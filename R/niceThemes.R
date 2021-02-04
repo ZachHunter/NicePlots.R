@@ -214,6 +214,7 @@ npStataTheme<- list(
   pointSizeBP=.6, #cex-like Numeric; size of points in overlay for boxplots
   pointSizeVP=.6, #cex-like Numeric; size of points in overlay for violin plots
   pointSizeDP=.5, #cex-like Numeric; size of points in overlay for dot plots
+  pointSize2D=.8, #cex-like Numeric; size of points in overlay for density and surface plots
   widthBP=.05, #Relative box width of each category for box plots
   widthVP=.85, #Relative violin width of each category for violin plots
   widthDP=.5, #Relative category width of each category for dot plots
@@ -221,6 +222,7 @@ npStataTheme<- list(
   pointShapeBP=1:10, #Numeric vector; point shapes for box plots
   pointShapeVP=1:10, #Numeric vector; point shapes for vioin plots
   pointShapeDP=1:10, #Numeric vector; point shapes for dot plots
+  pointShape2D=1:10, #Numeric vector; point shapes for density and surface plots
   pointLaneWidthBP=1, #Restricts the point overlay to a fraction of the box width
   pointLaneWidthDP=.95, #Restricts the point overlay to a fraction of the category width
   pointLaneWidthVP=5, #Restricts the point overlay to a fraction of the violin width
@@ -231,11 +233,13 @@ npStataTheme<- list(
   lWidthDP=3, #Line width (lwd) for dot plots
   lWidthVP=1, #Line width (lwd) for violin plots
   lWidthBar=1.5, #Line width (lwd) for violin plots
-  errorBarLineTypeBP=1, #Line type (lty) for boxplot wiskers
+  lWidth2D=1.5, #Line width (lwd) for density and surface plots
+  errorBarLineTypeBP=1, #Line type (lty) for boxplot whiskers
   errorBarLineTypeBar=1, #Line type (lty) for bar plot error bars
   errorBarLineTypeDP=1, #Line type (lty) for dot plot error bars
   errorBarLineTypeVP=1, #Whisker line type (lty) for box plot overlay in violin plots
-  errorBarCapWidthBP=10, #relative width of cap on box plot wiskers
+  errorBarLineType2D=1, #Line type (lty) for surface and density plots
+  errorBarCapWidthBP=10, #relative width of cap on box plot whiskers
   errorBarCapWidthDP=10,  #relative width of cap on dot plot
   errorBarCapWidthBar=1, #relative width of cap on bar plot error bars
   errorBarCapWidthVP=0, #Whisker cap width for box plot overlay in violin plots

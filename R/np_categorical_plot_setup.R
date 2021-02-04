@@ -182,7 +182,7 @@ prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TR
 #' @importFrom utils data str
 #'
 #' @seealso \code{\link[grDevices]{axisTicks}}, \code{\link[graphics]{axis}}, \code{\link{makeLogTicks}}, \code{\link{facetSpacing}}
-prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, guides=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, theme=NA, plotColors=if(is.na(theme)){list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white")}else{theme$plotColors}, trim=FALSE, logScale=FALSE, axisText=c(NULL,NULL), minorGuides=FALSE, extendTicks=F,subGroup=FALSE, expLabels=TRUE,sidePlot=FALSE,subGroupLabels=NULL,strictLimits=F, legend=FALSE, pointHighlights=FALSE, logAdjustment=1, stack=FALSE,...) {
+prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, guides=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, theme=NA, plotColors=if(is.na(theme)){list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white")}else{theme$plotColors}, trim=FALSE, logScale=FALSE, axisText=c(NULL,NULL), minorGuides=FALSE, extendTicks=FALSE,subGroup=FALSE, expLabels=TRUE,sidePlot=FALSE,subGroupLabels=NULL,strictLimits=FALSE, legend=FALSE, pointHighlights=FALSE, logAdjustment=1, stack=FALSE,...) {
   levelCount<-1
   tData<-x
   tBy<-by
@@ -411,7 +411,6 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
       }
     }
   }
-
   if (minorTick > 0) {
     lowerLim<-par("usr")[3]
     upperLim<-par("usr")[4]
@@ -422,7 +421,10 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
     minorLoc<-NULL
     if(logScale>0){
       minorLoc<-majorTicks[[3]]
-      if(extendTicks) {
+      if(is.null(extendTicks)){
+        extendTicks<-TRUE
+      }
+      if(extendTicks==TRUE) {
         delta<-myMajorTicks[2]-myMajorTicks[1]
         cBound<-logScale^(min(myMajorTicks)-delta)
         cBy<-(logScale^min(myMajorTicks)-cBound)/(minorTick+1)
@@ -524,7 +526,9 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
   if(!is.na(theme[1])) {
     par(family=theme$fontFamily)
   }
-
+  if(is.null(minorGuides)) {
+    minorGuides<-guides
+  }
   #Set margins for legends now
   prepLegendMarigins(x=x,by=by,theme=theme,legend=legend,pointHighlights=FALSE,subGroup=TRUE, is2D=TRUE)
 

@@ -20,7 +20,7 @@ niceBar(
   guides = TRUE,
   outliers = FALSE,
   width = NULL,
-  errorMultiple = 1,
+  errorMultiple = 2,
   plotColors = list(bg = "open", fill = setAlpha("grey", 0.8)),
   logScale = FALSE,
   trim = FALSE,

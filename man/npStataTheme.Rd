@@ -5,7 +5,7 @@
 \alias{npStataTheme}
 \title{NicePlots Theme: Stata Like}
 \format{
-An object of class \code{npTheme} (inherits from \code{list}) of length 47.
+An object of class \code{npTheme} (inherits from \code{list}) of length 51.
 }
 \usage{
 npStataTheme

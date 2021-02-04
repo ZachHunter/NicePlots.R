@@ -66,14 +66,14 @@
 #' @importFrom purrr reduce
 #' @export
 #' @seealso \code{\link[graphics]{stripchart}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{quantileTrim}}, \code{\link{prepCategoryWindow}}, \code{\link[base]{jitter}}
-niceDots <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, errorBars=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {UseMethod("niceDots",x)}
+niceDots <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, errorBars=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("se","sd","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {UseMethod("niceDots",x)}
 
 #' @importFrom dplyr mutate
 #' @importFrom magrittr %>%
 #' @importFrom purrr reduce
 #' @export
 #'@author Zachary Hunter
-niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, errorBars=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {
+niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, errorBars=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("se","sd","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset", call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -412,7 +412,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
     if(is.na(legendTitle) | legendTitle=="factTwo") {
       legendTitle<="Legend"
     }
-    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=plotColors$legendBorder, lineCol=plotColors$LegendLineCol, bg=plotColors$LegendBG, col=legendColors, shape="rect",size=theme$legendSize,spacing=theme$legendSpacing)
+    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=theme$legendBorder, lineCol=plotColors$LegendLineCol, bg=plotColors$LegendBG, col=legendColors, shape="rect",size=theme$legendSize,spacing=theme$legendSpacing)
   }
 
   #Add titles, sub and ylab

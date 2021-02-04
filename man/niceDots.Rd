@@ -14,7 +14,7 @@ niceDots(
   barType = c("bar", "dot"),
   barThickness = 2,
   aggFun = c("mean", "median", "none"),
-  errFun = c("sd", "se", "range"),
+  errFun = c("se", "sd", "range"),
   errorMultiple = 2,
   main = NULL,
   sub = NULL,
