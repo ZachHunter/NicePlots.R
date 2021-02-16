@@ -6,7 +6,7 @@
 #' @details
 #' The \code{NicePlots} plotColors object is a list of named color values/vectors. The options NicePlots colors include \code{bg} (background color), \code{marginBg} (color of area surrounding the plot), \code{guides} (guide lines for major tick-marks), \code{minorGuides} (guide lines for minor tick-marks)
 #' \code{lines} (lines for box/bar plots etc.), \code{points} (plotting data points), \code{fill} (fill for box/bar plots etc.), \code{axis} (axis colors), \code{majorTick} (major tick-mark color),
-#' \code{minorTick} (minor tick-mark color), \code{labels} (label colors), \code{subGroupLabels} (subgroup label colors), \code{rectCol} (inner quartile range box used in \code{\link{niceVio}}), and \code{medianMarkerCol} (the median value marker used in \code{\link{niceVio}}).
+#' \code{minorTick} (minor tick-mark color), \code{labels} (label colors), \code{subgroupLabels} (subgroup label colors), \code{rectCol} (inner quartile range box used in \code{\link{niceVio}}), and \code{medianMarkerCol} (the median value marker used in \code{\link{niceVio}}).
 #' Any option not set be the user will be added to the list and set to the default in order to insure compatibility with downstream NicePlot functions.
 #' If a theme is given, any option not set by the user will be set by the theme.
 #'
@@ -76,10 +76,10 @@ formatPlotColors<-function(plotColors, theme=NA){
     else if (is.null(theme$labels)) {plotColors$labels<-"black"}
     else {plotColors$labels<-theme$labels}
   }
-  if(is.null(plotColors$subGroupLabels)){
-    if(is.na(theme[1])) {plotColors$subGroupLabels<-"black"}
-    else if (is.null(theme$subGroupLabels)) {plotColors$subGroupLabels<-"black"}
-    else {plotColors$subGroupLabels<-theme$subGroupLabels}
+  if(is.null(plotColors$subgroupLabels)){
+    if(is.na(theme[1])) {plotColors$subgroupLabels<-"black"}
+    else if (is.null(theme$subgroupLabels)) {plotColors$subgroupLabels<-"black"}
+    else {plotColors$subgroupLabels<-theme$subgroupLabels}
   }
   if(is.null(plotColors$vioBoxFill)){
     if(is.na(theme[1])) {plotColors$vioBoxFill<-setAlpha("black",.8)}
@@ -149,7 +149,7 @@ formatPlotColors<-function(plotColors, theme=NA){
 #' @param width numeric; A multiplier that controls how wide the ploting elements will be. Setting \code{width=1.1} would result in plot elements being 10\% wider.
 #' @param guides logical; Should guidelines be drawn at the major tick marks.
 #' @param pointSize numeric; vector of numerics controling the size of points on the data overlay
-#' @param subGroup logical; Should the data be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}}.
+#' @param subgroup logical; Should the data be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}}.
 #' @param stack logical; Triggers stacked bar analysis for bar plots
 #' @param pointHighlights logical; will use additional factors in \code{by} to highlight points in the dot plot
 #' @param type character; What kind of plot is this for? Case sensitive options are "BP", "DP", "VP", and "Bar" corresponding to box plots, dot plots, violin plots, and bar plots, respectively.
@@ -167,7 +167,7 @@ formatPlotColors<-function(plotColors, theme=NA){
 #' @importFrom magrittr %>%
 #' @importFrom purrr reduce map map_lgl map_dbl
 #' @seealso \code{\link{formatPlotColors}}, \code{\link{niceBox}}, \code{\link{niceDots}}, \code{\link{niceVio}}, \code{\link{niceBar}}
-procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWidth,pointLaneWidth,width,guides,pointSize,subGroup=FALSE,stack=F,pointHighlights=F,type=c("BP","VP","DP","Bar"),theme,plotColors,pointMethod,logScale,drawPoints,groupNames,swarmOverflow,errorCap=NULL,CLOptions=NULL){
+procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWidth,pointLaneWidth,width,guides,pointSize,subgroup=FALSE,stack=F,pointHighlights=F,type=c("BP","VP","DP","Bar"),theme,plotColors,pointMethod,logScale,drawPoints,groupNames,swarmOverflow,errorCap=NULL,CLOptions=NULL){
   #Here we check to see if the user specified any options so that they are left unaltered if present
   defaultPoints<-FALSE
   defaultLines<-FALSE
@@ -294,7 +294,7 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
     byLength<-1
     if(is.data.frame(by)){
       byLength<-length(levels(by[,1]))
-      if(stack==TRUE & subGroup==TRUE) {
+      if(stack==TRUE & subgroup==TRUE) {
         cFilter<-purrr::map(1:dim(x)[2], function(n) purrr::map_lgl(levels(by[,2]), function(y) length(x[by[,2]==y,n])>0)) %>% purrr::reduce(c)
       } else {
         cFilter<-purrr::map(1:dim(x)[2], function(n) purrr::map_lgl(levels(by[,1]), function(y) length(x[by[,1]==y,n])>0)) %>% purrr::reduce(c)
@@ -339,7 +339,7 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
       }
       plotColors$vioBoxLineCol<-rep(plotColors$vioBoxLineCol[1:dim(x)[2]],byLength)[cFilter]
     }
-  } else if(subGroup==TRUE) {
+  } else if(subgroup==TRUE) {
     cFilter<-NULL
     byLevel<-1
     byFactor<-1
@@ -407,7 +407,7 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
       #}
       myLevels<-length(levels(by[,2]))
       if(stack==TRUE & type=="Bar") {
-        if (subGroup==TRUE) {
+        if (subgroup==TRUE) {
           myCol<-3
         } else {
           myCol<-2
@@ -500,6 +500,6 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
     }
   }
   theme$plotColors<-plotColors
-  list(groupNames=groupNames,minorTick=minorTick,pointShape=pointShape,whiskerLineType=whiskerLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subGroup=subGroup,stack=stack,pointHighlights=pointHighlights,theme=theme,plotColors=plotColors,pointMethod=pointMethod,swarmOverflow=swarmOverflow,errorCap=errorCap)
+  list(groupNames=groupNames,minorTick=minorTick,pointShape=pointShape,whiskerLineType=whiskerLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subgroup=subgroup,stack=stack,pointHighlights=pointHighlights,theme=theme,plotColors=plotColors,pointMethod=pointMethod,swarmOverflow=swarmOverflow,errorCap=errorCap)
 }
 

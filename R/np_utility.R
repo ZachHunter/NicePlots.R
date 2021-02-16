@@ -219,7 +219,7 @@ calcStats<-function(x,by,type=c("Wilcox","Tukey","T.Test","ANOVA"),verbose=FALSE
 #'The spacing assumes that each primary factor levels is plot on positive integers 1, 2, 3 etc.
 #' For a primary factor at position \code{i} with \code{f} subgroup levels, the subgrouping comes from generating equally spaced intervals starting at \eqn{i-\frac{1}{2}+\frac{1}{f+1}}{i-.5+1/(f+1)} and ending at \eqn{i+\frac{1}{2}-\frac{1}{f+1}}{i+.5-1/(f+1)}. Simply put: \deqn{Spacing = \frac{1}{NSubGroups-1}}
 #'
-#' @param subGroup positive integer; number of levels in the subgrouping factor
+#' @param subgroup positive integer; number of levels in the subgrouping factor
 #' @param labels positive integer; number of levels in the primary factor
 #'
 #' @return a numeric vector of where to plot the subgrouped data. Can be supplied to that \code{at=} option in plotting functions
@@ -227,11 +227,11 @@ calcStats<-function(x,by,type=c("Wilcox","Tukey","T.Test","ANOVA"),verbose=FALSE
 #' #\donttest{boxplot(CNA$BM~ CNA$Status,border="white")}
 #' #\donttest{stripchart(CNA$BM~factor(paste0(CNA$Status,CNA$Sex)),add=T,at=facetSpacing(2,2))}
 #' @seealso \code{\link{prepCategoryWindow}}
-facetSpacing<-function(subGroup,labels) {
+facetSpacing<-function(subgroup,labels) {
   subLabLoc<-NULL
-  padding<-1/(subGroup+1)
+  padding<-1/(subgroup+1)
   for (i in 1:labels){
-    subLabLoc<-c(subLabLoc,seq(i-0.5+padding,i+0.5-padding,length.out=subGroup))
+    subLabLoc<-c(subLabLoc,seq(i-0.5+padding,i+0.5-padding,length.out=subgroup))
   }
   subLabLoc
 }

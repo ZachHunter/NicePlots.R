@@ -4,10 +4,10 @@
 \alias{facetSpacing}
 \title{Generate plotting locations for subgrouping data}
 \usage{
-facetSpacing(subGroup, labels)
+facetSpacing(subgroup, labels)
 }
 \arguments{
-\item{subGroup}{positive integer; number of levels in the subgrouping factor}
+\item{subgroup}{positive integer; number of levels in the subgrouping factor}
 
 \item{labels}{positive integer; number of levels in the primary factor}
 }

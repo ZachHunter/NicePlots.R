@@ -33,8 +33,8 @@ niceVio(
   add = FALSE,
   minorGuides = NULL,
   extendTicks = TRUE,
-  subGroup = FALSE,
-  subGroupLabels = NULL,
+  subgroup = FALSE,
+  subgroupLabels = NULL,
   expLabels = TRUE,
   sidePlot = FALSE,
   drawPoints = TRUE,
@@ -52,7 +52,7 @@ niceVio(
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
 
-\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subGroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
+\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subgroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
 
 \item{bandwidth}{numeric; Used to override the default bandwidth calculation in \code{\link[vioplot]{vioplot}}. Default value is \code{\link{NULL}}.}
 
@@ -106,9 +106,9 @@ niceVio(
 
 \item{extendTicks}{logical; extends minor tick-marks past the first and last major tick to the edge of the graph provided there is enough room. Works for both log-scale and regular settings.}
 
-\item{subGroup}{logical; use additional column in \code{by} to group the data within each level of the major factor.}
+\item{subgroup}{logical; use additional column in \code{by} to group the data within each level of the major factor.}
 
-\item{subGroupLabels}{character vector; sets the labels used for the \code{subGroup} factor. Defaults to the levels of the factor.}
+\item{subgroupLabels}{character vector; sets the labels used for the \code{subgroup} factor. Defaults to the levels of the factor.}
 
 \item{expLabels}{logical; prints the major tick labels is \eqn{logScale^{x}}{logScale^x} instead of the raw value}
 
@@ -141,10 +141,10 @@ draws a violin plot with optional scatter plot overlays, subgrouping options and
 This violin plot function offers extensive log scale support, outlier detection, data point overlay options, data subsetting with a secondary factor, and data point highlighting with a tertiary factor.
 The complicated part of using this function is handling its many options. A wrapper function to set up and run it with preset options may be a good idea if you are using it along. The function \code{\link{niceDots}} is an example of this.
 Briefly put, the \code{by} argument can be a data frame of factors and the function will  work through the columns in order as needed.
-If \code{x} is a numeric vector, then \code{by} should be a factor to group it into categories. If \code{by} is a data frame of factors and \code{subGroup=\link{TRUE}}, then the first column for \code{by}
-is used as the grouping factor and the second column is used as the sub-grouping factor. If \code{pointHighlights==\link{TRUE}}, and \code{subGroup=\link{TRUE}}, the the third column of \code{by}
-is used to highlight points data point overlay (assuming \code{drawPoints=\link{TRUE}}). If \code{subGroup=\link{FALSE}} and \code{subGroup=\link{TRUE}}, then the second column of \code{by} is used to control
-the point highlighting. If \code{x} itself is a data frame of numeric vectors, \code{subGroup} is automatically set to false and each column of \code{x} is plotted like a sub-group and grouped
+If \code{x} is a numeric vector, then \code{by} should be a factor to group it into categories. If \code{by} is a data frame of factors and \code{subgroup=\link{TRUE}}, then the first column for \code{by}
+is used as the grouping factor and the second column is used as the sub-grouping factor. If \code{pointHighlights==\link{TRUE}}, and \code{subgroup=\link{TRUE}}, the the third column of \code{by}
+is used to highlight points data point overlay (assuming \code{drawPoints=\link{TRUE}}). If \code{subgroup=\link{FALSE}} and \code{subgroup=\link{TRUE}}, then the second column of \code{by} is used to control
+the point highlighting. If \code{x} itself is a data frame of numeric vectors, \code{subgroup} is automatically set to false and each column of \code{x} is plotted like a sub-group and grouped
 by the first column of \code{by}. Data point highlighting with \code{pointHighlights=\link{TRUE}} can still be used when \code{x} is a data frame and the highlighting factor will be drawn from the second column of \code{by}.
 Please note that the p-values can not always be calculated and are for general exploratory use only. More careful analysis is necessary to determine statistical significance.
 This function is as S3 generic and can be extended to provide class specific functionality. To further facilitate data exploration, outputs from statistical testing and data set summaries
@@ -165,7 +165,7 @@ lengthFact<-factor(iris$Petal.Length>2.82,labels=c("short","long"))
 
 Title<-"Sepal Length by Species and Petal Length"
 factorFrame<-data.frame(Species=iris$Species,PetalLength=lengthFact)
-niceVio(iris$Sepal.Length, by=factorFrame, minorTick=4,subGroup=TRUE,
+niceVio(iris$Sepal.Length, by=factorFrame, minorTick=4,subgroup=TRUE,
     ylab=Lab,main=Title,plotColors=myCols)
 }
 \seealso{

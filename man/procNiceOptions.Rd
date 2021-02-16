@@ -16,7 +16,7 @@ procNiceOptions(
   width,
   guides,
   pointSize,
-  subGroup = FALSE,
+  subgroup = FALSE,
   stack = F,
   pointHighlights = F,
   type = c("BP", "VP", "DP", "Bar"),
@@ -54,7 +54,7 @@ procNiceOptions(
 
 \item{pointSize}{numeric; vector of numerics controling the size of points on the data overlay}
 
-\item{subGroup}{logical; Should the data be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}}.}
+\item{subgroup}{logical; Should the data be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}}.}
 
 \item{stack}{logical; Triggers stacked bar analysis for bar plots}
 

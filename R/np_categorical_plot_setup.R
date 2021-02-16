@@ -53,10 +53,10 @@ makeLogTicks<-function(dataRange,minorCount=10,logScale=2,axisText=c(NULL,NULL),
 #' This is a utility function used by the window setup routines to calculate how much space the legend will take up in the margin and setting the \code{par(mai)} setting accordingly.
 #'
 #' @param x numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.
-#' @param by factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subGroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.
+#' @param by factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subgroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.
 #' @param theme list object; Themes are are an optional way of storing graphical preset options that are compatible with all nicePlot graphing functions.
 #' @param pointHighlights logical; Is pointHightlights turned on? This is used to determin with column of \code{by} should be used for legend factor levels.
-#' @param subGroup subGroup logical; use additional column in \code{by} to group the data within each level of the major factor.
+#' @param subgroup subgroup logical; use additional column in \code{by} to group the data within each level of the major factor.
 #' @param stack logical; Used for stack stacked bar plots. Used exclusively by \code{\link{niceBar}}.
 #' @param legend character; Title for the legend collumn. Set to \code{\link{TRUE}} if no header is desired.
 #' @param is2D logical; Is this for a 2D scatterplot or density plot? The first column of \code{by} will be use if set to \code{\link{TRUE}}.
@@ -66,7 +66,7 @@ makeLogTicks<-function(dataRange,minorCount=10,logScale=2,axisText=c(NULL,NULL),
 #' TODO<-1
 #' @importFrom magrittr %>%
 #' @importFrom purrr map_dbl
-prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TRUE,stack=FALSE, is2D=FALSE){
+prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subgroup=TRUE,stack=FALSE, is2D=FALSE){
   legendIndex<-1
   legendTitle<-""
   legendLevels<-NULL
@@ -82,16 +82,16 @@ prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TR
     maxLabelW<-0
     maxLabelH<-0
     if(stack==FALSE) {
-      if(pointHighlights==FALSE & subGroup==TRUE) {
+      if(pointHighlights==FALSE & subgroup==TRUE) {
         legendIndex<-2
-      } else if(pointHighlights==TRUE & subGroup==TRUE) {
+      } else if(pointHighlights==TRUE & subgroup==TRUE) {
         legendIndex<-3
-      } else if(pointHighlights==TRUE & subGroup==FALSE) {
+      } else if(pointHighlights==TRUE & subgroup==FALSE) {
         legendIndex<-2
       } else {
-        warning("Neither pointHighlights or subGroup are active - has legend been activated by accident?.\nUsing first factor level for legend.\n", call.=FALSE)
+        warning("Neither pointHighlights or subgroup are active - has legend been activated by accident?.\nUsing first factor level for legend.\n", call.=FALSE)
       }
-    } else if (subGroup==TRUE) {
+    } else if (subgroup==TRUE) {
       legendIndex<-3
     } else {
       legendIndex<-3
@@ -148,7 +148,7 @@ prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TR
 #'
 #' @inheritParams formatPlotColors
 #' @param x numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.
-#' @param by factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subGroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.
+#' @param by factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subgroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.
 #' @param groupNames character vector; overrides the factor levels of \code{by} to label the groups
 #' @param minorTick positive integer; number of minor tick-marks to draw between each pair of major ticks-marks.
 #' @param guides logical; will draw guidelines at the major tick-marks if set to \code{\link{TRUE}}. Color of the guidelines is determined by \code{plotColors$guides}.
@@ -160,10 +160,10 @@ prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TR
 #' @param axisText character; a length two character vector containing text to be prepended or appended to the major tick labels, respectively.
 #' @param minorGuides logical; draws guidelines at minor tick-marks
 #' @param extendTicks logical; extends minor tick-marks past the first and last major tick to the edge of the graph provided there is enough room. Works for both log-scale and regular settings.
-#' @param subGroup logical; use additional column in \code{by} to group the data within each level of the major factor.
+#' @param subgroup logical; use additional column in \code{by} to group the data within each level of the major factor.
 #' @param expLabels logical; prints the major tick labels is \eqn{logScale^{x}}{logScale^x} instead of the raw value
 #' @param sidePlot logical; switches the axis to plot horizontally instead of vertically.
-#' @param subGroupLabels character vector; sets the labels used for the \code{subGroup} factor. Defaults to the levels of the factor.
+#' @param subgroupLabels character vector; sets the labels used for the \code{subgroup} factor. Defaults to the levels of the factor.
 #' @param strictLimits logical; eliminates padding on the value axis so 0 can be flush with the x-axis. Defaults to \code{\link{FALSE}}.
 #' @param legend logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.
 #' @param pointHighlights logical; Is pointHightlights turned on? This is used to determin with column of \code{by} should be used for legend factor levels.
@@ -182,7 +182,7 @@ prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subGroup=TR
 #' @importFrom utils data str
 #'
 #' @seealso \code{\link[grDevices]{axisTicks}}, \code{\link[graphics]{axis}}, \code{\link{makeLogTicks}}, \code{\link{facetSpacing}}
-prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, guides=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, theme=NA, plotColors=if(is.na(theme)){list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white")}else{theme$plotColors}, trim=FALSE, logScale=FALSE, axisText=c(NULL,NULL), minorGuides=FALSE, extendTicks=FALSE,subGroup=FALSE, expLabels=TRUE,sidePlot=FALSE,subGroupLabels=NULL,strictLimits=FALSE, legend=FALSE, pointHighlights=FALSE, logAdjustment=1, stack=FALSE,...) {
+prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, guides=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, theme=NA, plotColors=if(is.na(theme)){list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white")}else{theme$plotColors}, trim=FALSE, logScale=FALSE, axisText=c(NULL,NULL), minorGuides=FALSE, extendTicks=FALSE,subgroup=FALSE, expLabels=TRUE,sidePlot=FALSE,subgroupLabels=NULL,strictLimits=FALSE, legend=FALSE, pointHighlights=FALSE, logAdjustment=1, stack=FALSE,...) {
   levelCount<-1
   tData<-x
   tBy<-by
@@ -194,7 +194,7 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
   }
 
   #Set margins for legends now
-  prepLegendMarigins(x=x,by=by,theme=theme,legend=legend,pointHighlights=pointHighlights,subGroup=subGroup,stack=stack)
+  prepLegendMarigins(x=x,by=by,theme=theme,legend=legend,pointHighlights=pointHighlights,subgroup=subgroup,stack=stack)
 
   #capture data range for plot formating
   dataRange<-NULL
@@ -303,35 +303,35 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
   myLabels<-NULL
   whichSide<-1
   groupCex<-1
-  subGroupCex<-.66
+  subgroupCex<-.66
   groupLine<-.95
-  subGroupLine<-.22
+  subgroupLine<-.22
   if(!is.na(theme[1])){
     groupCex<-theme$groupLabSize
-    subGroupCex<-theme$subGroupLabSize
+    subgroupCex<-theme$subgroupLabSize
     groupLine<-theme$groupLabelSpacing
-    subGroupLine<-theme$subgroupLabelSpacing
+    subgroupLine<-theme$subgroupLabelSpacing
   }
   sideGroupLine<-groupLine+.33
-  sideSubGroupLine<-subGroupLine+.33
+  sideSubGroupLine<-subgroupLine+.33
   axisNumCol<-plotColors$numbers
   if(!is.na(theme[1])){
     if(is.numeric(theme$groupLabSize)){
       groupCex<-theme$groupLabSize
     }
-    if(is.numeric(theme$subGroupLabSize)) {
-      subGroupCex<-theme$subGroupLabSize
+    if(is.numeric(theme$subgroupLabSize)) {
+      subgroupCex<-theme$subgroupLabSize
     }
   }
   if(is.data.frame(x)) {
     subLabLoc<-facetSpacing(length(x),length(groupNames))
-    if(is.null(subGroupLabels)){subGroupLabels<-names(x)}
+    if(is.null(subgroupLabels)){subgroupLabels<-names(x)}
     if(sidePlot) {
       if(legend==FALSE | pointHighlights==TRUE) {
         axis(side=2,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
         mtext(side=2, at=seq(1:levelCount), text=groupNames,las=rotateLabels, col=plotColors$labels,line=sideGroupLine ,cex=groupCex)
-        axis(side=2,at=subLabLoc,labels=F,lwd=0,lwd.ticks=1,cex.axis=subGroupCex,col=plotColors$axis,col.ticks=plotColors$majorTick)
-        mtext(side=2,at=subLabLoc,text=rep(subGroupLabels,length(groupNames)),cex=subGroupCex, line=sideSubGroupLine, col=plotColors$subGroupLabels)
+        axis(side=2,at=subLabLoc,labels=F,lwd=0,lwd.ticks=1,cex.axis=subgroupCex,col=plotColors$axis,col.ticks=plotColors$majorTick)
+        mtext(side=2,at=subLabLoc,text=rep(subgroupLabels,length(groupNames)),cex=subgroupCex, line=sideSubGroupLine, col=plotColors$subgroupLabels)
       } else {
         axis(side=2,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
         mtext(side=2,at=seq(1:levelCount),line=groupLine, text=groupNames,las=rotateLabels, col=plotColors$labels,cex=theme$groupLabSize)
@@ -340,23 +340,23 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
       if(legend==FALSE | pointHighlights==TRUE) {
         axis(side=1,at=seq(1:levelCount),labels=FALSE,las=rotateLabels,lwd=0,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
         mtext(side=1,at=seq(1:levelCount),text = groupNames,las=rotateLabels, col=plotColors$labels,line=groupLine ,cex=groupCex)
-        axis(side=1,at=subLabLoc,labels=F,lwd=0,lwd.ticks=1,cex.axis=subGroupCex,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=theme$subGroupLabSize)
-        mtext(text=rep(subGroupLabels,length(groupNames)),at=subLabLoc,side=1,line=subGroupLine,col=plotColors$subGroupLabels, cex=subGroupCex)
+        axis(side=1,at=subLabLoc,labels=F,lwd=0,lwd.ticks=1,cex.axis=subgroupCex,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=theme$subgroupLabSize)
+        mtext(text=rep(subgroupLabels,length(groupNames)),at=subLabLoc,side=1,line=subgroupLine,col=plotColors$subgroupLabels, cex=subgroupCex)
       } else {
         axis(side=1,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
         mtext(side=1,at=seq(1:levelCount),line=groupLine-.15,text=groupNames,cex=theme$groupLabSize,col=plotColors$labels,las=rotateLabels)
       }
       whichSide<-2
     }
-  } else if(subGroup==TRUE & is.data.frame(by)) {
+  } else if(subgroup==TRUE & is.data.frame(by)) {
     subLabLoc<-facetSpacing(length(levels(by[,2])),length(groupNames))
-    if(is.null(subGroupLabels)){subGroupLabels<-levels(by[,2])}
+    if(is.null(subgroupLabels)){subgroupLabels<-levels(by[,2])}
     if(sidePlot) {
       if(legend==FALSE | (legend!=FALSE & pointHighlights==TRUE)) {
         axis(side=2,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
         mtext(side=2,at=seq(1:levelCount),text=groupNames,las=rotateLabels,line=sideGroupLine, col=plotColors$labels,cex=groupCex)
-        axis(side=2,at=subLabLoc,labels=F,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=subGroupCex)
-        mtext(side=2,at=subLabLoc,text=rep(subGroupLabels,length(groupNames)),line=sideSubGroupLine, cex=subGroupCex,col=plotColors$subGroupLabels)
+        axis(side=2,at=subLabLoc,labels=F,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=subgroupCex)
+        mtext(side=2,at=subLabLoc,text=rep(subgroupLabels,length(groupNames)),line=sideSubGroupLine, cex=subgroupCex,col=plotColors$subgroupLabels)
       } else {
         axis(side=2,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
         mtext(side=2,at=seq(1:levelCount),line=groupLine,text=groupNames,las=rotateLabels,cex=groupCex,col=plotColors$labels)
@@ -365,8 +365,8 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
       if(legend==FALSE | (legend!=FALSE & pointHighlights==TRUE)) {
         axis(side=1,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
         mtext(side=1,at=seq(1:levelCount),text=groupNames,las=rotateLabels,line=groupLine,col=plotColors$labels, cex=groupCex)
-        axis(side=1,at=subLabLoc,labels=F,lwd=0,lwd.ticks=1,cex.axis=theme$subGroupLabSize,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=subGroupCex)
-        mtext(side=1,at=subLabLoc,text=rep(subGroupLabels,length(groupNames)),line=subGroupLine,cex=subGroupCex,col=plotColors$subGroupLabels)
+        axis(side=1,at=subLabLoc,labels=F,lwd=0,lwd.ticks=1,cex.axis=theme$subgroupLabSize,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=subgroupCex)
+        mtext(side=1,at=subLabLoc,text=rep(subgroupLabels,length(groupNames)),line=subgroupLine,cex=subgroupCex,col=plotColors$subgroupLabels)
       } else {
         axis(side=1,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
         mtext(side=1,line=groupLine-.15,at=seq(1:levelCount),text=groupNames,las=rotateLabels,col=plotColors$labels,cex=groupCex)
@@ -485,7 +485,7 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
 #'
 #' @inheritParams formatPlotColors
 #' @param x numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.
-#' @param by factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subGroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.
+#' @param by factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subgroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.
 #' @param minorTick positive integer; number of minor tick-marks to draw between each pair of major ticks-marks.
 #' @param guides logical; will draw guidelines at the major tick-marks if set to \code{\link{TRUE}}. Color of the guidelines is determined by \code{plotColors$guides}.
 #' @param yLim numeric vector; manually set the limits of the plotting area (eg. \code{yLim=c(min,max)}). Used to format the y-axis.
@@ -496,7 +496,7 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
 #' @param axisText list; A named list, "x" and "y" with two optional character values to be placed before and/or after the numeric axis label, respectively.
 #' @param minorGuides logical; draws guidelines at minor tick-marks
 #' @param extendTicks logical; extends minor tick-marks past the first and last major tick to the edge of the graph provided there is enough room. Works for both log-scale and regular settings.
-#' @param subGroup logical; use additional column in \code{by} to group the data within each level of the major factor.
+#' @param subgroup logical; use additional column in \code{by} to group the data within each level of the major factor.
 #' @param expLabels logical; prints the major tick labels is \eqn{logScale^{x}}{logScale^x} instead of the raw value
 #' @param strictLimits logical; eliminates padding on the value axis so 0 can be flush with the x-axis. Defaults to \code{\link{FALSE}}.
 #' @param legend logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.
@@ -515,7 +515,7 @@ prepCategoryWindow<-function(x,by=NULL, groupNames=levels(by), minorTick=FALSE, 
 #' @importFrom utils data str
 #'
 #' @seealso \code{\link[grDevices]{axisTicks}}, \code{\link[graphics]{axis}}, \code{\link{makeLogTicks}}, \code{\link{facetSpacing}}
-prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLim=NULL,rotateLabels=FALSE, theme=NA, plotColors=if(is.na(theme)){list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white")}else{theme$plotColors}, logScaleX=FALSE,logScaleY=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), minorGuides=FALSE, extendTicks=F,subGroup=FALSE, expLabels=TRUE,strictLimits=F, legend=FALSE, logAdjustment=1,makePlot=TRUE,...) {
+prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLim=NULL,rotateLabels=FALSE, theme=NA, plotColors=if(is.na(theme)){list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white")}else{theme$plotColors}, logScaleX=FALSE,logScaleY=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), minorGuides=FALSE, extendTicks=F,subgroup=FALSE, expLabels=TRUE,strictLimits=F, legend=FALSE, logAdjustment=1,makePlot=TRUE,...) {
   levelCount<-1
   xData<-x[,1]
   yData<-x[,2]
@@ -530,7 +530,7 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
     minorGuides<-guides
   }
   #Set margins for legends now
-  prepLegendMarigins(x=x,by=by,theme=theme,legend=legend,pointHighlights=FALSE,subGroup=TRUE, is2D=TRUE)
+  prepLegendMarigins(x=x,by=by,theme=theme,legend=legend,pointHighlights=FALSE,subgroup=TRUE, is2D=TRUE)
 
   #Calculate the data ranges for x and y
   dataRange<-list(x=c(NULL,NULL),y=c(NULL,NULL))
@@ -610,12 +610,21 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
     }
   }
   myMajorTicksX<-axTicks(side=1)
+  if(is.null(axisText)) {axisText<-list(x=c("",""),y=c("",""))}
+  if(!is.list(axisText)) {
+    if(length(axisText)==2) {
+      axisText<-list(x=as.character(axisText),y=as.character(axisText))
+    } else {
+      axisText<-list(x=c("",""),y=c("",""))
+    }
+  }
   myLabelsX<-paste0(axisText$x[1],axTicks(side=1), axisText$x[2])
   if(logScaleX>0){
     myLabelsX<-majorTicksX[[2]]
     myMajorTicksX<-majorTicksX[[1]]
   }
   myMajorTicksY<-axTicks(side=2)
+
   myLabelsY<-paste0(axisText$y[1],axTicks(side=2), axisText$y[2])
   if(logScaleY>0){
     myLabelsY<-majorTicksY[[2]]

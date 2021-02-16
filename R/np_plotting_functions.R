@@ -106,7 +106,7 @@ drawBoxPlot<-function(x,col="black",fill=NULL,drawBox=T,drawDot=F, whiskerLty =2
 #'
 #' @details
 #' This function adds data points to a chart. These can be organized exactly as specified (linear), as a jitter cloud (jitter), as a waterfall plot (distribution) or as a swarm (beeswarm).
-#' A factor labeled pfact can be included in \code{x} and used to highlight individual data points by setting \code{subGroup=\link{TRUE}}. All graphic customization options can given as vectors and will be iterated over during plotting.
+#' A factor labeled pfact can be included in \code{x} and used to highlight individual data points by setting \code{subgroup=\link{TRUE}}. All graphic customization options can given as vectors and will be iterated over during plotting.
 #' Note that the size/cex option can not be used to highlight pfact levels in a beeswarm plot and only the first element of the vector will be used.
 #' The function silently returns the final xy positions.
 #'
@@ -134,8 +134,8 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
   #Process color options
   gfact<-NULL
   xypos<-NULL
-  if(any(names(x)=="subGroup")) {
-    gfact<-factor(x$subGroup)
+  if(any(names(x)=="subgroup")) {
+    gfact<-factor(x$subgroup)
   } else {
     gfact<-factor(x$fact)
   }
@@ -236,9 +236,9 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
     #I had a hard time getting the beeswarm point wise coloring and grouping working properly
     #While there is surely a better way, the swarms are calculated seperately for each group with only the new x coordinate saved for plotting later.
     for(i in 1:length(levels(factor(x$fact)))) {
-      if(any(names(x)=="subGroup")){
-        for(n in 1:length(levels(factor(x$subGroup)))){
-          cFilter<-(x$fact==levels(factor(x$fact))[i] & x$subGroup==levels(factor(x$subGroup))[n])
+      if(any(names(x)=="subgroup")){
+        for(n in 1:length(levels(factor(x$subgroup)))){
+          cFilter<-(x$fact==levels(factor(x$fact))[i] & x$subgroup==levels(factor(x$subgroup))[n])
           #this is here to avoid running subset calculations for subgroups with no samples
           if(any(cFilter)){
             filter[[length(filter)+1]]<-data.frame(x=beeswarm::beeswarm(x$data[cFilter],pch=shape[cFilter][1],at=x[cFilter,"at"][1],do.plot=F,corralWidth=width*2,corral=swarmOverflow,cex=size[cFilter][1])$x,y=x$data[cFilter],color=col[cFilter],size=size[cFilter],shape=shape[cFilter])
@@ -529,7 +529,7 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
 #' @param by factor or dataframe of factors; One or more factors that control how the data is grouped. The first column is the primary grouping factor and the second and thrid columns are used for sub-grouping and highlighting as needed.
 #' @param filter logical vector; Used to further filter the data if necissary.
 #' @param sidePlot logical; switches the axis to plot horizontally instead of vertically.
-#' @param subGroup logical; Should the data be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}}.
+#' @param subgroup logical; Should the data be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}}.
 #' @param plotAt numeric; A vector of where to draw each set of points
 #' @param pointHighlights logical; will use additional factors in \code{by} to highlight points in the dot plot.
 #' @param pointMethod character; method to be used for ploting dots. Can be set to "jitter", "linear", "beeswarm" or "distribution".
@@ -549,7 +549,7 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
 #'
 #' @export
 #' @seealso \code{\link{drawPoints}}, \code{\link{niceBox}}, \code{\link{niceVio}}, \code{\link{niceDots}}, \code{\link[beeswarm]{beeswarm}}, \code{\link[base]{jitter}}, \code{\link{drawPoints}}
-addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,pointHighlights=F,pointMethod="jitter",pointShape=16,pointSize=1,width=1,pointLaneWidth=.9,plotColors=formatPlotColors(list(1)),drawPoints=T,outliers=F,dataCols=1,swarmOverflow="random") {
+addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subgroup=F,plotAt,pointHighlights=F,pointMethod="jitter",pointShape=16,pointSize=1,width=1,pointLaneWidth=.9,plotColors=formatPlotColors(list(1)),drawPoints=T,outliers=F,dataCols=1,swarmOverflow="random") {
   #CASE: by is a factor data is a numeric vector
   facetLoc<-plotAt
   if(is.numeric(prepedData[[1]])){
@@ -579,29 +579,29 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
         }
       }
     } else {
-      #CASE: by is not a factor, data is a numeric vector and subGroup is TRUE
-      if(subGroup) {
+      #CASE: by is not a factor, data is a numeric vector and subgroup is TRUE
+      if(subgroup) {
         if(outliers==FALSE) {
           if(drawPoints) {
             if(pointHighlights) {
-              bind_cols(data=prepedData[[1]],fact=by[filter,1],subGroup=by[filter,2],pfact=by[filter,3]) %>%
-                mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+              bind_cols(data=prepedData[[1]],fact=by[filter,1],subgroup=by[filter,2],pfact=by[filter,3]) %>%
+                mutate(facetLevel=paste0(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
                 drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/length(levels(by[,2])),col=plotColors$points,swarmOverflow=swarmOverflow)
             } else {
-              bind_cols(data=prepedData[[1]],fact=by[filter,1],subGroup=by[filter,2]) %>%
-                mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+              bind_cols(data=prepedData[[1]],fact=by[filter,1],subgroup=by[filter,2]) %>%
+                mutate(facetLevel=paste0(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
                 drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/length(levels(by[,2])),col=plotColors$points,swarmOverflow=swarmOverflow)
             }
           }
         } else {
           if(drawPoints) {
             if(pointHighlights) {
-              bind_cols(data=prepedData[[1]],fact=by[filter,1],subGroup=by[filter,2],pfact=by[filter,3]) %>%
-                mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+              bind_cols(data=prepedData[[1]],fact=by[filter,1],subgroup=by[filter,2],pfact=by[filter,3]) %>%
+                mutate(facetLevel=paste0(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
                 drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/length(levels(by[,2])),col=plotColors$points,swarmOverflow=swarmOverflow)
             } else {
-              bind_cols(data=prepedData[[1]],fact=by[filter,1],subGroup=by[filter,2]) %>%
-                mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+              bind_cols(data=prepedData[[1]],fact=by[filter,1],subgroup=by[filter,2]) %>%
+                mutate(facetLevel=paste0(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
                 drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/length(levels(by[,2])),col=plotColors$points,swarmOverflow=swarmOverflow)
             }
           } else {
@@ -611,8 +611,8 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
             if(length(tempCols)<length(levels(by[filter,2]))){
               tempCols<-rep(tempCols,(length(levels(by[filter,2])) %% length(tempCols)) +1)
             }
-            pointDat<-bind_cols(data=prepedData[[1]],fact=by[filter,1],subGroup=by[filter,2]) %>%
-              mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel],colCheck=tempCols[by[filter,2]]) %>%
+            pointDat<-bind_cols(data=prepedData[[1]],fact=by[filter,1],subgroup=by[filter,2]) %>%
+              mutate(facetLevel=paste0(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel],colCheck=tempCols[by[filter,2]]) %>%
               group_by(.data$facetLevel) %>%
               mutate(tFilter=quantileTrim(data,threshold=outliers,returnFilter = TRUE)[[2]]==FALSE) %>%
               filter(.data$tFilter) %>% ungroup()
@@ -620,7 +620,7 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
           }
         }
       } else {
-        #CASE: by is not a factor, data is a numeric vector and subGroup is FALSE
+        #CASE: by is not a factor, data is a numeric vector and subgroup is FALSE
         if(outliers==FALSE) {
           if(drawPoints) {
             if(pointHighlights) {
@@ -662,20 +662,20 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
       }
     }
   } else {
-    #CASE: data is a dataframe, by is a factor, subGroup is ignored
+    #CASE: data is a dataframe, by is a factor, subgroup is ignored
     if(is.factor(by)) {
       if(outliers==FALSE) {
         if(drawPoints){
           bind_cols(prepedData[[1]],fact=by[filter]) %>%
-            tidyr::gather(factor_key=TRUE, key=subGroup,value=data,-.data$fact) %>%
-            mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+            tidyr::gather(factor_key=TRUE, key=subgroup,value=data,-.data$fact) %>%
+            mutate(facetLevel=paste0(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
             drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
         }
       } else {
         if(drawPoints) {
           bind_cols(prepedData[[1]],fact=by[filter]) %>%
-            tidyr::gather(factor_key=TRUE, key=subGroup,value=data,-.data$fact) %>%
-            mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+            tidyr::gather(factor_key=TRUE, key=subgroup,value=data,-.data$fact) %>%
+            mutate(facetLevel=paste0(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
             drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
         } else {
           #draws outliers if drawPoints is off
@@ -685,8 +685,8 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
             tempCols<-rep(tempCols,(length(levels(by[filter])) %% length(tempCols)) +1)
           }
           pointDat<-bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
-            tidyr::gather(factor_key=TRUE, key=subGroup,value=data,-.data$fact) %>%
-            mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel],colCheck=tempCols[.data$subGroup]) %>%
+            tidyr::gather(factor_key=TRUE, key=subgroup,value=data,-.data$fact) %>%
+            mutate(facetLevel=paste0(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel],colCheck=tempCols[.data$subgroup]) %>%
             group_by(.data$facetLevel) %>%
             mutate(tFilter=quantileTrim(data,threshold=outliers,returnFilter = TRUE)[[2]]==FALSE) %>%
             filter(.data$tFilter) %>% ungroup()
@@ -694,18 +694,18 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
         }
       }
     } else {
-      #CASE: data is a dataframe, by is a dataframe, subGroup is ignored
+      #CASE: data is a dataframe, by is a dataframe, subgroup is ignored
       if(outliers==FALSE) {
         if(drawPoints){
           if(pointHighlights) {
             bind_cols(prepedData[[1]],fact=by[filter,1],pfact=by[filter,2]) %>%
-              tidyr::gather(factor_key=TRUE, key=subGroup,value=data,-.data$fact,-.data$pfact) %>%
-              mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+              tidyr::gather(factor_key=TRUE, key=subgroup,value=data,-.data$fact,-.data$pfact) %>%
+              mutate(facetLevel=paste0(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
               drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
           } else {
             bind_cols(prepedData[[1]],fact=by[filter,1]) %>%
-              tidyr::gather(factor_key=TRUE, key=subGroup,value=data,-.data$fact) %>%
-              mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+              tidyr::gather(factor_key=TRUE, key=subgroup,value=data,-.data$fact) %>%
+              mutate(facetLevel=paste0(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
               drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
           }
         }
@@ -713,13 +713,13 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
         if(drawPoints) {
           if(pointHighlights) {
             bind_cols(prepedData[[1]],fact=by[filter,1],pfact=by[filter,2]) %>%
-              tidyr::gather(factor_key=TRUE, key=subGroup,value=data,-.data$fact,-.data$pfact) %>%
-              mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+              tidyr::gather(factor_key=TRUE, key=subgroup,value=data,-.data$fact,-.data$pfact) %>%
+              mutate(facetLevel=paste0(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
               drawPoints(highlight=TRUE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
           } else {
             bind_cols(prepedData[[1]],fact=by[filter,1]) %>%
-              tidyr::gather(factor_key=TRUE, key=subGroup,value=data,-.data$fact) %>%
-              mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+              tidyr::gather(factor_key=TRUE, key=subgroup,value=data,-.data$fact) %>%
+              mutate(facetLevel=paste0(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
               drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow)
           }
         } else {
@@ -730,8 +730,8 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subGroup=F,plotAt,p
             tempCols<-rep(tempCols,(dim(prepedData[[1]])[2] %% length(tempCols)) +1)
           }
           pointDat<-bind_cols(data=prepedData[[1]],fact=by[filter,1]) %>%
-            tidyr::gather(factor_key=TRUE, key=subGroup,value=data,-.data$fact) %>%
-            mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel],colCheck=tempCols[.data$subGroup]) %>%
+            tidyr::gather(factor_key=TRUE, key=subgroup,value=data,-.data$fact) %>%
+            mutate(facetLevel=paste0(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel],colCheck=tempCols[.data$subgroup]) %>%
             group_by(.data$facetLevel) %>%
             mutate(tFilter=quantileTrim(data,threshold=outliers,returnFilter = TRUE)[[2]]==FALSE) %>%
             filter(.data$tFilter) %>% ungroup()

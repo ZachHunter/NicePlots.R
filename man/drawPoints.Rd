@@ -40,7 +40,7 @@ takes a data frame of locations, values and an optional subgrouping factor and a
 }
 \details{
 This function adds data points to a chart. These can be organized exactly as specified (linear), as a jitter cloud (jitter), as a waterfall plot (distribution) or as a swarm (beeswarm).
-A factor labeled pfact can be included in \code{x} and used to highlight individual data points by setting \code{subGroup=\link{TRUE}}. All graphic customization options can given as vectors and will be iterated over during plotting.
+A factor labeled pfact can be included in \code{x} and used to highlight individual data points by setting \code{subgroup=\link{TRUE}}. All graphic customization options can given as vectors and will be iterated over during plotting.
 Note that the size/cex option can not be used to highlight pfact levels in a beeswarm plot and only the first element of the vector will be used.
 The function silently returns the final xy positions.
 }

@@ -9,7 +9,7 @@ addNicePoints(
   by,
   filter = TRUE,
   sidePlot = F,
-  subGroup = F,
+  subgroup = F,
   plotAt,
   pointHighlights = F,
   pointMethod = "jitter",
@@ -33,7 +33,7 @@ addNicePoints(
 
 \item{sidePlot}{logical; switches the axis to plot horizontally instead of vertically.}
 
-\item{subGroup}{logical; Should the data be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}}.}
+\item{subgroup}{logical; Should the data be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}}.}
 
 \item{plotAt}{numeric; A vector of where to draw each set of points}
 

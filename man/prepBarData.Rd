@@ -12,7 +12,7 @@ prepBarData(
   lowerErrorFun = upperErrorFun,
   aggFunction = "mean",
   stack = FALSE,
-  subGroup = FALSE
+  subgroup = FALSE
 )
 }
 \arguments{
@@ -30,7 +30,7 @@ prepBarData(
 
 \item{stack}{logical; Should one of the factors in \code{by} be used make a stacked bar plot. Note that this sort of analysis is nonsensical for many data sets.}
 
-\item{subGroup}{logical; If \code{\link{TRUE}} the data will be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}} or \code{x} is a \code{\link[base]{data.frame}}.}
+\item{subgroup}{logical; If \code{\link{TRUE}} the data will be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}} or \code{x} is a \code{\link[base]{data.frame}}.}
 }
 \description{
 Processess the input data, factors, and options to produce summary data for drawing bar plots

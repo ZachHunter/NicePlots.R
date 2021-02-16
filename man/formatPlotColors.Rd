@@ -20,7 +20,7 @@ To simplify code and user options, any color option not set by the user is added
 \details{
 The \code{NicePlots} plotColors object is a list of named color values/vectors. The options NicePlots colors include \code{bg} (background color), \code{marginBg} (color of area surrounding the plot), \code{guides} (guide lines for major tick-marks), \code{minorGuides} (guide lines for minor tick-marks)
 \code{lines} (lines for box/bar plots etc.), \code{points} (plotting data points), \code{fill} (fill for box/bar plots etc.), \code{axis} (axis colors), \code{majorTick} (major tick-mark color),
-\code{minorTick} (minor tick-mark color), \code{labels} (label colors), \code{subGroupLabels} (subgroup label colors), \code{rectCol} (inner quartile range box used in \code{\link{niceVio}}), and \code{medianMarkerCol} (the median value marker used in \code{\link{niceVio}}).
+\code{minorTick} (minor tick-mark color), \code{labels} (label colors), \code{subgroupLabels} (subgroup label colors), \code{rectCol} (inner quartile range box used in \code{\link{niceVio}}), and \code{medianMarkerCol} (the median value marker used in \code{\link{niceVio}}).
 Any option not set be the user will be added to the list and set to the default in order to insure compatibility with downstream NicePlot functions.
 If a theme is given, any option not set by the user will be set by the theme.
 }

@@ -20,7 +20,7 @@ prepNiceWindow(
   axisText = list(x = c(NULL, NULL), y = c(NULL, NULL)),
   minorGuides = FALSE,
   extendTicks = F,
-  subGroup = FALSE,
+  subgroup = FALSE,
   expLabels = TRUE,
   strictLimits = F,
   legend = FALSE,
@@ -32,7 +32,7 @@ prepNiceWindow(
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
 
-\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subGroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
+\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subgroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
 
 \item{minorTick}{positive integer; number of minor tick-marks to draw between each pair of major ticks-marks.}
 
@@ -58,7 +58,7 @@ prepNiceWindow(
 
 \item{extendTicks}{logical; extends minor tick-marks past the first and last major tick to the edge of the graph provided there is enough room. Works for both log-scale and regular settings.}
 
-\item{subGroup}{logical; use additional column in \code{by} to group the data within each level of the major factor.}
+\item{subgroup}{logical; use additional column in \code{by} to group the data within each level of the major factor.}
 
 \item{expLabels}{logical; prints the major tick labels is \eqn{logScale^{x}}{logScale^x} instead of the raw value}
 

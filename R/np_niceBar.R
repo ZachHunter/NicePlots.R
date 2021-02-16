@@ -39,31 +39,31 @@
 #' @examples
 #' data(mtcars)
 #' Groups<-data.frame(Cyl=factor(mtcars$cyl),Gear=factor(mtcars$gear))
-#' niceBar(mtcars$mpg,by=Groups,subGroup=TRUE,yLim=c(0,45),main="MpG by Cylinders and Gear")
+#' niceBar(mtcars$mpg,by=Groups,subgroup=TRUE,yLim=c(0,45),main="MpG by Cylinders and Gear")
 #'
 #' @importFrom magrittr %>%
 #' @importFrom dplyr mutate
 #' @export
 #' @seealso \code{\link[vioplot]{vioplot}}, \code{\link{boxplot}}, \code{\link{niceBox}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{prepCategoryWindow}}
-niceBar <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=list(bg="open",fill=setAlpha("grey",.8)), logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap="ball", errorLineType=1,capWidth=1.2, lWidth=1.5, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1,normalize=FALSE, ...) {UseMethod("niceBar",x)}
+niceBar <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=list(bg="open",fill=setAlpha("grey",.8)), logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap="ball", errorLineType=1,capWidth=1.2, lWidth=1.5, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1,normalize=FALSE, ...) {UseMethod("niceBar",x)}
 
 #' @import dplyr
 #' @export
-niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median"),errFun=c("se","sd","range", "t95ci", "boot95ci"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=NULL, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=NULL, logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subGroup=FALSE, subGroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1, normalize=FALSE, ...) {
+niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median"),errFun=c("se","sd","range", "t95ci", "boot95ci"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=NULL, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=NULL, logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1, normalize=FALSE, ...) {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset", call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
   lWidth<-NULL
   whiskerLineType<-NULL
   capWidth<-NULL
-
+  if(is.null(normalize)) {normalize<-FALSE}
   #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, groupNames=groupNames, aggFun=aggFun,errFun=errFun, theme=theme, legend=legend, stack=stack, main=main,sub=sub, ylab=ylab, minorTick=minorTick, guides=guides, outliers=outliers, width=width, errorMultiple=errorMultiple, plotColors=plotColors, logScale=logScale, trim=trim, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, subGroupLabels=subGroupLabels, expLabels=expLabels, sidePlot=sidePlot, errorBars=errorBars, errorCap=errorCap, errorLineType=errorLineType,capWidth=capWidth, lWidth=lWidth, na.rm=na.rm, flipFacts=flipFacts, verbose=verbose,logAdjustment=logAdjustment, normalize=normalize)
+  ActiveOptions<-list(x=x, by=by, groupNames=groupNames, aggFun=aggFun,errFun=errFun, theme=theme, legend=legend, stack=stack, main=main,sub=sub, ylab=ylab, minorTick=minorTick, guides=guides, outliers=outliers, width=width, errorMultiple=errorMultiple, plotColors=plotColors, logScale=logScale, trim=trim, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, errorBars=errorBars, errorCap=errorCap, errorLineType=errorLineType,capWidth=capWidth, lWidth=lWidth, na.rm=na.rm, flipFacts=flipFacts, verbose=verbose,logAdjustment=logAdjustment, normalize=normalize)
   ActiveOptions<-append(ActiveOptions,moreOptions)
 
   if(is.data.frame(x) | is.matrix(x)) {
-    if(dim(x)[2]>1 & subGroup==FALSE) {flipFacts<-TRUE}
+    if(dim(x)[2]>1 & subgroup==FALSE) {flipFacts<-TRUE}
   }
 
   #Here we check to see if the user specified any options so that they are left unaltered if present
@@ -99,11 +99,11 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
     cLine<-plotColors$lines
   }
   #If fill colors are needed to distinguish groups but are of length 1, point colors will be used if it has more levels.
-  if(length(cFill)<=1 & length(cLine)<=1 & length(cPoint)>1 & (subGroup==T | stack == T)) {
+  if(length(cFill)<=1 & length(cLine)<=1 & length(cPoint)>1 & (subgroup==T | stack == T)) {
     plotColors$fill<-cPoint
   }
   #Note we are using stack here for pointHighlights as they have the same priority.
-  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=1,whiskerLineType=errorLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=1,width=width,guides=guides,pointSize=1,subGroup=subGroup,stack=stack,pointHighlights=stack,type="Bar",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod="jitter",drawPoints=FALSE,groupNames=groupNames,swarmOverflow="random" ,errorCap=errorCap,CLOptions=moreOptions)
+  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=1,whiskerLineType=errorLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=1,width=width,guides=guides,pointSize=1,subgroup=subgroup,stack=stack,pointHighlights=stack,type="Bar",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod="jitter",drawPoints=FALSE,groupNames=groupNames,swarmOverflow="random" ,errorCap=errorCap,CLOptions=moreOptions)
   minorTick<-finalOptions$minorTick
   pointShape<-finalOptions$pointShape
   errorLineType<-finalOptions$whiskerLineType
@@ -169,7 +169,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
     prepedData<-x
     #in order to know how to set the window size, we need to preprocess the data
     #if(logScale>1) {prepedData<-log(prepedData+logAdjustment,logScale)}
-    pData<-prepBarData(x=prepedData,by=by,errorMultiple=errorMultiple,upperErrorFun=upperErrorFun,lowerErrorFun=lowerErrorFun,aggFunction=aggFun,stack=stack,subGroup=subGroup)
+    pData<-prepBarData(x=prepedData,by=by,errorMultiple=errorMultiple,upperErrorFun=upperErrorFun,lowerErrorFun=lowerErrorFun,aggFunction=aggFun,stack=stack,subgroup=subgroup)
 
     #If all aggregated values are >= 0 then we want to interect the y-axis exactly at zero
     dmin<-min(pData$plot$AData)
@@ -185,10 +185,10 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
         }
       } else {
         #Find the height of the the stacked bars to set the window data ranges
-        if(subGroup==T) {
+        if(subgroup==T) {
           dRange<-c(bVal,max(map_dbl(levels(pData$plot$fact),
-            function(l) max(map_dbl(levels(pData$plot$subGroup),
-              function(g) sum(pData$plot$AData[which(pData$plot$fact==l & pData$plot$subGroup==g)],na.rm=T)
+            function(l) max(map_dbl(levels(pData$plot$subgroup),
+              function(g) sum(pData$plot$AData[which(pData$plot$fact==l & pData$plot$subgroup==g)],na.rm=T)
             ),na.rm=T)
           ),na.rm=T)*1.04)
         } else {
@@ -231,10 +231,10 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
     #RStudio seems not to update the graphics devices properly
     if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOveride"]])) {graphics.off()}
 
-    prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subGroup=subGroup, expLabels=expLabels,sidePlot=sidePlot,subGroupLabels=subGroupLabels,strictLimits=strictBase,theme=theme,legend=legend,logAdjustment=logAdjustment, stack=stack, pointHighlights=stack)
+    prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, expLabels=expLabels,sidePlot=sidePlot,subgroupLabels=subgroupLabels,strictLimits=strictBase,theme=theme,legend=legend,logAdjustment=logAdjustment, stack=stack, pointHighlights=stack)
   }
   pvalue<-NULL
-  if(subGroup==TRUE){width<-width*2}
+  if(subgroup==TRUE){width<-width*2}
 
   filter<-rep(TRUE,length(x))
   if(trim>0){
@@ -247,7 +247,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   }
 
   #Here we calculated all the data to print
-  pData<-prepBarData(x=prepedData[[1]],by=by,errorMultiple=errorMultiple,upperErrorFun=upperErrorFun,lowerErrorFun=lowerErrorFun,aggFunction=aggFun,stack=stack,subGroup=subGroup)
+  pData<-prepBarData(x=prepedData[[1]],by=by,errorMultiple=errorMultiple,upperErrorFun=upperErrorFun,lowerErrorFun=lowerErrorFun,aggFunction=aggFun,stack=stack,subgroup=subgroup)
 
   #Now we just need to perform some slight customizations to legend and width options based on inputs.
   if(is.numeric(prepedData[[1]])){
@@ -258,12 +258,12 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       width<-.25*width
     } else {
       if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[,1],calcType[1],verbose=verbose)}
-      #CASE: by is not a factor data is a numeric vector and subGroup is TRUE
-      if(subGroup) {
+      #CASE: by is not a factor data is a numeric vector and subgroup is TRUE
+      if(subgroup) {
         facetLoc<-facetSpacing(length(levels(by[,2])),length(groupNames))
         width<-width*(facetLoc[2]-facetLoc[1])/4
       } else {
-        #CASE: by is not a factor, data is a numeric vector and subGroup is FALSE
+        #CASE: by is not a factor, data is a numeric vector and subgroup is FALSE
         facetLoc<-seq(1,length(groupNames))
         if(length(groupNames)>1) {
           width<-width*(facetLoc[2]-facetLoc[1])/4
@@ -274,18 +274,18 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       if(legend!=FALSE) {
         if(stack==TRUE){
           if(legend==TRUE){
-            if(subGroup==TRUE) {
+            if(subgroup==TRUE) {
               legendTitle<-colnames(by)[3]
             } else {
               legendTitle<-colnames(by)[2]
             }
           }
-          if(subGroup==TRUE) {
+          if(subgroup==TRUE) {
             legendLabels<-levels(by[,3])
           } else {
             legendLabels<-levels(by[,2])
           }
-        } else if (subGroup==TRUE) {
+        } else if (subgroup==TRUE) {
           if(legend==TRUE){
             legendTitle<-colnames(by)[2]
           }
@@ -296,7 +296,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       }
     }
   } else {
-    #CASE: data is a dataframe, by is a factor, subGroup is ignored, Stack is ignored
+    #CASE: data is a dataframe, by is a factor, subgroup is ignored, Stack is ignored
     if(is.factor(by)) {
       facetLoc<-facetSpacing(length(prepedData[[1]]),length(levels(by)))
       width<-width*(facetLoc[2]-facetLoc[1])/4
@@ -319,7 +319,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       width<-width*(facetLoc[2]-facetLoc[1])/4
       if(legend!=FALSE) {
         if(stack & flipFacts ==FALSE){
-          if(subGroup==TRUE) {
+          if(subgroup==TRUE) {
             if(legend==TRUE){
               legendTitle<-colnames(by)[2]
             }
@@ -335,7 +335,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
             if(legend==TRUE){
               legendTitle<-"Legend"
             }
-            if(subGroup==TRUE & stack==TRUE){
+            if(subgroup==TRUE & stack==TRUE){
               legendLabels<-levels(by[,2])
             } else {
               legendLabels<-levels(by[,1])
@@ -361,7 +361,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   #Draw legend and set associated options if indicated
   if(length(legendColors)<length(legendLabels) & legend!=FALSE){
     legend<-FALSE
-    warning("Not enough point colors to uniquely color subGroups levels\nPlease update plotColors point options to use legend options.", call.=FALSE)
+    warning("Not enough point colors to uniquely color subgroups levels\nPlease update plotColors point options to use legend options.", call.=FALSE)
   }
   oFont<-par()$family
   oCexMain<-par()$cex.main

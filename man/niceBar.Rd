@@ -33,8 +33,8 @@ niceBar(
   add = FALSE,
   minorGuides = NULL,
   extendTicks = TRUE,
-  subGroup = FALSE,
-  subGroupLabels = NULL,
+  subgroup = FALSE,
+  subgroupLabels = NULL,
   expLabels = FALSE,
   sidePlot = FALSE,
   errorBars = TRUE,
@@ -53,7 +53,7 @@ niceBar(
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
 
-\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subGroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
+\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subgroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
 
 \item{groupNames}{character vector; overrides the factor levels of \code{by} to label the groups}
 
@@ -107,9 +107,9 @@ niceBar(
 
 \item{extendTicks}{logical; extends minor tick-marks past the first and last major tick to the edge of the graph provided there is enough room. Works for both log-scale and regular settings.}
 
-\item{subGroup}{logical; use additional column in \code{by} to group the data within each level of the major factor.}
+\item{subgroup}{logical; use additional column in \code{by} to group the data within each level of the major factor.}
 
-\item{subGroupLabels}{character vector; sets the labels used for the \code{subGroup} factor. Defaults to the levels of the factor.}
+\item{subgroupLabels}{character vector; sets the labels used for the \code{subgroup} factor. Defaults to the levels of the factor.}
 
 \item{expLabels}{logical; prints the major tick labels is \eqn{logScale^{x}}{logScale^x} instead of the raw value}
 
@@ -153,7 +153,7 @@ For most data this would be nonsensical but if you data is say store profits by 
 \examples{
 data(mtcars)
 Groups<-data.frame(Cyl=factor(mtcars$cyl),Gear=factor(mtcars$gear))
-niceBar(mtcars$mpg,by=Groups,subGroup=TRUE,yLim=c(0,45),main="MpG by Cylinders and Gear")
+niceBar(mtcars$mpg,by=Groups,subgroup=TRUE,yLim=c(0,45),main="MpG by Cylinders and Gear")
 
 }
 \seealso{

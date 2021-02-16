@@ -31,7 +31,7 @@ myTheme<-newNPTheme(theme=npColorTheme,
    plotColors=list(lines=c("darkgrey")),
    pointMethodBP="beeswarm")
 npThemes()
-niceBox(iris[,1:2],iris$Species,subGroup=TRUE,legend=TRUE,theme=myTheme)
+niceBox(iris[,1:2],iris$Species,subgroup=TRUE,legend=TRUE,theme=myTheme)
 }
 \seealso{
 \code{\link{npThemes}}

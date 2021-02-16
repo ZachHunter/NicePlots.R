@@ -9,7 +9,7 @@ basicTheme<- list(
   #General Plot Settings
   fontFamily="sans", #Possible values: 'sans', 'mono', or 'serif'
   groupLabSize=1, #Label cex for the primary group labels
-  subGroupLabSize=.68, #Label cex for subgroup labels
+  subgroupLabSize=.68, #Label cex for subgroup labels
   groupLabelSpacing=.96, #distance of group labels from axis in lines
   subgroupLabelSpacing=.26, #distance of subgroup labels from axis in lines
   yAxisLabSize=.9, #Label cex for y-axis tick labels
@@ -82,7 +82,7 @@ basicTheme<- list(
     subtext="black", #Color of sub text
     labels="black", #label color,
     axisLabels="black", #axis label color
-    subGroupLabels="black", #color of subgroups
+    subgroupLabels="black", #color of subgroups
     legendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
     legendLineCol=NA, #Border color for the legend color boxes
     legendBG=NA, #Legend background color
@@ -100,7 +100,7 @@ npColorTheme<- list(
   #General Plot Settings
   fontFamily="serif", #Possible values: 'sans', 'mono', or 'serif'
   groupLabSize=1, #Label cex for the primary group labels
-  subGroupLabSize=.75, #Label cex for subgroup labels
+  subgroupLabSize=.75, #Label cex for subgroup labels
   groupLabelSpacing=.96, #distance of group labels from axis in lines
   subgroupLabelSpacing=.26, #distance of subgroup labels from axis in lines
   yAxisLabSize=.95, #Label cex for y-axis tick labels
@@ -172,7 +172,7 @@ npColorTheme<- list(
     numbers="black", #Color of y-axis numbers
     subtext="black", #Color of sub text
     labels="black", #label color
-    subGroupLabels="black", #color of subgroups
+    subgroupLabels="black", #color of subgroups
     legendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
     legendLineCol=NA, #Border color for the legend color boxes
     legendBG=NA, #Legend background color
@@ -190,7 +190,7 @@ npStataTheme<- list(
   #General Plot Settings
   fontFamily="sans", #Possible values: 'sans', 'mono', or 'serif'
   groupLabSize=1, #Label cex for the primary group labels
-  subGroupLabSize=.66, #Label cex for subgroup labels
+  subgroupLabSize=.66, #Label cex for subgroup labels
   groupLabelSpacing=.96, #distance of group labels from axis in lines
   subgroupLabelSpacing=.3, #distance of subgroup labels from axis in lines
   yAxisLabSize=.9, #Label cex for y-axis tick labels
@@ -262,7 +262,7 @@ npStataTheme<- list(
     numbers="black", #Color of y-axis numbers
     subtext="black", #Color of sub text
     labels="black", #label color
-    subGroupLabels="black", #color of subgroups
+    subgroupLabels="black", #color of subgroups
     legendBorder="black", #Color of the border box around legend. Set to NULL to turn off
     legendLineCol=NA, #Border color for the legend color boxes
     legendBG="white", #Legend background color
@@ -280,7 +280,7 @@ npGGTheme<- list(
   #General Plot Settings
   fontFamily="serif", #Possible values: 'sans', 'mono', or 'serif'
   groupLabSize=1, #Label cex for the primary group labels
-  subGroupLabSize=.68, #Label cex for subgroup labels
+  subgroupLabSize=.68, #Label cex for subgroup labels
   groupLabelSpacing=.96, #distance of group labels from axis in lines
   subgroupLabelSpacing=.25, #distance of subgroup labels from axis in lines
   yAxisLabSize=.95, #Label cex for y-axis tick labels
@@ -352,7 +352,7 @@ npGGTheme<- list(
     numbers="black", #Color of y-axis numbers
     subtext="black", #Color of sub text
     labels="black", #label color
-    subGroupLabels="black", #color of subgroups
+    subgroupLabels="black", #color of subgroups
     legendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
     legendLineCol="lightgrey", #Border color for the legend color boxes
     legendBG=NA, #Legend background color
@@ -406,7 +406,7 @@ npThemes<-function() {
 #'    plotColors=list(lines=c("darkgrey")),
 #'    pointMethodBP="beeswarm")
 #' npThemes()
-#' niceBox(iris[,1:2],iris$Species,subGroup=TRUE,legend=TRUE,theme=myTheme)
+#' niceBox(iris[,1:2],iris$Species,subgroup=TRUE,legend=TRUE,theme=myTheme)
 #' @seealso \code{\link{npThemes}}
 #' @export
 newNPTheme<-function(theme=basicTheme, plotColors=NULL,...){

@@ -9,7 +9,7 @@ niceDensity(
   by = NULL,
   drawPoints = TRUE,
   groupNames = NULL,
-  subGroup = FALSE,
+  subgroup = FALSE,
   bandwidth = NULL,
   drawRug = FALSE,
   useRgl = FALSE,
@@ -45,13 +45,13 @@ niceDensity(
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
 
-\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subGroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
+\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subgroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
 
 \item{drawPoints}{logical; draws a dot plot overlay for contour plots}
 
 \item{groupNames}{character vector; overrides the factor levels of \code{by} to label the groups}
 
-\item{subGroup}{logical; Will use the factor levels in \code{by} to plot a series of distributions from the data in \code{x}.}
+\item{subgroup}{logical; Will use the factor levels in \code{by} to plot a series of distributions from the data in \code{x}.}
 
 \item{bandwidth}{numeric; Manually sets the bandwith for the kernal density estimation overiding default calculations. For 2D plots \code{bandwidth} should be a vector of length 2. Set to \code{\link{NULL}} or \code{\link{NA}} to enable default calculations.}
 
@@ -118,10 +118,10 @@ Draws a kernal density plot of one or two variables.
 }
 \details{
 \code{niceDensity} is draws gernal density plots. This can be a single kernal density plot or a series of density plots overplotted
-on the graph based on a grouping factor from \code{by}. The \code{subGroup} option should be set to \code{\link{TRUE}} to anable this functionality.
+on the graph based on a grouping factor from \code{by}. The \code{subgroup} option should be set to \code{\link{TRUE}} to anable this functionality.
 If two or more variables are passed in \code{x} in a \code{\link{data.frame}}, \code{\link{matrix}} or \code{\link[tibble]{tibble}}, then the
 first two columns will be used to generate a scatter plot with a 2-D scatter plot with a \code{\link[graphics]{contour}} plot overlay giving the 2D
-kernal density estimates. Setting \code{subGroup} to \code{\link{TRUE}} is this case will color the points by the first factor in \code{by}.
+kernal density estimates. Setting \code{subgroup} to \code{\link{TRUE}} is this case will color the points by the first factor in \code{by}.
 Alternatively, for two column input,  \code{plotType} can be set to "suface" to draw a 3D prepresnetation of the kernal density over the x-y plane using \code{\link[graphics]{persp}}.
 Plotting options such as \code{theta}/\code{phi} to control rotation for \code{\link[graphics]{persp}} or \code{nlevels} for \code{\link[graphics]{contour}}, can be entered as arguments to \code{niceDensity} and will be passed along via \code{\link{do.call}}.
 Finally, if the \code{rgl} package is installed and \code{useRgl} is set to \code{\link{TRUE}}, the interactive \code{\link[rgl]{persp3d}} function will be used instead.
@@ -137,15 +137,15 @@ niceDensity(iris[,1], main="Distrinbution of Sepal Length")
 
 #Kernal density plot subgrouped by species
 niceDensity(iris[,1],iris$Species, main="Sepal Length by Species",
-subGroup=TRUE)
+subgroup=TRUE)
 
 #Same thing with trimCurves=FALSE
 niceDensity(iris[,1],iris$Species, main="Sepal Length by Species",
-subGroup=TRUE, trimCurves=FALSE)
+subgroup=TRUE, trimCurves=FALSE)
 
 #2D Density of Sepal Width vs. Length
 niceDensity(iris[,1:2],iris$Species, main="Sepal Width vs. Length",
-subGroup=TRUE)
+subgroup=TRUE)
 
 #Representing the 2D contour plot in 3D
 niceDensity(iris[,1:2],iris$Species, main="Sepal Width vs. Length",

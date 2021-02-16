@@ -7,7 +7,7 @@
 prepNiceData(
   prepedData,
   by,
-  subGroup = FALSE,
+  subgroup = FALSE,
   outliers = TRUE,
   filter,
   groupNames,
@@ -22,7 +22,7 @@ prepNiceData(
 
 \item{by}{factor or dataframe of factors; One or more factors that control how the data is grouped. The first column is the primary grouping factor and the second and thrid columns are used for sub-grouping and highlighting as needed.}
 
-\item{subGroup}{logical; Should the data be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}}.}
+\item{subgroup}{logical; Should the data be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}}.}
 
 \item{outliers}{positive numeric; number of interquartile ranges (IQR) past the Q1 (25\%) and Q3 (75\%) cumulative distribution values. Outliers are often defined as \eqn{1.5 \times IQR}{1.5 * IQR} and extreme outliers are more than \eqn{3 \times IQR}{3 * IQR} away from the inner 50\% data range.}
 
@@ -43,7 +43,7 @@ Uses filtred data with subgroup and factor information to calculate quartile dat
 }
 \details{
 To aid in data interpretation and exploration, quartile distribution statistics are calculated for each group and subgroup
-if specified. For \code{\link{niceBox}} this data is also used to plot the data. The data is parsed by checking \code{outlier} and \code{subGroup} status
+if specified. For \code{\link{niceBox}} this data is also used to plot the data. The data is parsed by checking \code{outlier} and \code{subgroup} status
 as weel as checking if either \code{prepedData} or \code{by} are a \code{\link[base]{data.frame}} or a \code{\link[base]{vector}}.
 }
 \examples{

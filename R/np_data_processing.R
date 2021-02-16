@@ -136,7 +136,7 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
 #'
 #' @details
 #' To aid in data interpretation and exploration, quartile distribution statistics are calculated for each group and subgroup
-#' if specified. For \code{\link{niceBox}} this data is also used to plot the data. The data is parsed by checking \code{outlier} and \code{subGroup} status
+#' if specified. For \code{\link{niceBox}} this data is also used to plot the data. The data is parsed by checking \code{outlier} and \code{subgroup} status
 #' as weel as checking if either \code{prepedData} or \code{by} are a \code{\link[base]{data.frame}} or a \code{\link[base]{vector}}.
 #'
 #' @examples
@@ -150,7 +150,7 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
 #'
 #' @param prepedData list; a list object returned by \code{\link{prepCategoryWindow}}
 #' @param by factor or dataframe of factors; One or more factors that control how the data is grouped. The first column is the primary grouping factor and the second and thrid columns are used for sub-grouping and highlighting as needed.
-#' @param subGroup logical; Should the data be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}}.
+#' @param subgroup logical; Should the data be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}}.
 #' @param outliers positive numeric; number of interquartile ranges (IQR) past the Q1 (25\%) and Q3 (75\%) cumulative distribution values. Outliers are often defined as \eqn{1.5 \times IQR}{1.5 * IQR} and extreme outliers are more than \eqn{3 \times IQR}{3 * IQR} away from the inner 50\% data range.
 #' @param filter logical vector; Used to further filter the data if necissary.
 #' @param groupNames character; A character vector for the primary group names
@@ -164,7 +164,7 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
 #' @importFrom tidyr gather
 #' @importFrom grDevices boxplot.stats
 #' @seealso \code{\link{niceBox}}, \code{\link{niceVio}}, \code{\link{niceDots}}, \code{\link[grDevices]{boxplot.stats}}
-prepNiceData<- function(prepedData,by, subGroup=FALSE,outliers=TRUE,filter,groupNames,plotLoc,width=1,flipFacts=FALSE,verbose=FALSE){
+prepNiceData<- function(prepedData,by, subgroup=FALSE,outliers=TRUE,filter,groupNames,plotLoc,width=1,flipFacts=FALSE,verbose=FALSE){
   #CASE: by is a factor; data is a numeric vector
   if(is.numeric(prepedData[[1]])){
     if(is.factor(by)) {
@@ -178,19 +178,19 @@ prepNiceData<- function(prepedData,by, subGroup=FALSE,outliers=TRUE,filter,group
       if(verbose){print(select(plotData,.data$fact,.data$n,.data$median,.data$q1,.data$q3,.data$min,.data$max))}
       return(plotData)
     } else {
-      #CASE: by is not a factor; data is a numeric vector; subGroup is TRUE
-      if(subGroup) {
-        plotData<-bind_cols(data=prepedData[[1]],fact=by[filter,1],subGroup=by[filter,2]) %>%
-          group_by(.data$fact,.data$subGroup) %>%
+      #CASE: by is not a factor; data is a numeric vector; subgroup is TRUE
+      if(subgroup) {
+        plotData<-bind_cols(data=prepedData[[1]],fact=by[filter,1],subgroup=by[filter,2]) %>%
+          group_by(.data$fact,.data$subgroup) %>%
           do(data.frame(t(boxplot.stats(.data$data,coef=outliers)$stats),n=length(.data$data))) %>%
           ungroup() %>%
-          select(fact=.data$fact,subGroup=.data$subGroup,n=n,min=.data$X1,q1=.data$X2,median=.data$X3,q3=.data$X4, max=.data$X5) %>%
-          mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."))
+          select(fact=.data$fact,subgroup=.data$subgroup,n=n,min=.data$X1,q1=.data$X2,median=.data$X3,q3=.data$X4, max=.data$X5) %>%
+          mutate(facetLevel=paste0(.data$fact,.data$subgroup,sep="."))
 
-        if(verbose){print(select(plotData,.data$fact,.data$subGroup,.data$n,.data$median,.data$q1,.data$q3,.data$min,.data$max))}
+        if(verbose){print(select(plotData,.data$fact,.data$subgroup,.data$n,.data$median,.data$q1,.data$q3,.data$min,.data$max))}
         return(plotData)
       } else {
-        #CASE: by is not a factor; data is a numeric vector; subGroup is FALSE
+        #CASE: by is not a factor; data is a numeric vector; subgroup is FALSE
         plotData<-bind_cols(data=prepedData[[1]],fact=by[filter,1]) %>%
           group_by(.data$fact) %>%
           do(data.frame(t(boxplot.stats(.data$data,coef=outliers)$stats),n=length(.data$data))) %>%
@@ -203,29 +203,29 @@ prepNiceData<- function(prepedData,by, subGroup=FALSE,outliers=TRUE,filter,group
       }
     }
   } else {
-    #CASE: data is a dataframe; by is a factor; subGroup is ignored
+    #CASE: data is a dataframe; by is a factor; subgroup is ignored
     if(is.factor(by)) {
       plotData<-bind_cols(prepedData[[1]],fact=by[filter]) %>%
-        tidyr::gather(factor_key=TRUE,key=subGroup,value=data,-.data$fact) %>%
-        group_by(.data$fact,.data$subGroup) %>%
+        tidyr::gather(factor_key=TRUE,key=subgroup,value=data,-.data$fact) %>%
+        group_by(.data$fact,.data$subgroup) %>%
         do(data.frame(t(boxplot.stats(.data$data,coef=outliers)$stats),n=length(.data$data))) %>%
         ungroup() %>%
-        select(fact=.data$fact,subGroup=.data$subGroup,n=n,min=.data$X1,q1=.data$X2,median=.data$X3,q3=.data$X4, max=.data$X5) %>%
-        mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."))
+        select(fact=.data$fact,subgroup=.data$subgroup,n=n,min=.data$X1,q1=.data$X2,median=.data$X3,q3=.data$X4, max=.data$X5) %>%
+        mutate(facetLevel=paste0(.data$fact,.data$subgroup,sep="."))
 
-      if(verbose){print(select(plotData,.data$fact,.data$subGroup,.data$n,.data$median,.data$q1,.data$q3,.data$min,.data$max))}
+      if(verbose){print(select(plotData,.data$fact,.data$subgroup,.data$n,.data$median,.data$q1,.data$q3,.data$min,.data$max))}
       return(plotData)
     } else {
-      #CASE: data is a dataframe; by is a dataframe; subGroup is ignored
+      #CASE: data is a dataframe; by is a dataframe; subgroup is ignored
       plotData<-bind_cols(prepedData[[1]],fact=by[filter,1]) %>%
-        tidyr::gather(factor_key=TRUE,key=subGroup,value=data,-.data$fact) %>%
-        group_by(.data$fact,.data$subGroup) %>%
+        tidyr::gather(factor_key=TRUE,key=subgroup,value=data,-.data$fact) %>%
+        group_by(.data$fact,.data$subgroup) %>%
         do(data.frame(t(boxplot.stats(.data$data,coef=outliers)$stats),n=length(.data$data))) %>%
         ungroup() %>%
-        select(fact=.data$fact,subGroup=.data$subGroup,n=n,min=.data$X1,q1=.data$X2,median=.data$X3,q3=.data$X4, max=.data$X5) %>%
-        mutate(facetLevel=paste0(.data$fact,.data$subGroup,sep="."))
+        select(fact=.data$fact,subgroup=.data$subgroup,n=n,min=.data$X1,q1=.data$X2,median=.data$X3,q3=.data$X4, max=.data$X5) %>%
+        mutate(facetLevel=paste0(.data$fact,.data$subgroup,sep="."))
 
-      if(verbose){print(select(plotData,.data$fact,.data$subGroup,.data$n,.data$median,.data$q1,.data$q3,.data$min,.data$max))}
+      if(verbose){print(select(plotData,.data$fact,.data$subgroup,.data$n,.data$median,.data$q1,.data$q3,.data$min,.data$max))}
       return(plotData)
     }
   }
@@ -244,7 +244,7 @@ prepNiceData<- function(prepedData,by, subGroup=FALSE,outliers=TRUE,filter,group
 #'
 #' @param x list; a list object returned by \code{\link{prepCategoryWindow}}
 #' @param by factor or dataframe of factors; One or more factors that control how the data is grouped. The first column is the primary grouping factor and the second and thrid columns are used for sub-grouping and/or stacking as needed.
-#' @param subGroup logical; If \code{\link{TRUE}} the data will be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}} or \code{x} is a \code{\link[base]{data.frame}}.
+#' @param subgroup logical; If \code{\link{TRUE}} the data will be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}} or \code{x} is a \code{\link[base]{data.frame}}.
 #' @param errorMultiple numeric; How many standard errors/deviations should be represented by the error bars.
 #' @param upperErrorFun character string; Determines how the error barse are calculated. Options are \code{\link[stats]{sd}} (standard deviation), \code{\link{se}} (standard error), \code{\link[base]{min}}, \code{\link[base]{max}} and \code{\link{boot95ci}} (bootstrap 95\% confidence interval).
 #' @param lowerErrorFun character; A character vector for the primary group names
@@ -256,7 +256,7 @@ prepNiceData<- function(prepedData,by, subGroup=FALSE,outliers=TRUE,filter,group
 #' @importFrom tidyr gather
 #' @importFrom purrr invoke
 #' @seealso \code{\link{niceBar}}, \code{\link{boot95ci}}, \code{\link{drawBar}}
-prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=upperErrorFun,aggFunction="mean",stack=FALSE,subGroup=FALSE){
+prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=upperErrorFun,aggFunction="mean",stack=FALSE,subgroup=FALSE){
   optsU<-NULL
   optsL<-NULL
   if(upperErrorFun=="boot95ci") {
@@ -277,30 +277,30 @@ prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=uppe
 
   #x is a vector and by is a dataframe
   } else if (is.numeric(x) & is.data.frame(by)) {
-    if(subGroup){
+    if(subgroup){
       facetLoc<-facetSpacing(length(levels(by[,2])),length(levels(by[,1])))
       names(facetLoc)<-unlist(lapply(levels(by[,1]),FUN=function(y) paste(y,levels(by[,2]),sep=".")))
-      #Stack is TRUE and subGroup is TRUE
+      #Stack is TRUE and subgroup is TRUE
       if(stack==T & ncol(by)>2) {
-        plotData<-bind_cols(data=x,fact=by[,1],subGroup=by[,2],Stack=by[,3]) %>%
-          group_by(.data$fact,.data$subGroup,.data$Stack) %>%
+        plotData<-bind_cols(data=x,fact=by[,1],subgroup=by[,2],Stack=by[,3]) %>%
+          group_by(.data$fact,.data$subgroup,.data$Stack) %>%
           summarize(AData=invoke(aggFunction, list(x=.data$data)),upperError=invoke(upperErrorFun,append(list(x=.data$data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(x=.data$data),optsL))*errorMultiple,N=n()) %>%
-          mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+          mutate(facetLevel=paste(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
           ungroup()
-        vars<-c("fact","subGroup","Stack","N",aggFunction,upperErrorFun,lowerErrorFun)
-      #Stack is FALSE and subGroup is TRUE
+        vars<-c("fact","subgroup","Stack","N",aggFunction,upperErrorFun,lowerErrorFun)
+      #Stack is FALSE and subgroup is TRUE
       } else {
-        plotData<-bind_cols(data=x,fact=by[,1],subGroup=by[,2]) %>%
-          group_by(.data$fact,.data$subGroup) %>%
+        plotData<-bind_cols(data=x,fact=by[,1],subgroup=by[,2]) %>%
+          group_by(.data$fact,.data$subgroup) %>%
           summarize(AData=invoke(aggFunction, list(x=.data$data)),upperError=invoke(upperErrorFun,append(list(x=.data$data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(x=.data$data),optsL))*errorMultiple,N=n()) %>%
-          mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+          mutate(facetLevel=paste(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
           ungroup()
-        vars<-c("fact","subGroup","N",aggFunction,upperErrorFun,lowerErrorFun)
+        vars<-c("fact","subgroup","N",aggFunction,upperErrorFun,lowerErrorFun)
       }
     } else {
       facetLoc<-seq(1,length(levels(by[,1])))
       names(facetLoc)<-levels(by[,1])
-      #Stack is TRUE and subGroup is FALSE
+      #Stack is TRUE and subgroup is FALSE
       if(stack==T & ncol(by)>1) {
         plotData<-bind_cols(data=x,fact=by[,1],Stack=by[,2]) %>%
           group_by(.data$fact,.data$Stack) %>%
@@ -308,7 +308,7 @@ prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=uppe
           mutate(facetLevel=.data$fact,at=facetLoc[.data$facetLevel]) %>%
           ungroup()
         vars<-c("fact","Stack","N",aggFunction,upperErrorFun,lowerErrorFun)
-      #Stack is FALSE and subGroup is FALSE
+      #Stack is FALSE and subgroup is FALSE
       } else {
         plotData<-bind_cols(data=x,fact=by[,1]) %>%
           group_by(.data$fact) %>%
@@ -318,40 +318,40 @@ prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=uppe
       }
     }
 
-  #x is a dataframe and by is a factor (subGroup and stack are ignored)
+  #x is a dataframe and by is a factor (subgroup and stack are ignored)
   } else if(is.data.frame(x) & is.factor(by)){
     facetLoc<-facetSpacing(length(x),length(levels(by)))
     names(facetLoc)<-unlist(lapply(levels(by),FUN=function(y) paste(y,colnames(x),sep=".")))
     plotData<-bind_cols(data=x,fact=by) %>%
-      tidyr::gather(factor_key=TRUE,key=subGroup,value=data,-.data$fact) %>%
-      group_by(.data$fact,.data$subGroup) %>%
+      tidyr::gather(factor_key=TRUE,key=subgroup,value=data,-.data$fact) %>%
+      group_by(.data$fact,.data$subgroup) %>%
       summarize(AData=invoke(aggFunction, list(x=.data$data)),upperError=invoke(upperErrorFun,append(list(x=.data$data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(x=.data$data),optsL))*errorMultiple,N=n()) %>%
-      mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+      mutate(facetLevel=paste(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
       ungroup()
-    vars<-c("fact","subGroup","N",aggFunction,upperErrorFun,lowerErrorFun)
+    vars<-c("fact","subgroup","N",aggFunction,upperErrorFun,lowerErrorFun)
 
-  #x is a dataframe and by is a dataframe (subGroup is ignored)
+  #x is a dataframe and by is a dataframe (subgroup is ignored)
   } else if(is.data.frame(x) & is.data.frame(by)) {
     facetLoc<-facetSpacing(length(x),length(levels(by[,1])))
     names(facetLoc)<-unlist(lapply(levels(by[,1]),FUN=function(y) paste(y,colnames(x),sep=".")))
     #Stack is TRUE
     if(stack==T & ncol(by)>1) {
       plotData<-bind_cols(data=x,fact=by[,1],Stack=by[,2]) %>%
-        tidyr::gather(factor_key=TRUE,key=subGroup,value=data,-.data$fact,-.data$Stack) %>%
-        group_by(.data$fact,.data$subGroup,.data$Stack) %>%
+        tidyr::gather(factor_key=TRUE,key=subgroup,value=data,-.data$fact,-.data$Stack) %>%
+        group_by(.data$fact,.data$subgroup,.data$Stack) %>%
         summarize(AData=invoke(aggFunction, list(x=.data$data)),upperError=invoke(upperErrorFun,append(list(x=.data$data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(x=.data$data),optsL))*errorMultiple,N=n()) %>%
-        mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+        mutate(facetLevel=paste(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
         ungroup()
-      vars<-c("fact","subGroup","Stack","N",aggFunction,upperErrorFun,lowerErrorFun)
+      vars<-c("fact","subgroup","Stack","N",aggFunction,upperErrorFun,lowerErrorFun)
     #Stack is FALSE
     } else {
       plotData<-bind_cols(data=x,fact=by[,1]) %>%
-        tidyr::gather(factor_key=TRUE,key=subGroup,value=data,-.data$fact) %>%
-        group_by(.data$fact,.data$subGroup) %>%
+        tidyr::gather(factor_key=TRUE,key=subgroup,value=data,-.data$fact) %>%
+        group_by(.data$fact,.data$subgroup) %>%
         summarize(AData=invoke(aggFunction, list(x=.data$data)),upperError=invoke(upperErrorFun,append(list(x=.data$data),optsU))*errorMultiple,lowerError=invoke(lowerErrorFun,append(list(x=.data$data),optsL))*errorMultiple,N=n()) %>%
-        mutate(facetLevel=paste(.data$fact,.data$subGroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
+        mutate(facetLevel=paste(.data$fact,.data$subgroup,sep="."),at=facetLoc[.data$facetLevel]) %>%
         ungroup()
-      vars<-c("fact","subGroup","N",aggFunction,upperErrorFun,lowerErrorFun)
+      vars<-c("fact","subgroup","N",aggFunction,upperErrorFun,lowerErrorFun)
     }
   } else {
     stop("Error in prepBarData: x and by are misformated... this appears to be a bug.\nThey should be factors and/or dataframes.\n")

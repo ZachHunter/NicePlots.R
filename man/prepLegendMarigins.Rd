@@ -10,7 +10,7 @@ prepLegendMarigins(
   theme,
   legend,
   pointHighlights = FALSE,
-  subGroup = TRUE,
+  subgroup = TRUE,
   stack = FALSE,
   is2D = FALSE
 )
@@ -18,7 +18,7 @@ prepLegendMarigins(
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
 
-\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subGroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
+\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subgroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
 
 \item{theme}{list object; Themes are are an optional way of storing graphical preset options that are compatible with all nicePlot graphing functions.}
 
@@ -26,7 +26,7 @@ prepLegendMarigins(
 
 \item{pointHighlights}{logical; Is pointHightlights turned on? This is used to determin with column of \code{by} should be used for legend factor levels.}
 
-\item{subGroup}{subGroup logical; use additional column in \code{by} to group the data within each level of the major factor.}
+\item{subgroup}{subgroup logical; use additional column in \code{by} to group the data within each level of the major factor.}
 
 \item{stack}{logical; Used for stack stacked bar plots. Used exclusively by \code{\link{niceBar}}.}
 

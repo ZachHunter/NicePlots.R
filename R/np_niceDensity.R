@@ -3,10 +3,10 @@
 #' @description Draws a kernal density plot of one or two variables.
 #' @details
 #' \code{niceDensity} is draws gernal density plots. This can be a single kernal density plot or a series of density plots overplotted
-#' on the graph based on a grouping factor from \code{by}. The \code{subGroup} option should be set to \code{\link{TRUE}} to anable this functionality.
+#' on the graph based on a grouping factor from \code{by}. The \code{subgroup} option should be set to \code{\link{TRUE}} to anable this functionality.
 #' If two or more variables are passed in \code{x} in a \code{\link{data.frame}}, \code{\link{matrix}} or \code{\link[tibble]{tibble}}, then the
 #' first two columns will be used to generate a scatter plot with a 2-D scatter plot with a \code{\link[graphics]{contour}} plot overlay giving the 2D
-#' kernal density estimates. Setting \code{subGroup} to \code{\link{TRUE}} is this case will color the points by the first factor in \code{by}.
+#' kernal density estimates. Setting \code{subgroup} to \code{\link{TRUE}} is this case will color the points by the first factor in \code{by}.
 #' Alternatively, for two column input,  \code{plotType} can be set to "suface" to draw a 3D prepresnetation of the kernal density over the x-y plane using \code{\link[graphics]{persp}}.
 #' Plotting options such as \code{theta}/\code{phi} to control rotation for \code{\link[graphics]{persp}} or \code{nlevels} for \code{\link[graphics]{contour}}, can be entered as arguments to \code{niceDensity} and will be passed along via \code{\link{do.call}}.
 #' Finally, if the \code{rgl} package is installed and \code{useRgl} is set to \code{\link{TRUE}}, the interactive \code{\link[rgl]{persp3d}} function will be used instead.
@@ -20,7 +20,7 @@
 #' @inheritParams prepNiceWindow
 #' @param groupNames character vector; overrides the factor levels of \code{by} to label the groups
 #' @param drawPoints logical; draws a dot plot overlay for contour plots
-#' @param subGroup logical; Will use the factor levels in \code{by} to plot a series of distributions from the data in \code{x}.
+#' @param subgroup logical; Will use the factor levels in \code{by} to plot a series of distributions from the data in \code{x}.
 #' @param bandwidth numeric; Manually sets the bandwith for the kernal density estimation overiding default calculations. For 2D plots \code{bandwidth} should be a vector of length 2. Set to \code{\link{NULL}} or \code{\link{NA}} to enable default calculations.
 #' @param drawRug logical; adds a \code{\link[graphics]{rug}} plot overlay to a kernel density plot. Default is FALSE.
 #' @param useRgl logical; Should the library \code{\link[rgl]{rgl}} be used to make 3D surface plots.
@@ -47,15 +47,15 @@
 #'
 #' #Kernal density plot subgrouped by species
 #' niceDensity(iris[,1],iris$Species, main="Sepal Length by Species",
-#' subGroup=TRUE)
+#' subgroup=TRUE)
 #'
 #' #Same thing with trimCurves=FALSE
 #' niceDensity(iris[,1],iris$Species, main="Sepal Length by Species",
-#' subGroup=TRUE, trimCurves=FALSE)
+#' subgroup=TRUE, trimCurves=FALSE)
 #'
 #' #2D Density of Sepal Width vs. Length
 #' niceDensity(iris[,1:2],iris$Species, main="Sepal Width vs. Length",
-#' subGroup=TRUE)
+#' subgroup=TRUE)
 #'
 #' #Representing the 2D contour plot in 3D
 #' niceDensity(iris[,1:2],iris$Species, main="Sepal Width vs. Length",
@@ -68,7 +68,7 @@
 #' @importFrom purrr walk2 map_dbl
 #' @importFrom graphics polygon contour lines persp rug
 #' @export
-niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subGroup=FALSE, bandwidth=NULL, drawRug=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, sidePlot=FALSE, ...) {UseMethod("niceDensity",x)}
+niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subgroup=FALSE, bandwidth=NULL, drawRug=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, sidePlot=FALSE, ...) {UseMethod("niceDensity",x)}
 
 #' @importFrom dplyr bind_cols mutate arrange
 #' @importFrom magrittr %>%
@@ -77,7 +77,7 @@ niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subGroup=FAL
 #' @importFrom tidyr gather
 #' @importFrom graphics polygon contour lines persp rug
 #' @export
-niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGroup=FALSE, bandwidth=NULL, drawRug=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), rotateLabels=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, sidePlot=FALSE, ...)  {
+niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgroup=FALSE, bandwidth=NULL, drawRug=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), rotateLabels=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, sidePlot=FALSE, ...)  {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset",call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -93,11 +93,11 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
 
   #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, drawPoints=drawPoints, groupNames=groupNames,subGroup=subGroup, useRgl=useRgl, plotType=plotType,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimCurves=trimCurves)
+  ActiveOptions<-list(x=x, by=by, drawPoints=drawPoints, groupNames=groupNames,subgroup=subgroup, useRgl=useRgl, plotType=plotType,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimCurves=trimCurves)
   ActiveOptions<-append(ActiveOptions,moreOptions)
 
   #Here we check to see if the user specified any options so that they not overwritten by the designated theme
-  finalOptions<-procNiceOptions(x=rep(1,length(by)),by=by,minorTick=minorTick,pointShape=NULL,whiskerLineType=NULL,lWidth=lWidth,capWidth=NULL,pointLaneWidth=FALSE,width=NULL,guides=guides,pointSize=NULL,subGroup=subGroup,stack=F,pointHighlights=FALSE,type="VP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=NULL,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow=NULL, errorCap = NULL, CLOptions=moreOptions)
+  finalOptions<-procNiceOptions(x=rep(1,length(by)),by=by,minorTick=minorTick,pointShape=NULL,whiskerLineType=NULL,lWidth=lWidth,capWidth=NULL,pointLaneWidth=FALSE,width=NULL,guides=guides,pointSize=NULL,subgroup=subgroup,stack=F,pointHighlights=FALSE,type="VP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=NULL,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow=NULL, errorCap = NULL, CLOptions=moreOptions)
   minorTick<-finalOptions$minorTick
   pointShape<-finalOptions$pointShape
   lWidth<-finalOptions$lWidth
@@ -137,7 +137,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
   #Initialize legend variables so we can update based on options
   legendLabels<-groupNames
   legendTitle<-"Legend"
-  if(!is.null(by) & (subGroup==TRUE | is.data.frame(x))){
+  if(!is.null(by) & (subgroup==TRUE | is.data.frame(x))){
     if(legend[1]==FALSE | is.null(legend[1])) {
       legend<-TRUE
     } else if (legend[1]!=TRUE) {
@@ -280,7 +280,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
        x<-log(x + logAdjustment, logScaleX)
     }
     if(is.null(ylab)) {ylab<-"Density"}
-    if(!is.null(by) & subGroup==TRUE){
+    if(!is.null(by) & subgroup==TRUE){
       if(length(plotColors$fill)==1) {plotColors$fill<-plotColors$points}
       n_groups<-length(levels(by))
       densities<-vector(mode="list",length=n_groups)
@@ -420,7 +420,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subGr
   #Draw legend and set associated options if indicated
   if(length(legendColors)<length(legendLabels) & legend!=FALSE){
     legend<-FALSE
-    warning("Not enough point colors to uniquely color subGroups levels\nPlease update plotColors point options to use legend options with this subgroup.", call.=FALSE)
+    warning("Not enough point colors to uniquely color subgroups levels\nPlease update plotColors point options to use legend options with this subgroup.", call.=FALSE)
   }
 
   if(legend!=FALSE) {
