@@ -81,6 +81,13 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgr
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset",call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
+
+  #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
+  moreOptions<-list(...)
+  ActiveOptions<-list(x=x, by=by, drawPoints=drawPoints, groupNames=groupNames,subgroup=subgroup, useRgl=useRgl, plotType=plotType,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimCurves=trimCurves)
+  ActiveOptions<-append(ActiveOptions,moreOptions)
+
+  #Flight check data and remove na.
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = FALSE)
   x<-checked$d
   by<-checked$b
@@ -90,11 +97,6 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgr
   }
   finalStats<-NULL
   finalSummary<-NULL
-
-  #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
-  moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, drawPoints=drawPoints, groupNames=groupNames,subgroup=subgroup, useRgl=useRgl, plotType=plotType,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimCurves=trimCurves)
-  ActiveOptions<-append(ActiveOptions,moreOptions)
 
   #Here we check to see if the user specified any options so that they not overwritten by the designated theme
   finalOptions<-procNiceOptions(x=rep(1,length(by)),by=by,minorTick=minorTick,pointShape=NULL,whiskerLineType=NULL,lWidth=lWidth,capWidth=NULL,pointLaneWidth=FALSE,width=NULL,guides=guides,pointSize=NULL,subgroup=subgroup,stack=F,pointHighlights=FALSE,type="VP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=NULL,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow=NULL, errorCap = NULL, CLOptions=moreOptions)

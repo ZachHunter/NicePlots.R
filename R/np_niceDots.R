@@ -82,15 +82,17 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
     if(dim(x)[2]>1 & subgroup==FALSE) {flipFacts<-TRUE}
   }
 
+  #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
+  moreOptions<-list(...)
+  ActiveOptions<-list(x=x, by=by, groupNames=groupNames, drawPoints=drawPoints, errorBars=errorBars,barWidth=barWidth, barType=barType, barThickness=barThickness, aggFun=aggFun,errFun=errFun, errorMultiple=errorMultiple, main=main,sub=sub, ylab=ylab, minorTick=minorTick, theme=theme, guides=guides, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth, na.rm=na.rm, flipFacts=flipFacts, verbose=verbose, legend=legend,logAdjustment=logAdjustment,errorCap=errorCap, errorLineType=errorLineType,capWidth=capWidth, lWidth=lWidth)
+
+  #Flight check and prep data. Removes NAs.
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = flipFacts)
   x<-checked$d
   by<-checked$b
   rm(checked)
   swarmOverflow<-NULL
 
-  #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
-  moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, groupNames=groupNames, drawPoints=drawPoints, errorBars=errorBars,barWidth=barWidth, barType=barType, barThickness=barThickness, aggFun=aggFun,errFun=errFun, errorMultiple=errorMultiple, main=main,sub=sub, ylab=ylab, minorTick=minorTick, theme=theme, guides=guides, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth, na.rm=na.rm, flipFacts=flipFacts, verbose=verbose, legend=legend,logAdjustment=logAdjustment,errorCap=errorCap, errorLineType=errorLineType,capWidth=capWidth, lWidth=lWidth)
   ActiveOptions<-append(ActiveOptions,moreOptions)
 
   #Here we check to see if the user specified any options so that they not overwritten by the designated theme
@@ -193,7 +195,6 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
     }
 
     #RStudio seems not to update the graphics devices properly
-    #RStudio seems not to update the graphics devices properly
     if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOveride"]])) {graphics.off()}
     prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, expLabels=expLabels,sidePlot=sidePlot,subgroupLabels=subgroupLabels,strictLimits=FALSE,theme=theme,legend=legend,logAdjustment=logAdjustment, pointHighlights=pointHighlights)
   }
@@ -234,13 +235,6 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
       facetLoc<-seq(1,length(groupNames),by=1)
       names(facetLoc)<-groupNames
       width<-.25*width
-      IDS<-as.character(seq(length(ActiveOptions$x)))
-      IDfilter<-!is.na(ActiveOptions$x) & !is.na(ActiveOptions$by)
-      if(sidePlot[1]==TRUE) {
-        xypos<-data.frame(x=x,y=facetLoc[as.character(by)],group=by, ID=IDS[IDfilter])
-      } else {
-        xypos<-data.frame(x=facetLoc[as.character(by)],y=x,group=by, ID=IDS[IDfilter])
-      }
     } else {
       if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[,1],calcType[1],verbose=verbose)}
       #CASE: by is not a factor data is a numeric vector and subgroup is TRUE
@@ -248,13 +242,6 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
         facetLoc<-facetSpacing(length(levels(by[,2])),length(groupNames))
         names(facetLoc)<-unlist(lapply(levels(by[,1]),FUN=function(x) paste0(x,levels(by[,2]),sep=".")))
         width<-width*(facetLoc[2]-facetLoc[1])/4
-        IDS<-as.character(seq(length(ActiveOptions$x)))
-        IDfilter<-!is.na(ActiveOptions$x) & (rowSums(is.na(ActiveOptions$by))==0)
-        if(sidePlot[1]==TRUE) {
-          xypos<-data.frame(x=x,y=facetLoc[as.character(by[,1])],group=by[,1], ID=IDS[IDfilter])
-        } else {
-          xypos<-data.frame(x=facetLoc[as.character(by[,1])],y=x,group=by[,1], ID=IDS[IDfilter])
-        }
       } else {
         #CASE: by is not a factor, data is a numeric vector and subgroup is FALSE
         facetLoc<-seq(1,length(groupNames),by=1)
@@ -289,14 +276,6 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
           }
         }
       }
-      IDS<-as.character(seq(length(ActiveOptions$x)))
-      IDfilter<-!is.na(ActiveOptions$x) & (rowSums(is.na(ActiveOptions$by))==0)
-      fLevels<-paste0(by[,1],by[,2],".")
-      if(sidePlot[1]==TRUE) {
-        xypos<-data.frame(x=x,y=facetLoc[fLevels],group=paste0(by[,1],".",by[,2]), ID=IDS[IDfilter])
-      } else {
-        xypos<-data.frame(x=facetLoc[fLevels],y=x,group=paste0(by[,1],".",by[,2]), ID=IDS[IDfilter])
-      }
     }
   } else {
     #CASE: data is a dataframe, by is a factor, subgroup is ignored
@@ -316,17 +295,6 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
           }
           legendLabels<-colnames(prepedData[[1]])
         }
-      }
-      longX<-purrr::reduce(x,c)
-      longGroup<-NULL
-      for(n in colnames(x)) {longGroup<-c(longGroup,paste0(n,as.character(by),"."))}
-      longY<-facetLoc[longGroup]
-      IDS<-as.character(seq(length(ActiveOptions$x)))
-      IDfilter<-(rowSums(is.na(ActiveOptions$x))==0) & !is.na(ActiveOptions$by)
-      if(sidePlot[1]==TRUE) {
-        xypos<-data.frame(x=longX,y=longY,group=longGroup, ID=rep(IDS[IDfilter],dim(x)[2]))
-      } else {
-        xypos<-data.frame(x=longY,y=longX,group=longGroup, ID=rep(IDS[IDfilter],dim(x)[2]))
       }
     } else {
       #CASE: data is a dataframe, by is a dataframe, subgroup is ignored
@@ -354,16 +322,6 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
         }
       }
       longX<-purrr::reduce(x,c)
-      longGroup<-NULL
-      for(n in colnames(x)) {longGroup<-c(longGroup,paste0(n,as.character(by[,1]),"."))}
-      longY<-facetLoc[longGroup]
-      IDS<-as.character(seq(length(ActiveOptions$x)))
-      IDfilter<-(rowSums(is.na(ActiveOptions$x))==0) & (rowSums(is.na(ActiveOptions$by))==0)
-      if(sidePlot[1]==TRUE) {
-        xypos<-data.frame(x=longX,y=longY,group=longGroup, ID=rep(IDS[IDfilter],dim(x)[2]))
-      } else {
-        xypos<-data.frame(x=longY,y=longX,group=longGroup, ID=rep(IDS[IDfilter],dim(x)[2]))
-      }
     }
   }
   #Print summary data if indicated
@@ -373,7 +331,28 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
 
   #updating preping the plot data from pData to be compatible with errorBars
   if(drawPoints[1]==TRUE) {
-    addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
+    xypos <- addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
+    xyid<-1
+    xFilter<-1
+    byFilter<-1
+    if(is.vector(ActiveOptions$x)) {
+      xyid<-seq(length(ActiveOptions$x))
+      xFilter<-!is.na(x)
+    } else {
+      xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+      xFilter<-rowSums(is.na(as.data.frame(x)))==0
+    }
+    if(is.vector(ActiveOptions$by)){
+      byFilter<-!is.na()
+    } else {
+      xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
+    }
+    xyid<-xyid[xFilter ==TRUE & byFilter ==TRUE]
+    xyid<-xyid[filter]
+    if(length(xyid)<nrow(xypos)){
+      xyid<-rep(xyid,nrow(xypos)/length(xyid))
+    }
+    xypos<-data.frame(xypos,ID=xyid)
   }
   plotThis<-pData[[1]] %>%
     mutate(barHight=.data$AData,width1=.data$at-width*barWidth,width2=.data$at + width*barWidth)

@@ -79,17 +79,19 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
   if(is.data.frame(x) | is.matrix(x)) {
     if(dim(x)[2]>1 & subgroup==FALSE) {flipFacts<-TRUE}
   }
+
+  #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
+  moreOptions<-list(...)
+  ActiveOptions<-list(x=x, by=by, bandwidth=bandwidth, groupNames=groupNames, main=main,sub=sub, ylab=ylab, minorTick=minorTick, guides=guides, theme=theme, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, drawBox=drawBox, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, drawPoints=drawPoints, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth,flipFacts=flipFacts,  na.rm=na.rm, verbose=verbose,legend=legend, trimViolins=trimViolins,logAdjustment=logAdjustment)
+  ActiveOptions<-append(ActiveOptions,moreOptions)
+
+  #Flight check data, remove NAs.
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = flipFacts)
   x<-checked$d
   by<-checked$b
   rm(checked)
   swarmOverflow<-NULL
   lWidth<-NULL
-
-  #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
-  moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, bandwidth=bandwidth, groupNames=groupNames, main=main,sub=sub, ylab=ylab, minorTick=minorTick, guides=guides, theme=theme, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, drawBox=drawBox, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, drawPoints=drawPoints, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth,flipFacts=flipFacts,  na.rm=na.rm, verbose=verbose,legend=legend, trimViolins=trimViolins,logAdjustment=logAdjustment)
-  ActiveOptions<-append(ActiveOptions,moreOptions)
 
   #Here we check to see if the user specified any options so that they not overwritten by the designated theme
   finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=pointShape,whiskerLineType=NULL,lWidth=lWidth,capWidth=NULL,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subgroup=subgroup,stack=F,pointHighlights=pointHighlights,type="VP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=pointMethod,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow=swarmOverflow, errorCap = "bar", CLOptions=moreOptions)
@@ -193,14 +195,28 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
         plotData %>% drawBoxPlot(side=sidePlot,col=plotColors$vioBoxLineCol,fill=plotColors$vioBoxFill,drawDot=F,drawBox=drawBox, lWidth=lWidth,whiskerLty=whiskerLineType,capWidth=capWidth)
       }
       if(drawPoints){
-        addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
-      }
-      IDS<-as.character(seq(length(ActiveOptions$x)))
-      IDfilter<-!is.na(ActiveOptions$x) & !is.na(ActiveOptions$by)
-      if(sidePlot[1]==TRUE) {
-        xypos<-data.frame(x=x,y=plotLoc[as.character(by)],group=by, ID=IDS[IDfilter])
-      } else {
-        xypos<-data.frame(x=plotLoc[as.character(by)],y=x,group=by, ID=IDS[IDfilter])
+        xypos<-addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
+        xyid<-1
+        xFilter<-1
+        byFilter<-1
+        if(is.vector(ActiveOptions$x)) {
+          xyid<-seq(length(ActiveOptions$x))
+          xFilter<-!is.na(x)
+        } else {
+          xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+          xFilter<-rowSums(is.na(as.data.frame(x)))==0
+        }
+        if(is.vector(ActiveOptions$by)){
+          byFilter<-!is.na()
+        } else {
+          xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
+        }
+        xyid<-xyid[xFilter ==TRUE & byFilter ==TRUE]
+        xyid<-xyid[filter]
+        if(length(xyid)<nrow(xypos)){
+          xyid<-rep(xyid,nrow(xypos)/length(xyid))
+        }
+        xypos<-data.frame(xypos,ID=xyid)
       }
     } else {
       if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[,1],calcType[1],verbose=verbose)}
@@ -220,7 +236,28 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
             drawBoxPlot(side=sidePlot,col=plotColors$vioBoxLineCol,fill=plotColors$vioBoxFill,drawDot=F,drawBox=drawBox,lWidth = lWidth,whiskerLty=whiskerLineType,capWidth=capWidth)
         }
         if(drawPoints) {
-          addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
+          xypos<-addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
+          xyid<-1
+          xFilter<-1
+          byFilter<-1
+          if(is.vector(ActiveOptions$x)) {
+            xyid<-seq(length(ActiveOptions$x))
+            xFilter<-!is.na(x)
+          } else {
+            xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+            xFilter<-rowSums(is.na(as.data.frame(x)))==0
+          }
+          if(is.vector(ActiveOptions$by)){
+            byFilter<-!is.na()
+          } else {
+            xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
+          }
+          xyid<-xyid[xFilter ==TRUE & byFilter ==TRUE]
+          xyid<-xyid[filter]
+          if(length(xyid)<nrow(xypos)){
+            xyid<-rep(xyid,nrow(xypos)/length(xyid))
+          }
+          xypos<-data.frame(xypos,ID=xyid)
         }
         if(legend!=FALSE) {
           if(pointHighlights){
@@ -235,14 +272,6 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
             legendLabels<-levels(by[,2])
           }
         }
-        IDS<-as.character(seq(length(ActiveOptions$x)))
-        IDfilter<-!is.na(ActiveOptions$x) & (rowSums(is.na(ActiveOptions$by))==0)
-        fLevels<-paste0(by[,1],by[,2],".")
-        if(sidePlot[1]==TRUE) {
-          xypos<-data.frame(x=x,y=facetLoc[fLevels],group=paste0(by[,1],".",by[,2]), ID=IDS[IDfilter])
-        } else {
-          xypos<-data.frame(x=facetLoc[fLevels],y=x,group=paste0(by[,1],".",by[,2]), ID=IDS[IDfilter])
-        }
       } else {
         #CASE: by is not a factor, data is a numeric vector and subgroup is FALSE
         plotLoc<-seq(1,length(groupNames),by=1)
@@ -256,7 +285,28 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
           plotData %>% drawBoxPlot(side=sidePlot,col=plotColors$vioBoxLineCol,fill=plotColors$vioBoxFill,drawDot=F,drawBox=drawBox,lWidth=lWidth,whiskerLty=whiskerLineType,capWidth=capWidth)
         }
         if(drawPoints) {
-          addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
+          xypos<-addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
+          xyid<-1
+          xFilter<-1
+          byFilter<-1
+          if(is.vector(ActiveOptions$x)) {
+            xyid<-seq(length(ActiveOptions$x))
+            xFilter<-!is.na(x)
+          } else {
+            xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+            xFilter<-rowSums(is.na(as.data.frame(x)))==0
+          }
+          if(is.vector(ActiveOptions$by)){
+            byFilter<-!is.na()
+          } else {
+            xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
+          }
+          xyid<-xyid[xFilter ==TRUE & byFilter ==TRUE]
+          xyid<-xyid[filter]
+          if(length(xyid)<nrow(xypos)){
+            xyid<-rep(xyid,nrow(xypos)/length(xyid))
+          }
+          xypos<-data.frame(xypos,ID=xyid)
         }
         if(legend!=FALSE) {
           if(pointHighlights==TRUE){
@@ -265,13 +315,6 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
             }
             legendLabels<-levels(by[,2])
           }
-        }
-        IDS<-as.character(seq(length(ActiveOptions$x)))
-        IDfilter<-!is.na(ActiveOptions$x) & (rowSums(is.na(ActiveOptions$by))==0)
-        if(sidePlot[1]==TRUE) {
-          xypos<-data.frame(x=x,y=plotLoc[as.character(by[,1])],group=by[,1], ID=IDS[IDfilter])
-        } else {
-          xypos<-data.frame(x=plotLoc[as.character(by[,1])],y=x,group=by[,1], ID=IDS[IDfilter])
         }
       }
     }
@@ -295,7 +338,28 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
           drawBoxPlot(side=sidePlot,col=plotColors$vioBoxLineCol,fill=plotColors$vioBoxFill,drawDot=F,drawBox=drawBox, lWidth=lWidth,whiskerLty=whiskerLineType,capWidth=capWidth)
       }
       if(drawPoints) {
-        addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x),swarmOverflow = swarmOverflow)
+        xypos<-addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x),swarmOverflow = swarmOverflow)
+        xyid<-1
+        xFilter<-1
+        byFilter<-1
+        if(is.vector(ActiveOptions$x)) {
+          xyid<-seq(length(ActiveOptions$x))
+          xFilter<-!is.na(x)
+        } else {
+          xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+          xFilter<-rowSums(is.na(as.data.frame(x)))==0
+        }
+        if(is.vector(ActiveOptions$by)){
+          byFilter<-!is.na()
+        } else {
+          xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
+        }
+        xyid<-xyid[xFilter ==TRUE & byFilter ==TRUE]
+        xyid<-xyid[filter]
+        if(length(xyid)<nrow(xypos)){
+          xyid<-rep(xyid,nrow(xypos)/length(xyid))
+        }
+        xypos<-data.frame(xypos,ID=xyid)
       }
       if(legend!=FALSE) {
         if(flipFacts) {
@@ -309,17 +373,6 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
           }
           legendLabels<-colnames(prepedData[[1]])
         }
-      }
-      longX<-purrr::reduce(x,c)
-      longGroup<-NULL
-      for(n in colnames(x)) {longGroup<-c(longGroup,paste0(n,as.character(by),"."))}
-      longY<-facetLoc[longGroup]
-      IDS<-as.character(seq(length(ActiveOptions$x)))
-      IDfilter<-(rowSums(is.na(ActiveOptions$x))==0) & !is.na(ActiveOptions$by)
-      if(sidePlot[1]==TRUE) {
-        xypos<-data.frame(x=longX,y=longY,group=longGroup, ID=rep(IDS[IDfilter],dim(x)[2]))
-      } else {
-        xypos<-data.frame(x=longY,y=longX,group=longGroup, ID=rep(IDS[IDfilter],dim(x)[2]))
       }
     } else {
       #CASE: data is a dataframe, by is a dataframe, subgroup is ignored
@@ -340,7 +393,28 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
           drawBoxPlot(side=sidePlot,col=plotColors$vioBoxLineCol,fill=plotColors$vioBoxFill,drawDot=F,drawBox=drawBox,lWidth=lWidth,whiskerLty=whiskerLineType,capWidth=capWidth)
       }
       if(drawPoints) {
-        addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x),swarmOverflow = swarmOverflow)
+        xypos<-addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x),swarmOverflow = swarmOverflow)
+        xyid<-1
+        xFilter<-1
+        byFilter<-1
+        if(is.vector(ActiveOptions$x)) {
+          xyid<-seq(length(ActiveOptions$x))
+          xFilter<-!is.na(x)
+        } else {
+          xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+          xFilter<-rowSums(is.na(as.data.frame(x)))==0
+        }
+        if(is.vector(ActiveOptions$by)){
+          byFilter<-!is.na()
+        } else {
+          xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
+        }
+        xyid<-xyid[xFilter ==TRUE & byFilter ==TRUE]
+        xyid<-xyid[filter]
+        if(length(xyid)<nrow(xypos)){
+          xyid<-rep(xyid,nrow(xypos)/length(xyid))
+        }
+        xypos<-data.frame(xypos,ID=xyid)
       }
       if(legend!=FALSE) {
         if(pointHighlights){
@@ -361,17 +435,6 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
             legendLabels<-colnames(prepedData[[1]])
           }
         }
-      }
-      longX<-purrr::reduce(x,c)
-      longGroup<-NULL
-      for(n in colnames(x)) {longGroup<-c(longGroup,paste0(n,as.character(by[,1]),"."))}
-      longY<-facetLoc[longGroup]
-      IDS<-as.character(seq(length(ActiveOptions$x)))
-      IDfilter<-(rowSums(is.na(ActiveOptions$x))==0) & (rowSums(is.na(ActiveOptions$by))==0)
-      if(sidePlot[1]==TRUE) {
-        xypos<-data.frame(x=longX,y=longY,group=longGroup, ID=rep(IDS[IDfilter],dim(x)[2]))
-      } else {
-        xypos<-data.frame(x=longY,y=longX,group=longGroup, ID=rep(IDS[IDfilter],dim(x)[2]))
       }
     }
   }

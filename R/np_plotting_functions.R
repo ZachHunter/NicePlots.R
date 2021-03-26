@@ -234,7 +234,7 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
     if(length(size)==1){size<-rep(size[1],length(x$data))}
     filter<-list()
     #I had a hard time getting the beeswarm point wise coloring and grouping working properly
-    #While there is surely a better way, the swarms are calculated seperately for each group with only the new x coordinate saved for plotting later.
+    #While there is surely a better way, the swarms are calculated separately for each group with only the new x coordinate saved for plotting later.
     for(i in 1:length(levels(factor(x$fact)))) {
       if(any(names(x)=="subgroup")){
         for(n in 1:length(levels(factor(x$subgroup)))){
@@ -257,10 +257,10 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
       if(!is.null(filter[[i]])) {
         #Note that the col option has been factorized and needs an as.character wrapper to function properly
         if(sidePlot) {
-          xypos<-data.frame(x=filter[[i]]$y,y=filter[[i]]$x)
+          xypos<-rbind(xypos,data.frame(x=filter[[i]]$y,y=filter[[i]]$x))
           points(y=filter[[i]]$x,x=filter[[i]]$y,pch=filter[[i]]$shape,col=as.character(filter[[i]]$color),cex=filter[[i]]$size)
         } else {
-          xypos<-data.frame(x=filter[[i]]$x,y=filter[[i]]$y)
+          xypos<-rbind(xypos,data.frame(x=filter[[i]]$x,y=filter[[i]]$y))
           points(x=filter[[i]]$x,y=filter[[i]]$y,pch=filter[[i]]$shape,col=as.character(filter[[i]]$color),cex=filter[[i]]$size)
         }
       }
