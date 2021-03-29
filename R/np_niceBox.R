@@ -199,7 +199,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
         xyid<-1
         xFilter<-1
         byFilter<-1
-        if(is.vector(ActiveOptxyposions$x)) {
+        if(is.vector(ActiveOptions$x)) {
           xyid<-seq(length(ActiveOptions$x))
           xFilter<-!is.na(x)
         } else {
