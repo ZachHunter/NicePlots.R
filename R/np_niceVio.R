@@ -203,8 +203,13 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
           xyid<-seq(length(ActiveOptions$x))
           xFilter<-!is.na(x)
         } else {
-          xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
-          xFilter<-rowSums(is.na(as.data.frame(x)))==0
+          if(flipFacts==TRUE) {
+            xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
+            xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+          } else {
+            xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+            xFilter<-rowSums(is.na(as.data.frame(x)))==0
+          }
         }
         if(is.vector(ActiveOptions$by)){
           byFilter<-!is.na()
@@ -244,8 +249,13 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
             xyid<-seq(length(ActiveOptions$x))
             xFilter<-!is.na(x)
           } else {
-            xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
-            xFilter<-rowSums(is.na(as.data.frame(x)))==0
+            if(flipFacts==TRUE) {
+              xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
+              xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+            } else {
+              xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+              xFilter<-rowSums(is.na(as.data.frame(x)))==0
+            }
           }
           if(is.vector(ActiveOptions$by)){
             byFilter<-!is.na()
@@ -293,8 +303,13 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
             xyid<-seq(length(ActiveOptions$x))
             xFilter<-!is.na(x)
           } else {
-            xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
-            xFilter<-rowSums(is.na(as.data.frame(x)))==0
+            if(flipFacts==TRUE) {
+              xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
+              xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+            } else {
+              xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+              xFilter<-rowSums(is.na(as.data.frame(x)))==0
+            }
           }
           if(is.vector(ActiveOptions$by)){
             byFilter<-!is.na()
@@ -346,8 +361,13 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
           xyid<-seq(length(ActiveOptions$x))
           xFilter<-!is.na(x)
         } else {
-          xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
-          xFilter<-rowSums(is.na(as.data.frame(x)))==0
+          if(flipFacts==TRUE) {
+            xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
+            xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+          } else {
+            xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+            xFilter<-rowSums(is.na(as.data.frame(x)))==0
+          }
         }
         if(is.vector(ActiveOptions$by)){
           byFilter<-!is.na()
@@ -401,8 +421,13 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
           xyid<-seq(length(ActiveOptions$x))
           xFilter<-!is.na(x)
         } else {
-          xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
-          xFilter<-rowSums(is.na(as.data.frame(x)))==0
+          if(flipFacts==TRUE) {
+            xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
+            xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+          } else {
+            xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+            xFilter<-rowSums(is.na(as.data.frame(x)))==0
+          }
         }
         if(is.vector(ActiveOptions$by)){
           byFilter<-!is.na()

@@ -170,8 +170,13 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
         xyid<-seq(length(ActiveOptions$x))
         xFilter<-!is.na(x)
       } else {
-        xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
-        xFilter<-rowSums(is.na(as.data.frame(x)))==0
+        if(flipFacts==TRUE) {
+          xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
+          xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+        } else {
+          xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+          xFilter<-rowSums(is.na(as.data.frame(x)))==0
+        }
       }
       if(is.vector(ActiveOptions$by)){
         byFilter<-!is.na()
@@ -203,8 +208,13 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
           xyid<-seq(length(ActiveOptions$x))
           xFilter<-!is.na(x)
         } else {
-          xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
-          xFilter<-rowSums(is.na(as.data.frame(x)))==0
+          if(flipFacts==TRUE) {
+            xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
+            xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+          } else {
+            xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+            xFilter<-rowSums(is.na(as.data.frame(x)))==0
+          }
         }
         if(is.vector(ActiveOptions$by)){
           byFilter<-!is.na()
@@ -245,8 +255,13 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
           xyid<-seq(length(ActiveOptions$x))
           xFilter<-!is.na(x)
         } else {
-          xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
-          xFilter<-rowSums(is.na(as.data.frame(x)))==0
+          if(flipFacts==TRUE) {
+            xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
+            xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+          } else {
+            xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+            xFilter<-rowSums(is.na(as.data.frame(x)))==0
+          }
         }
         if(is.vector(ActiveOptions$by)){
           byFilter<-!is.na()
@@ -289,8 +304,13 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
         xyid<-seq(length(ActiveOptions$x))
         xFilter<-!is.na(x)
       } else {
-        xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
-        xFilter<-rowSums(is.na(as.data.frame(x)))==0
+        if(flipFacts==TRUE) {
+          xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
+          xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+        } else {
+          xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+          xFilter<-rowSums(is.na(as.data.frame(x)))==0
+        }
       }
       if(is.vector(ActiveOptions$by)){
         byFilter<-!is.na()
@@ -335,8 +355,13 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
         xyid<-seq(length(ActiveOptions$x))
         xFilter<-!is.na(x)
       } else {
-        xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
-        xFilter<-rowSums(is.na(as.data.frame(x)))==0
+        if(flipFacts==TRUE) {
+          xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
+          xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+        } else {
+          xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+          xFilter<-rowSums(is.na(as.data.frame(x)))==0
+        }
       }
       if(is.vector(ActiveOptions$by)){
         byFilter<-!is.na()
