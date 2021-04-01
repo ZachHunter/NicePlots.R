@@ -166,7 +166,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
       xyid<-1
       xFilter<-1
       byFilter<-1
-      if(is.vector(ActiveOptions$x)) {
+      if(is.vector(ActiveOptions$x) | is.factor(ActiveOptions$x)) {
         xyid<-seq(length(ActiveOptions$x))
         xFilter<-!is.na(x)
       } else {
@@ -178,8 +178,8 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
           xFilter<-rowSums(is.na(as.data.frame(x)))==0
         }
       }
-      if(is.vector(ActiveOptions$by)){
-        byFilter<-!is.na()
+      if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){
+        byFilter<-!is.na(ActiveOptions$by)
       } else {
         xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
       }
@@ -204,7 +204,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
         xyid<-1
         xFilter<-1
         byFilter<-1
-        if(is.vector(ActiveOptions$x)) {
+        if(is.vector(ActiveOptions$x) | is.factor(ActiveOptions$x)) {
           xyid<-seq(length(ActiveOptions$x))
           xFilter<-!is.na(x)
         } else {
@@ -216,8 +216,8 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
             xFilter<-rowSums(is.na(as.data.frame(x)))==0
           }
         }
-        if(is.vector(ActiveOptions$by)){
-          byFilter<-!is.na()
+        if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){
+          byFilter<-!is.na(ActiveOptions$by)
         } else {
           xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
         }
@@ -251,7 +251,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
         xyid<-1
         xFilter<-1
         byFilter<-1
-        if(is.vector(ActiveOptions$x)) {
+        if(is.vector(ActiveOptions$x) | is.factor(ActiveOptions$x)) {
           xyid<-seq(length(ActiveOptions$x))
           xFilter<-!is.na(x)
         } else {
@@ -263,8 +263,8 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
             xFilter<-rowSums(is.na(as.data.frame(x)))==0
           }
         }
-        if(is.vector(ActiveOptions$by)){
-          byFilter<-!is.na()
+        if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){
+          byFilter<-!is.na(ActiveOptions$by)
         } else {
           xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
         }
@@ -300,7 +300,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
       xyid<-1
       xFilter<-1
       byFilter<-1
-      if(is.vector(ActiveOptions$x)) {
+      if(is.vector(ActiveOptions$x) | is.factor(ActiveOptions$x)) {
         xyid<-seq(length(ActiveOptions$x))
         xFilter<-!is.na(x)
       } else {
@@ -312,8 +312,8 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
           xFilter<-rowSums(is.na(as.data.frame(x)))==0
         }
       }
-      if(is.vector(ActiveOptions$by)){
-        byFilter<-!is.na()
+      if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){
+        byFilter<-!is.na(ActiveOptions$by)
       } else {
         xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
       }
@@ -351,7 +351,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
       xyid<-1
       xFilter<-1
       byFilter<-1
-      if(is.vector(ActiveOptions$x)) {
+      if(is.vector(ActiveOptions$x) | is.factor(ActiveOptions$x)) {
         xyid<-seq(length(ActiveOptions$x))
         xFilter<-!is.na(x)
       } else {
@@ -363,8 +363,8 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
           xFilter<-rowSums(is.na(as.data.frame(x)))==0
         }
       }
-      if(is.vector(ActiveOptions$by)){
-        byFilter<-!is.na()
+      if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){
+        byFilter<-!is.na(ActiveOptions$by)
       } else {
         xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
       }

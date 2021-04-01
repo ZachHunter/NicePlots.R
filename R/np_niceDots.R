@@ -335,7 +335,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
     xyid<-1
     xFilter<-1
     byFilter<-1
-    if(is.vector(ActiveOptions$x)) {
+    if(is.vector(ActiveOptions$x) | is.factor(ActiveOptions$x)) {
       xyid<-seq(length(ActiveOptions$x))
       xFilter<-!is.na(x)
     } else {
@@ -347,8 +347,8 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
         xFilter<-rowSums(is.na(as.data.frame(x)))==0
       }
     }
-    if(is.vector(ActiveOptions$by)){
-      byFilter<-!is.na()
+    if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){
+      byFilter<-!is.na(ActiveOptions$by)
     } else {
       xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
     }

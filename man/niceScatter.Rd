@@ -35,7 +35,7 @@ niceScatter(
   extendTicks = TRUE,
   expLabels = FALSE,
   lWidth = NULL,
-  na.rm = FALSE,
+  na.rm = TRUE,
   verbose = FALSE,
   logAdjustment = 1,
   xLim = NULL,
