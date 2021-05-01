@@ -68,7 +68,7 @@
 #' @importFrom purrr walk2 map_dbl
 #' @importFrom graphics polygon contour lines persp rug
 #' @export
-niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subgroup=FALSE, bandwidth=NULL, drawRug=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, sidePlot=FALSE, ...) {UseMethod("niceDensity",x)}
+niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subgroup=FALSE, bandwidth=NULL, drawRug=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=TRUE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, sidePlot=FALSE, ...) {UseMethod("niceDensity",x)}
 
 #' @importFrom dplyr bind_cols mutate arrange
 #' @importFrom magrittr %>%
@@ -77,10 +77,17 @@ niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subgroup=FAL
 #' @importFrom tidyr gather
 #' @importFrom graphics polygon contour lines persp rug
 #' @export
-niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgroup=FALSE, bandwidth=NULL, drawRug=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), rotateLabels=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, sidePlot=FALSE, ...)  {
+niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgroup=FALSE, bandwidth=NULL, drawRug=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), rotateLabels=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=TRUE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, sidePlot=FALSE, ...)  {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset",call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
+
+  #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
+  moreOptions<-list(...)
+  ActiveOptions<-list(x=x, by=by, drawPoints=drawPoints, groupNames=groupNames,subgroup=subgroup, useRgl=useRgl, plotType=plotType,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimCurves=trimCurves)
+  ActiveOptions<-append(ActiveOptions,moreOptions)
+
+  #Flight check data and remove na.
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = FALSE)
   x<-checked$d
   by<-checked$b
@@ -90,11 +97,6 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgr
   }
   finalStats<-NULL
   finalSummary<-NULL
-
-  #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
-  moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, drawPoints=drawPoints, groupNames=groupNames,subgroup=subgroup, useRgl=useRgl, plotType=plotType,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimCurves=trimCurves)
-  ActiveOptions<-append(ActiveOptions,moreOptions)
 
   #Here we check to see if the user specified any options so that they not overwritten by the designated theme
   finalOptions<-procNiceOptions(x=rep(1,length(by)),by=by,minorTick=minorTick,pointShape=NULL,whiskerLineType=NULL,lWidth=lWidth,capWidth=NULL,pointLaneWidth=FALSE,width=NULL,guides=guides,pointSize=NULL,subgroup=subgroup,stack=F,pointHighlights=FALSE,type="VP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=NULL,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow=NULL, errorCap = NULL, CLOptions=moreOptions)
@@ -242,6 +244,27 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgr
         if(length(plotColors$points) < n_groups) {plotColors$points<-rep(plotColors$points,n_groups)}
         for(i in 1:n_groups){
           points(x[groups==levels(groups)[i],1],x[groups==levels(groups)[i],2],col=plotColors$points[i],cex=pointSize,pch=pointShape[i])
+        }
+        if(is.vector(ActiveOptions$x)) {
+          xfilter<-!is.na(ActiveOptions$x)
+          IDs<-seq(length(ActiveOptions$x))
+        } else {
+          xfilter<-rowSums(is.na(ActiveOptions$x))==0
+          IDs<-seq(nrow(ActiveOptions$x))
+        }
+        if(is.null(ActiveOptions$by)) {
+          byfilter<-rep(TRUE,length(xfilter))
+        } else {
+          if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)) {
+            byfilter<-!is.na(ActiveOptions$by)
+          } else {
+            byfilter<-rowSums(is.na(ActiveOptions$by))==0
+          }
+        }
+        if(na.rm==TRUE) {
+          ActiveOptions$xypos<-data.frame(x=x[[1]],y=x[[2]],ID=IDs[xfilter & byfilter])
+        } else {
+          ActiveOptions$xypos<-data.frame(x=x[[1]],y=x[[2]],ID=IDs)
         }
       }
     } else if(plotType=="surface" & !is.numeric(den2D)) {

@@ -162,17 +162,33 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
       legend<-FALSE
       plotData<-prepNiceData(prepedData=prepedData,by=by, subgroup=subgroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,verbose=verbose)
       plotData %>% drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=F,drawBox=drawBox, lWidth=lWidth,whiskerLty=whiskerLineType,capWidth=capWidth, capType=capType)
-      addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
-      #IDS<-names(ActiveOptions$x)
-      #if(is.null(IDS)){
-      IDS<-as.character(seq(length(ActiveOptions$x)))
-      #}
-      IDfilter<-!is.na(ActiveOptions$x) & !is.na(ActiveOptions$by)
-      if(sidePlot[1]==TRUE) {
-        xypos<-data.frame(x=x,y=plotLoc[as.character(by)],group=by, ID=IDS[IDfilter])
+      xypos<-addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
+      xyid<-1
+      xFilter<-1
+      byFilter<-1
+      if(is.vector(ActiveOptions$x) | is.factor(ActiveOptions$x)) {
+        xyid<-seq(length(ActiveOptions$x))
+        xFilter<-!is.na(x)
       } else {
-        xypos<-data.frame(x=plotLoc[as.character(by)],y=x,group=by, ID=IDS[IDfilter])
+        if(flipFacts==TRUE) {
+          xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
+          xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+        } else {
+          xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+          xFilter<-rowSums(is.na(as.data.frame(x)))==0
+        }
       }
+      if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){
+        byFilter<-!is.na(ActiveOptions$by)
+      } else {
+        xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
+      }
+      xyid<-xyid[xFilter ==TRUE & byFilter ==TRUE]
+      xyid<-xyid[filter]
+      if(length(xyid)<nrow(xypos)){
+        xyid<-rep(xyid,nrow(xypos)/length(xyid))
+      }
+      xypos<-data.frame(xypos,ID=xyid)
 
     } else {
       if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[,1],calcType[1])}
@@ -184,7 +200,34 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
         cLoc<-facetLoc[plotData$facetLevel]
         plotData %>% bind_cols(at=cLoc,width=rep(.25*width/length(levels(by[,2])),length(cLoc))) %>%
           drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=F,drawBox=drawBox,lWidth = lWidth,whiskerLty=whiskerLineType,capWidth=capWidth, capType=capType)
-        addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
+        xypos<-addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
+        xyid<-1
+        xFilter<-1
+        byFilter<-1
+        if(is.vector(ActiveOptions$x) | is.factor(ActiveOptions$x)) {
+          xyid<-seq(length(ActiveOptions$x))
+          xFilter<-!is.na(x)
+        } else {
+          if(flipFacts==TRUE) {
+            xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
+            xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+          } else {
+            xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+            xFilter<-rowSums(is.na(as.data.frame(x)))==0
+          }
+        }
+        if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){
+          byFilter<-!is.na(ActiveOptions$by)
+        } else {
+          xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
+        }
+        xyid<-xyid[xFilter ==TRUE & byFilter ==TRUE]
+        xyid<-xyid[filter]
+        if(length(xyid)<nrow(xypos)){
+          xyid<-rep(xyid,nrow(xypos)/length(xyid))
+        }
+        xypos<-data.frame(xypos,ID=xyid)
+
         if(legend!=FALSE) {
           if(pointHighlights){
             if(legend==TRUE){
@@ -198,24 +241,40 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
             legendLabels<-levels(by[,2])
           }
         }
-        #IDS<-names(ActiveOptions$x)
-        #if(is.null(IDS)){
-        IDS<-as.character(seq(length(ActiveOptions$x)))
-        #}
-        IDfilter<-!is.na(ActiveOptions$x) & (rowSums(is.na(ActiveOptions$by))==0)
-        fLevels<-paste0(by[,1],by[,2],".")
-        if(sidePlot[1]==TRUE) {
-          xypos<-data.frame(x=x,y=facetLoc[fLevels],group=paste0(by[,1],".",by[,2]), ID=IDS[IDfilter])
-        } else {
-          xypos<-data.frame(x=facetLoc[fLevels],y=x,group=paste0(by[,1],".",by[,2]), ID=IDS[IDfilter])
-        }
       } else {
         #CASE: by is not a factor, data is a numeric vector and subgroup is FALSE
         plotLoc<-seq(1,length(groupNames),by=1)
         names(plotLoc)<-groupNames
         plotData<-prepNiceData(prepedData=prepedData,by=by, subgroup=subgroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,verbose=verbose)
         plotData %>% drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=F,drawBox=drawBox,lWidth=lWidth,whiskerLty=whiskerLineType,capWidth=capWidth, capType=capType)
-        addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
+        xypos<-addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers,swarmOverflow = swarmOverflow)
+        xyid<-1
+        xFilter<-1
+        byFilter<-1
+        if(is.vector(ActiveOptions$x) | is.factor(ActiveOptions$x)) {
+          xyid<-seq(length(ActiveOptions$x))
+          xFilter<-!is.na(x)
+        } else {
+          if(flipFacts==TRUE) {
+            xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
+            xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+          } else {
+            xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+            xFilter<-rowSums(is.na(as.data.frame(x)))==0
+          }
+        }
+        if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){
+          byFilter<-!is.na(ActiveOptions$by)
+        } else {
+          xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
+        }
+        xyid<-xyid[xFilter ==TRUE & byFilter ==TRUE]
+        xyid<-xyid[filter]
+        if(length(xyid)<nrow(xypos)){
+          xyid<-rep(xyid,nrow(xypos)/length(xyid))
+        }
+        xypos<-data.frame(xypos,ID=xyid)
+
         facetLoc<-plotLoc
         if(legend!=FALSE) {
           if(pointHighlights==TRUE){
@@ -224,16 +283,6 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
             }
             legendLabels<-levels(by[,2])
           }
-        }
-        #IDS<-names(ActiveOptions$x)
-        #if(is.null(IDS)){
-        IDS<-as.character(seq(length(ActiveOptions$x)))
-        #}
-        IDfilter<-!is.na(ActiveOptions$x) & (rowSums(is.na(ActiveOptions$by))==0)
-        if(sidePlot[1]==TRUE) {
-          xypos<-data.frame(x=x,y=plotLoc[as.character(by[,1])],group=by[,1], ID=IDS[IDfilter])
-        } else {
-          xypos<-data.frame(x=plotLoc[as.character(by[,1])],y=x,group=by[,1], ID=IDS[IDfilter])
         }
       }
     }
@@ -247,7 +296,34 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
       cLoc<-facetLoc[plotData$facetLevel]
       plotData %>% bind_cols(at=cLoc,width=rep(.25*width/length(x),length(cLoc))) %>%
         drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=F,drawBox=drawBox, lWidth=lWidth,whiskerLty=whiskerLineType,capWidth=capWidth, capType=capType)
-      addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x),swarmOverflow = swarmOverflow)
+      xypos<-addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x),swarmOverflow = swarmOverflow)
+      xyid<-1
+      xFilter<-1
+      byFilter<-1
+      if(is.vector(ActiveOptions$x) | is.factor(ActiveOptions$x)) {
+        xyid<-seq(length(ActiveOptions$x))
+        xFilter<-!is.na(x)
+      } else {
+        if(flipFacts==TRUE) {
+          xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
+          xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+        } else {
+          xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+          xFilter<-rowSums(is.na(as.data.frame(x)))==0
+        }
+      }
+      if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){
+        byFilter<-!is.na(ActiveOptions$by)
+      } else {
+        xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
+      }
+      xyid<-xyid[xFilter ==TRUE & byFilter ==TRUE]
+      xyid<-xyid[filter]
+      if(length(xyid)<nrow(xypos)){
+        xyid<-rep(xyid,nrow(xypos)/length(xyid))
+      }
+      xypos<-data.frame(xypos,ID=xyid)
+
       #Note we are ignoring pointHighlights here as by is a factor
       if(legend!=FALSE) {
         if(flipFacts) {
@@ -262,24 +338,8 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
           legendLabels<-colnames(prepedData[[1]])
         }
       }
-      longX<-purrr::reduce(x,c)
-      longGroup<-NULL
-      for(n in colnames(x)) {longGroup<-c(longGroup,paste0(n,as.character(by),"."))}
-      longY<-facetLoc[longGroup]
-      #IDS<-rownames(ActiveOptions$x)
-      #print(paste(IDS))
-      #print(head(ActiveOptions$x))
-      #if(is.null(IDS)){
-      IDS<-as.character(seq(length(ActiveOptions$x)))
-      #}
-      IDfilter<-(rowSums(is.na(ActiveOptions$x))==0) & !is.na(ActiveOptions$by)
-      if(sidePlot[1]==TRUE) {
-        xypos<-data.frame(x=longX,y=longY,group=longGroup, ID=rep(IDS[IDfilter],dim(x)[2]))
-      } else {
-        xypos<-data.frame(x=longY,y=longX,group=longGroup, ID=rep(IDS[IDfilter],dim(x)[2]))
-      }
     } else {
-      #CASE: data is a dataframe, by is a dataframe, subgroup is ignored
+      #CASE: data is a data.frame, by is a dataframe, subgroup is ignored
       facetLoc<-facetSpacing(length(prepedData[[1]]),length(groupNames))
       names(facetLoc)<-unlist(lapply(levels(by[,1]),FUN=function(y) paste0(y,names(x),sep=".")))
       if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]][,1],by[,1],calcType[1])}
@@ -287,7 +347,34 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
       cLoc<-facetLoc[plotData$facetLevel]
       plotData %>% bind_cols(at=cLoc,width=rep(.25*width/length(x),length(cLoc))) %>%
         drawBoxPlot(side=sidePlot,col=plotColors$lines,fill=plotColors$fill,drawDot=F,drawBox=drawBox,lWidth=lWidth,whiskerLty=whiskerLineType,capWidth=capWidth, capType=capType)
-      addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x),swarmOverflow = swarmOverflow)
+      xypos<-addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=drawPoints, outliers=outliers, dataCols=length(x),swarmOverflow = swarmOverflow)
+      xyid<-1
+      xFilter<-1
+      byFilter<-1
+      if(is.vector(ActiveOptions$x) | is.factor(ActiveOptions$x)) {
+        xyid<-seq(length(ActiveOptions$x))
+        xFilter<-!is.na(x)
+      } else {
+        if(flipFacts==TRUE) {
+          xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
+          xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+        } else {
+          xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+          xFilter<-rowSums(is.na(as.data.frame(x)))==0
+        }
+      }
+      if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){
+        byFilter<-!is.na(ActiveOptions$by)
+      } else {
+        xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
+      }
+      xyid<-xyid[xFilter ==TRUE & byFilter ==TRUE]
+      xyid<-xyid[filter]
+      if(length(xyid)<nrow(xypos)){
+        xyid<-rep(xyid,nrow(xypos)/length(xyid))
+      }
+      xypos<-data.frame(xypos,ID=xyid)
+
       if(legend!=FALSE) {
         if(pointHighlights){
           if(legend==TRUE){
@@ -307,22 +394,6 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
             legendLabels<-colnames(prepedData[[1]])
           }
         }
-      }
-      longX<-purrr::reduce(x,c)
-      longGroup<-NULL
-      for(n in colnames(x)) {longGroup<-c(longGroup,paste0(n,as.character(by[,1]),"."))}
-      longY<-facetLoc[longGroup]
-      #IDS<-rownames(ActiveOptions$x)
-      #print(paste(IDS))
-      #print(head(ActiveOptions$x))
-      #if(is.null(IDS)){
-      IDS<-as.character(seq(length(ActiveOptions$x)))
-      #}
-      IDfilter<-(rowSums(is.na(ActiveOptions$x))==0) & (rowSums(is.na(ActiveOptions$by))==0)
-      if(sidePlot[1]==TRUE) {
-        xypos<-data.frame(x=longX,y=longY,group=longGroup, ID=rep(IDS[IDfilter],dim(x)[2]))
-      } else {
-        xypos<-data.frame(x=longY,y=longX,group=longGroup, ID=rep(IDS[IDfilter],dim(x)[2]))
       }
     }
   }

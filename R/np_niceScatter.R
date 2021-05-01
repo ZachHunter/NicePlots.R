@@ -70,7 +70,7 @@
 #' @importFrom stats lm predict cor.test
 #' @importFrom scatterplot3d scatterplot3d
 #' @export
-niceScatter<-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=3, sizeLevels=6, groupNames=NULL, subgroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL,  minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL,zLim=NULL, strictLimits=FALSE, legend=FALSE ,trimTrendLines=TRUE, showTrendConfidence=TRUE, drawPoints=TRUE, corMethod="pearson", ...) {UseMethod("niceScatter",x)}
+niceScatter<-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=3, sizeLevels=6, groupNames=NULL, subgroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL,  minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=TRUE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL,zLim=NULL, strictLimits=FALSE, legend=FALSE ,trimTrendLines=TRUE, showTrendConfidence=TRUE, drawPoints=TRUE, corMethod="pearson", ...) {UseMethod("niceScatter",x)}
 
 #' @importFrom magrittr %>%
 #' @importFrom purrr map_lgl map_dbl map walk
@@ -80,7 +80,7 @@ niceScatter<-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FA
 #' @importFrom stats lm predict cor.test
 #' @importFrom scatterplot3d scatterplot3d
 #' @export
-niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=3, sizeLevels=6, groupNames=NULL, subgroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=FALSE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, zLim=NULL, strictLimits=FALSE, legend=FALSE, trimTrendLines=TRUE, showTrendConfidence=TRUE, drawPoints=TRUE, corMethod="pearson", ...) {
+niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=3, sizeLevels=6, groupNames=NULL, subgroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=TRUE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, zLim=NULL, strictLimits=FALSE, legend=FALSE, trimTrendLines=TRUE, showTrendConfidence=TRUE, drawPoints=TRUE, corMethod="pearson", ...) {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset",call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -167,6 +167,12 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
       }
     }
   }
+
+  #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
+  moreOptions<-list(...)
+  ActiveOptions<-list(x=x, by=by, groupNames=groupNames,subgroup=subgroup,color=color,shape=shape,size=size, useRgl=useRgl, type=type,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick,trendline=trendline, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimTrendLines=trimTrendLines, showTrendConfidence=showTrendConfidence, drawPoints=drawPoints, corMethod=corMethod)
+  ActiveOptions<-append(ActiveOptions,moreOptions)
+
   preFlightBy<-by
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = FALSE)
   x<-checked$d
@@ -175,10 +181,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
   finalStats<-NULL
   finalSummary<-NULL
 
-  #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
-  moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, groupNames=groupNames,subgroup=subgroup,color=color,shape=shape,size=size, useRgl=useRgl, type=type,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick,trendline=trendline, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimTrendLines=trimTrendLines, showTrendConfidence=showTrendConfidence, drawPoints=drawPoints, corMethod=corMethod)
-  ActiveOptions<-append(ActiveOptions,moreOptions)
+
 
   #Here we check to see if the user specified any options so that they not overwritten by the designated theme
   finalOptions<-procNiceOptions(x=rep(1,length(by)),by=by,minorTick=minorTick,pointShape=NULL,whiskerLineType=NULL,lWidth=lWidth,capWidth=NULL,pointLaneWidth=FALSE,width=NULL,guides=guides,pointSize=NULL,subgroup=subgroup,stack=F,pointHighlights=FALSE,type="2D",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=NULL,drawPoints=TRUE,groupNames=groupNames,swarmOverflow=NULL, errorCap = NULL, CLOptions=moreOptions)
@@ -480,7 +483,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
         print(modelStats)
         #walk(seq(groupLevels), function(p) print(paste0(levels(by$color)[p],":\n",myModels[[p]])))
       }
-      #draw trend lines based on groupsing that determine point shape
+      #draw trend lines based on groupings that determine point shape
     } else if (grepl("shape", trendline, ignore.case = T) & shape[1]==TRUE) {
       OkToDraw<-TRUE
       groupLevels<-length(unique(myShapes))
@@ -560,6 +563,30 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
       pch=myShapes,
       cex=mySize,
       type=type)
+    xfilter<-1
+    byfilter<-1
+    IDs<-1
+    if(is.vector(ActiveOptions$x)) {
+      xfilter<-!is.na(ActiveOptions$x)
+      IDs<-seq(length(ActiveOptions$x))
+    } else {
+      xfilter<-rowSums(is.na(ActiveOptions$x))==0
+      IDs<-seq(nrow(ActiveOptions$x))
+    }
+    if(is.null(preFlightBy)) {
+      byfilter<-rep(TRUE,length(xfilter))
+    } else {
+      if(is.vector(preFlightBy) | is.factor(preFlightBy)) {
+        byfilter<-!is.na(preFlightBy)
+      } else {
+        byfilter<-rowSums(is.na(preFlightBy))==0
+      }
+    }
+    if(na.rm==TRUE) {
+      ActiveOptions$xypos<-data.frame(x=x[[1]],y=x[[2]],ID=IDs[xfilter & byfilter])
+    } else {
+      ActiveOptions$xypos<-data.frame(x=x[[1]],y=x[[2]],ID=IDs)
+    }
   }
 
   #Note from niceDensity, needs review
