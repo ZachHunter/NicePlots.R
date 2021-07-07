@@ -412,7 +412,7 @@ drawViolinPlot <- function(x,groups,at=seq(1,length(levels(groups))),h=NULL, plo
 #' @seealso \code{\link[graphics]{barplot}}, \code{\link{niceBar}}, \code{\link{errorBars}}
 drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineType=1, width=.5, sidePlot=FALSE, stacked=FALSE,capSize=2,lineWidth=1,normalize=FALSE, logScale=FALSE, logAdjustment=1) {
   colorOrder<-plotColors$fill
-  #This section builds out the color list to match the number of factors for stacted barplots
+  #This section builds out the color list to match the number of factors for stacked bar plots
   if(stacked){
     if(length(colorOrder)<length(levels(x$Stack))) {
       warning("There are fewer colors in plotColors$fill than factor levels for stacking. Stacks will have repeated colors. Use plotColors=list(fill=c(...)) to make a custom color vector.", call. = FALSE)
@@ -423,23 +423,23 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
     names(colorOrder)<-levels(x$Stack)
   }
   if(sidePlot) {
-    #IE plot with xy axis fliped
+    #IE plot with xy axis flipped
     if(stacked){
       #Build stacks by position using factor levels. Missing factor levels are skipped.
       for (at in unique(x$at)) {
         temp<-x[x$at==at,]
         hAdjust<-0
         if(normalize==TRUE) {
-          temp$yt<-temp$yt/sum(temp$ty)
+          temp$yt<-temp$yt/sum(temp$ty) * 100
         }
         if(logScale!=FALSE & !is.na(logScale) & !is.null(logScale)){
           temp$yt<-logScale^temp$yt - logAdjustment
-          for(i in levels(factor(temp$Stack))) {
+          for(i in rev(levels(factor(temp$Stack)))) {
             rect(log(temp[temp$Stack==i,"yb"]+hAdjust+logAdjustment,logScale),at-width,log(temp[temp$Stack==i,"yt"]+hAdjust+logAdjustment,logScale),at+width,col=colorOrder[as.character(i)],border=plotColors$lines[1], lwd=lineWidth)
             hAdjust<-temp[temp$Stack==i,"yt"]+hAdjust
           }
         } else {
-          for(i in levels(factor(temp$Stack))) {
+          for(i in rev(levels(factor(temp$Stack)))) {
             rect(temp[temp$Stack==i,"yb"]+hAdjust,at-width,temp[temp$Stack==i,"yt"]+hAdjust,at+width,col=colorOrder[as.character(i)],border=plotColors$lines[1], lwd=lineWidth)
             hAdjust<-temp[temp$Stack==i,"yt"]+hAdjust
           }
@@ -468,16 +468,16 @@ drawBar <- function(x, plotColors, errorBars=FALSE, errorCap="ball", errorLineTy
         temp<-x[x$at==at,,drop=FALSE]
         hAdjust<-0
         if(normalize==TRUE) {
-          temp$yt<-temp$yt/sum(temp$yt,na.rm=TRUE)*100
+          temp$yt<-temp$yt/sum(temp$yt,na.rm=TRUE) *100
         }
         if(logScale!=FALSE & !is.na(logScale) & !is.null(logScale)){
           temp$yt<-logScale^temp$yt - logAdjustment
-          for(i in levels(factor(temp$Stack))) {
+          for(i in rev(levels(factor(temp$Stack)))) {
             rect(at-width, log(temp[temp$Stack==i,"yb"]+hAdjust + logAdjustment,logScale),at+width,log(temp[temp$Stack==i,"yt"]+hAdjust+logAdjustment,logScale),col=colorOrder[as.character(i)],border=plotColors$lines[1], lwd=lineWidth)
             hAdjust<-temp[temp$Stack==i,"yt"]+hAdjust
           }
         } else {
-         for(i in levels(factor(temp$Stack))) {
+         for(i in rev(levels(factor(temp$Stack)))) {
             rect(at-width, temp[temp$Stack==i,"yb"]+hAdjust,at+width,temp[temp$Stack==i,"yt"]+hAdjust,col=colorOrder[as.character(i)],border=plotColors$lines[1], lwd=lineWidth)
             hAdjust<-temp[temp$Stack==i,"yt"]+hAdjust
          }
