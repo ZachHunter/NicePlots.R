@@ -21,7 +21,7 @@ drawBar(
 )
 }
 \arguments{
-\item{x}{dataframe; number of interquartile ranges (IQR) past the Q1 (25\%) and Q3 (75\%) cumulative distribution values. Outliers are often defined as \eqn{1.5 \times IQR}{1.5 * IQR} and extreme outliers are more than \eqn{3 \times IQR}{3 * IQR} away from the inner 50\% data range.}
+\item{x}{dataframe; Gives top and bottom y-axis positions for the bar plots as well as error bar parameters. See example for details.}
 
 \item{plotColors}{list; a named list of vectors of colors that set the color options for all NicePlot functions. Names left unspecified will be added and set to default values automatically.}
 
@@ -48,10 +48,10 @@ drawBar(
 \item{logAdjustment}{numeric; a number added to each value prior to log trasformation. Defaults value is 1.}
 }
 \description{
-Add a barplot with options error pars to the active ploting enviroment
+Add a bar plot with options error pars to the active plotting environment
 }
 \details{
-This function draws a series of bars based on a dataframe. The expected columns include \code{yt} (locaion top of the bar),
+This function draws a series of bars based on a data frame. The expected columns include \code{yt} (location top of the bar),
 \code{yb} or bottom of the bar, \code{at} indicating where the bar should be drawn, \code{Group} which is a unique ID per row, \code{fact} which contains an optional stacking factor
 \code{UpperError} for the top of the error bar and \code{LowerError} for the location of the bottom of the error bar. The construction of the dataframe is handled automatically from input data
 by \code{\link{niceBar}}.
@@ -65,7 +65,8 @@ data<-iris  \%>\% group_by(Species) \%>\%
     ungroup() \%>\% select(yt,yb,UpperError,LowerError,Group=Species) \%>\%
     bind_cols(at=1:3,fact=1:3)
 plot(type="n",xlim=c(0,4),ylim=c(0,max(iris$Sepal.Length)),-1,xaxt="n")
-# drawBar(data,plotColors=list())
+# drawBar(data, width=.3, lineWidth=3,plotColors=list(lines="blue",fill="darkgrey"),
+# errorBars = T, errorCap = "none")
 
 }
 \seealso{

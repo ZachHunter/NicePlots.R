@@ -53,7 +53,6 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset", call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
-  lWidth<-NULL
   whiskerLineType<-NULL
   capWidth<-NULL
   if(is.null(normalize)) {normalize<-FALSE}
@@ -256,6 +255,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by,calcType[1],verbose=verbose)}
       legend<-FALSE
       width<-.25*width
+      facetLoc<-seq(1,length(groupNames))
     } else {
       if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[,1],calcType[1],verbose=verbose)}
       #CASE: by is not a factor data is a numeric vector and subgroup is TRUE
@@ -354,6 +354,42 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   if(verbose){
     print(pData[[2]])
   }
+
+  #Calculating data point positions comparability with npData specs.
+  xypos<-addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc, plotColors=plotColors, drawPoints=TRUE,pointMethod = "linear", calcOnly=TRUE)
+  xyid<-1
+  xFilter<-1
+  byFilter<-1
+  if(is.vector(ActiveOptions$x) | is.factor(ActiveOptions$x)) {
+    xyid<-seq(length(ActiveOptions$x))
+    xFilter<-!is.na(x)
+  } else {
+    if(flipFacts==TRUE) {
+      xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
+      xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+    } else {
+      xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
+      xFilter<-rowSums(is.na(as.data.frame(x)))==0
+    }
+  }
+  if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){
+    byFilter<-!is.na(ActiveOptions$by)
+  } else {
+    xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
+  }
+  xyid<-xyid[xFilter ==TRUE & byFilter ==TRUE]
+  xyid<-xyid[filter]
+  xyLength<-1
+  if(is.numeric(xypos) & !is.matrix(xypos)){
+    xyLength<-length(xypos)
+  } else {
+    xyLength<-nrow(xypos)
+  }
+  if(length(xyid)<xyLength){
+    xyid<-rep(xyid,xyLength/length(xyid))
+  }
+  ActiveOptions$xypos<-data.frame(xypos,ID=xyid)
+
   #updating the plot data from pData to be compatible with drawBar
   pData[[1]] %>%
     mutate(yb=bVal,UpperError=.data$upperError, LowerError=.data$lowerError,yt=.data$AData) %>%

@@ -21,7 +21,8 @@ addNicePoints(
   drawPoints = T,
   outliers = F,
   dataCols = 1,
-  swarmOverflow = "random"
+  swarmOverflow = "random",
+  calcOnly = FALSE
 )
 }
 \arguments{
@@ -58,6 +59,8 @@ addNicePoints(
 \item{dataCols}{numeric; A number of representing the number of data columns to be plotted. These is a combination of the dimentions of \code{prepedData} and/or the number of primary and secondary grouping factors. Used to determine the maximum ploting width for the points.}
 
 \item{swarmOverflow}{character; How to handle beeswarms that would normally overflow the \code{pointLaneWidth} argument. Valid options are "random", "gutter", "wrap", "omit", and "none".}
+
+\item{calcOnly}{logical; Will return just xy plotting data but will plot nothing if set to \code{TRUE}. Setting drawPoints to false will still plot outlier data.}
 }
 \description{
 This function prepares data based on settings from \code{\link{niceBox}}, \code{\link{niceDots}}, or \code{\link{niceVio}}
