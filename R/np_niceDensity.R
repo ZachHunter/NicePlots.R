@@ -227,7 +227,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgr
       if(!is.numeric(den2D)) {
         myCol<-plotColors$lines[1]
         if(!is.null(moreOptions[["col"]])){myCol<-moreOptions[["col"]]}
-        do.call("contour", append(list(x=den2D$x1,y=den2D$x2,z=den2D$fhat,col=myCol,main=main,sub=sub,ylab=ylab, add=TRUE),moreOptions[!names(moreOptions) %in% c("z","x","y","col", "curvePoints")]))
+        do.call("contour", append(list(x=den2D$x1,y=den2D$x2,z=den2D$fhat,col=myCol,main=main,sub=sub,ylab=ylab, add=TRUE,lwd=lWidth),moreOptions[!names(moreOptions) %in% c("z","x","y","col", "curvePoints")]))
       }
       if(drawPoints==TRUE) {
         if(is.null(by)){
@@ -394,7 +394,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgr
       }
       walk2(.x=densities2,.y=plotColors$lines[1:n_groups],~lines(.x,col=.y,lwd=lWidth))
       if(drawRug[1]==TRUE){
-        walk(1:n_groups,~rug(x[as.character(by)==levels(by)[.x]], col=plotColors$fill[.x], side=(1+sidePlot[1]),ticksize=0.05*pointSize[1],lwd=lWidth*.8))
+        walk(1:n_groups,~rug(x[as.character(by)==levels(by)[.x]], col=plotColors$fill[.x], side=(1+sidePlot[1]),ticksize=0.05*pointSize[1],lwd=lWidth*.7))
       }
     } else {
       if(is.null(bandwidth)) {
@@ -429,14 +429,14 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgr
           xlab<-ylab
           ylab<-temp
         }
-        test<-prepNiceWindow(data.frame(x=x,y=x), by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
+        prepData<-prepNiceWindow(data.frame(x=x,y=x), by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
         title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$axisLabels)
       }
       #plot(-1,-1,type="n",xlim=c(minx,maxx),ylim=c(0,maxy),main=main,sub=sub,ylab=ylab)
       polygon(densities2,col=theme$plotColors$fill[1],border=0)
-      lines(densities2,col=theme$plotColors$lines[1])
+      lines(densities2,col=theme$plotColors$lines[1], lwd=lWidth)
       if(drawRug[1]==TRUE){
-        rug(x,col=theme$plotColors$lines[1], side=1+sidePlot[1],ticksize=0.05*pointSize[1],lwd=lWidth*.8)
+        rug(x,col=theme$plotColors$lines[1], side=1+sidePlot[1],ticksize=0.05*pointSize[1],lwd=lWidth*.7)
       }
     }
   }
