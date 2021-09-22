@@ -244,20 +244,20 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
         byFilter<-1
         if(is.vector(ActiveOptions$x) | is.factor(ActiveOptions$x)) {
           xyid<-seq(length(ActiveOptions$x))
-          xFilter<-!is.na(x)
+          xFilter<-!is.na(ActiveOptions$x)
         } else {
           if(flipFacts==TRUE) {
             xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
-            xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+            xFilter<-rep(rowSums(is.na(as.data.frame(ActiveOptions$x)))==0,ncol(ActiveOptions$x))
           } else {
             xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
-            xFilter<-rowSums(is.na(as.data.frame(x)))==0
+            xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$x)))==0
           }
         }
         if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){
           byFilter<-!is.na(ActiveOptions$by)
         } else {
-          xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
+          byFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
         }
         xyid<-xyid[xFilter ==TRUE & byFilter ==TRUE]
         xyid<-xyid[filter]
@@ -290,6 +290,7 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
         if(drawBox) {
           plotData %>% drawBoxPlot(side=sidePlot,col=plotColors$vioBoxLineCol,fill=plotColors$vioBoxFill,drawDot=F,drawBox=drawBox,lWidth=lWidth,whiskerLty=whiskerLineType,capWidth=capWidth)
         }
+
         xypos<-addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=plotLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=TRUE, outliers=outliers,swarmOverflow = swarmOverflow, calcOnly=!drawPoints)
         xyid<-1
         xFilter<-1
@@ -304,11 +305,15 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
           } else {
             xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
             xFilter<-rowSums(is.na(as.data.frame(x)))==0
+
+        
           }
         }
         if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){            byFilter<-!is.na(ActiveOptions$by)
           } else {
+
           xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
+
         }
         xyid<-xyid[xFilter ==TRUE & byFilter ==TRUE]
         xyid<-xyid[filter]
@@ -345,6 +350,7 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
         plotData %>% bind_cols(at=cLoc,width=rep(.25*width*vioBoxWidth,length(cLoc))) %>%
           drawBoxPlot(side=sidePlot,col=plotColors$vioBoxLineCol,fill=plotColors$vioBoxFill,drawDot=F,drawBox=drawBox, lWidth=lWidth,whiskerLty=whiskerLineType,capWidth=capWidth)
       }
+
       xypos<-addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=TRUE, outliers=outliers, dataCols=length(x),swarmOverflow = swarmOverflow, calcOnly=!drawPoints)
       xyid<-1
       xFilter<-1
@@ -359,6 +365,7 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
         } else {
           xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
           xFilter<-rowSums(is.na(as.data.frame(x)))==0
+
         }
       }
       if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){
@@ -403,6 +410,7 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
         plotData %>% bind_cols(at=cLoc,width=rep(.25*width*vioBoxWidth,length(cLoc))) %>%
           drawBoxPlot(side=sidePlot,col=plotColors$vioBoxLineCol,fill=plotColors$vioBoxFill,drawDot=F,drawBox=drawBox,lWidth=lWidth,whiskerLty=whiskerLineType,capWidth=capWidth)
       }
+
       xypos<-addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=pointHighlights, pointMethod=pointMethod, pointShape=pointShape, pointSize=pointSize, width=width, pointLaneWidth=pointLaneWidth, plotColors=plotColors, drawPoints=TRUE, outliers=outliers, dataCols=length(x),swarmOverflow = swarmOverflow, calcOnly=!drawPoints)
       xyid<-1
       xFilter<-1
