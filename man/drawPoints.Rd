@@ -13,7 +13,8 @@ drawPoints(
   highlight = FALSE,
   width = 0.2,
   sidePlot = FALSE,
-  swarmOverflow = "random"
+  swarmOverflow = "random",
+  calcOnly = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ drawPoints(
 \item{sidePlot}{logical; plots dots for a horizontal rather than vertical axis.}
 
 \item{swarmOverflow}{character; How to handle beeswarms that would normally overflow the \code{width} argument. Valid options are "random", "gutter", "wrap", "omit", and "none".}
+
+\item{calcOnly}{logical; Will return just xy plotting data but will plot nothing if set to \code{TRUE}. Setting drawPoints to false will still plot outlier data.}
 }
 \description{
 takes a data frame of locations, values and an optional subgrouping factor and adds the data points to the active plot
