@@ -80,7 +80,7 @@ quantileTrim<-function(x,threshold=3,na.rm=FALSE,returnFilter=FALSE){
 #' @import RColorBrewer
 #' @seealso \code{\link[grDevices]{rainbow}}, \code{\link[grDevices]{col2rgb}}, \code{\link[grDevices]{rgb}}.
 makeColorMatrix<-function(){
-  myColors<-list(base=c("red","blue","green","gray","purple","gold"))
+  myColors<-list(base=c("red","blue","green","black","purple","gold"))
   for(i in 1:4) {
     r<-col2rgb("red",alpha=(1-.2*i))
     b<-col2rgb("blue",alpha=(1-.2*i))
@@ -136,7 +136,7 @@ setAlpha<-function(x,alpha=.2){
 #' @param type character; determines which statistical test should be used. Accepted values are 'wilcox', 't.test', 'ttest', 'anova' and 'tukey'. Values not matching a valid input will produce a warning.
 #' @param verbose logical; will print statistical output to the screen if set \code{\link{TRUE}}. Calculations returned by the function either way.
 #'
-#' @return a character string describing the test run and the p-value.
+#' @return A three element list with the test type, test result object and the p-value as a text string (if available).
 #' @importFrom stats t.test wilcox.test anova TukeyHSD pairwise.wilcox.test pairwise.t.test aov median
 #' @examples
 #' data(iris)
@@ -146,25 +146,31 @@ setAlpha<-function(x,alpha=.2){
 #'
 #' @seealso \code{\link[stats]{wilcox.test}}, \code{\link[stats]{pairwise.wilcox.test}}, \code{\link[stats]{t.test}}, \code{\link[stats]{pairwise.t.test}}, \code{\link[stats]{anova}}, \code{\link[stats]{TukeyHSD}}
 calcStats<-function(x,by,type=c("Wilcox","Tukey","T.Test","ANOVA"),verbose=FALSE){
-  pvalue<-NULL
-  p<-NULL
+  pvalue<-NA
+  testType<-NA
+  testData<-NA
+  p<-NA
   if(length(levels(factor(by)))>2){
-    if(type[1]=="wilcox"| type[1]=="Wilcox") {
-      pairwise<-pairwise.wilcox.test(x,by,p.adjust.method="holm")
-      if(verbose){print(pairwise)}
-    } else if(type[1]=="t.test"| type[1]=="ttest" | type[1]=="T.test") {
-      pairwise<-pairwise.t.test(x,by,p.adjust.method="holm")
-      if(verbose){print(pairwise)}
-    } else if(type[1]=="ANOVA"| type[1]=="anova") {
-      m<-aov(x~by)
-      if(verbose){print(anova(m))}
+    if(grepl("^wil",ignore.case = TRUE,x = type[1])) {
+      testData<-pairwise.wilcox.test(x,by,p.adjust.method="holm")
+      testType<-"pairwise.wilcox.test"
+      if(verbose){print(testData)}
+    } else if(grepl("^t\\.?t",ignore.case = TRUE, x=type[1])) {
+      testData<-pairwise.t.test(x,by,p.adjust.method="holm")
+      testType<-"pairwise.t.test"
+      if(verbose){print(testData)}
+    } else if(grepl("^an",ignore.case = TRUE, x=type[1])) {
+      testData<-aov(x~by)
+      testType<-"anova"
+      if(verbose){print(anova(testData))}
       pvalue <-"ANOVA p-value "
-      p<-unlist(anova(m)[5])
-    } else if (type[1]=="tukey"| type[1]=="Tukey") {
+      p<-unlist(anova(testData)[5])
+    } else if (grepl("^tuk",ignore.case = TRUE,x=type[1])) {
       m<-aov(x~by)
       if(verbose){print(anova(m))}
-      pairwise<-TukeyHSD(m)
-      if(verbose){print(pairwise)}
+      testData<-TukeyHSD(m)
+      testType<-"TukeyHSD"
+      if(verbose){print(testData)}
       pvalue <-"ANOVA p-value "
       p<-unlist(anova(m)[5])
     } else {
@@ -172,41 +178,45 @@ calcStats<-function(x,by,type=c("Wilcox","Tukey","T.Test","ANOVA"),verbose=FALSE
       #return("P=NA")
     }
   } else if(length(levels(factor(by)))==2){
-    if(type[1]=="ANOVA" | type[1]=="anova") {
+    if(grepl("^an",ignore.case = TRUE, x=type[1])) {
       warning("Only two levels detected for analysis of variance (ANOVA).\nReccomend using wilcoxon rank sum instead.")
-      m<-aov(x~by)
-      if(verbose){print(anova(m))}
+      testData<-aov(x~by)
+      testType<-"anova"
+      if(verbose){print(anova(testData))}
       pvalue <-"ANOVA p-value "
-      p<-unlist(anova(m)[5])
-    } else if (type[1]=="tukey"| type[1]=="Tukey") {
+      p<-unlist(anova(testData)[5])
+    } else if (grepl("^tuk",ignore.case = TRUE,x=type[1])) {
       warning("Only two levels detected for Tukey's honestly significant difference analysis.\nRecommend using wilcoxon rank sum instead.")
       m<-aov(x~by)
       if(verbose){print(anova(m))}
-      pairwise<-TukeyHSD(m)
-      if(verbose){print(pairwise)}
+      testData<-TukeyHSD(m)
+      testType<-"TukeyHSD"
+      if(verbose){print(testData)}
       pvalue <-"ANOVA p-value "
       p<-unlist(anova(m)[5])
-    } else if(type[1]=="wilcox" | type[1]=="Wilcox") {
-      p<-wilcox.test(x~by)
-      if(verbose){print(p)}
-      p<-p$p.value
+    } else if(grepl("^wil",ignore.case = TRUE,x = type[1])) {
+      testData<-wilcox.test(x~by)
+      testType<-"wilcox.test"
+      if(verbose){print(testData)}
+      p<-testData$p.value
       pvalue <-"Wilcoxon rank sum p-value "
-    } else if(type[1]=="t.test" | type[1]=="ttest" | type[1]=="T.test") {
-      p<-t.test(x~by)
-      if(verbose){print(p)}
-      p<-p$p.value
+    } else if(grepl("^t\\.?t",ignore.case = TRUE, x=type[1])) {
+      testData<-t.test(x~by)
+      testType<-"t.test"
+      if(verbose){print(testData)}
+      p<-testData$p.value
       pvalue <-"Welch Two Sample t-test p-value "
     } else {
-      warning(paste0("Statistic type ",type," not recognized.\nPlease check spelling and/or documentation for more information."))
+      warning(paste0("Statistic type ",type[1]," not recognized.\nPlease check spelling and/or documentation for more information."))
       #return("P=NA")
     }
   } else {
-    warning("Only one level detected in the factor. Statistics can not be calculated.")
+    warning("Only one level detected in the factor.\nStatistics can not be calculated.")
   }
-  if(!(length(levels(factor(by)))>2 & (type[1]=="wilcox" | type[1]=="Wilcox" | type[1]=="t.test" | type[1]=="ttest" | type[1]=="T.test"))) {
+  if(!is.na(p[1]) & ! is.na(pvalue[1])) {
     if(as.numeric(p[1])<0.00001){pvalue<-paste0(pvalue[1],"< 0.00001")}
     else {pvalue<-paste0(pvalue[1],"= ",round(p,5)) }
-    return(pvalue)
+    return(list(p.value=pvalue,test=testType,results=testData))
   }
 }
 
@@ -297,8 +307,8 @@ t95ci<-function(x) {
 #' from the package \code{boot} and are used to determine calculated the different bootstrap iterations of the \code{agg} functions on \code{x}.
 #'
 #' @param x numeric vector
-#' @param agg character: A string corresponding to the aggregator function to be modeled (eg. \code{\link[stats]{median}}, \code{\link[base]{mean}}, etc.)
 #' @param indices numeric vector: Indicies are passed to calculated individual bootstaps of \code{x}
+#' @param agg character: A string corresponding to the aggregate or central tendency function to be modeled (eg. \code{\link[stats]{median}}, \code{\link[base]{mean}}, etc.)
 #'
 #' @return a number corresponding to a bootstrap iteration of the aggregator function given by \code{agg}
 #' @examples
@@ -307,8 +317,8 @@ t95ci<-function(x) {
 #' #ci(iris$Sepal.Length,"median",seq(1,length(iris$Sepal.Length)))
 #' @seealso \code{\link[boot]{boot}}, \code{\link{boot95ci}}
 #' @importFrom purrr invoke
-ci<-function(x,agg,indices) {
-  purrr::invoke(agg,x[indices])
+ci<-function(x,indices,agg) {
+  purrr::invoke(agg,list(x=x[indices]))
 }
 
 #' @title Calculate a basic bootstrap 95\% confidence interval
@@ -321,8 +331,9 @@ ci<-function(x,agg,indices) {
 #' confidence interval if set to \code{\link{TRUE}} or the lower bound if set to \code{\link{FALSE}}.
 #'
 #' @param x numeric vector
-#' @param agg character: A string corresponding to the aggregator function to be modeled (eg. \code{\link[stats]{median}}, \code{\link[base]{mean}}, etc.)
-#' @param upper logical:
+#' @param agg character: A string corresponding to the aggregate or central tendency function to be modeled (eg. \code{\link[stats]{median}}, \code{\link[base]{mean}}, etc.)
+#' @param upper logical: Should the upper or lower confidence interval boundary be returned
+#' @param nBoot numeric; An integer value indicating the number of boot strap resampling trails to run. Defaults to 1,000.
 #'
 #' @return a number corresponding to the upper or lower bootrap 95\% confidence interval of the aggregator function given by \code{agg}.
 #' @examples
@@ -334,14 +345,8 @@ ci<-function(x,agg,indices) {
 #' @seealso \code{\link{prepBarData}}, \code{\link{niceBar}}, \code{\link[boot]{boot}}, \code{\link[boot]{boot.ci}}
 # @importFrom boot boot boot.ci
 # @importFrom purrr invoke
-boot95ci<-function(x,agg="mean",upper=FALSE) {
-  errVal<-boot::boot.ci(boot::boot(x,ci,agg=agg,R=1000),type="perc")$percent[4+upper]
-  if(upper){
-    errVal<-errVal-purrr::invoke(agg,list(x=x))
-  } else {
-    errVal<-purrr::invoke(agg,list(x=x))-errVal
-  }
-  errVal
+boot95ci<-function(x,agg="mean",upper=FALSE,nBoot=1000L) {
+  boot::boot.ci(boot::boot(x,ci,agg=agg,R=nBoot),type="perc")$percent[4+upper]
 }
 
 # This is just an extention of plot to handle the npData class for convenience.

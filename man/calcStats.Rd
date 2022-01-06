@@ -21,7 +21,7 @@ calcStats(
 \item{verbose}{logical; will print statistical output to the screen if set \code{\link{TRUE}}. Calculations returned by the function either way.}
 }
 \value{
-a character string describing the test run and the p-value.
+A three element list with the test type, test result object and the p-value as a text string (if available).
 }
 \description{
 \code{calcStats} takes a numeric vector and a factor and runs a preliminary statistical analysis. Output is printed to the screen and the p-value is returned as a character string.

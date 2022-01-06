@@ -32,7 +32,7 @@ niceDots(
   pointMethod = NULL,
   axisText = c(NULL, NULL),
   showCalc = FALSE,
-  calcType = "none",
+  calcType = "wilcox",
   yLim = NULL,
   rotateLabels = FALSE,
   rotateY = FALSE,

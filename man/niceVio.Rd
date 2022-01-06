@@ -25,7 +25,7 @@ niceVio(
   pointMethod = NULL,
   axisText = c(NULL, NULL),
   showCalc = FALSE,
-  calcType = "none",
+  calcType = "wilcox",
   drawBox = TRUE,
   yLim = NULL,
   rotateLabels = FALSE,

@@ -30,7 +30,7 @@
 #' @param outliers positive numeric; number of interquartile ranges (IQR) past the Q1 (25\%) and Q3 (75\%) cumulative distribution values. Outliers are often defined as \eqn{1.5 \times IQR} and extreme outliers are more than \eqn{3 \times IQR} away from the inner 50\% data range.
 #' @param showCalc logical; if a p-value can be easily calculated for your data, it will be displayed using the \code{sub} annotation setting.
 #' @param calcType character; should match one of 'none', 'wilcox', 'Tukey','t.test','anova' which will determine which, if any statistical test should be performed on the data.
-#' @param flipFacts logical; When a dataframe of values is given, column names are used as a secondary grouping factor by default. Setting \code{flipFacts=\link{TRUE}} makes the column names the primary factor and \code{by} the secondary factor.
+#' @param flipFacts logical; When a \code{\link{data.frame}} of values is given, column names are used as a secondary grouping factor by default. Setting \code{flipFacts=\link{TRUE}} makes the column names the primary factor and \code{by} the secondary factor.
 #' @param na.rm logical; Should \code{NA}s be removed from the data set? Both data input and the factor input from \code{by} with be checked.
 #' @param legend logical/character; if not equal to \code{\link{FALSE}} with cause a legend to be drawn in the margins. If set to a character string instead of a logical value, the string will be used as the legend title insteas of the factor column name from \code{by}.
 #' @param verbose logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.
@@ -45,11 +45,11 @@
 #' @importFrom dplyr mutate
 #' @export
 #' @seealso \code{\link[vioplot]{vioplot}}, \code{\link{boxplot}}, \code{\link{niceBox}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{prepCategoryWindow}}
-niceBar <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=list(bg="open",fill=setAlpha("grey",.8)), logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap="ball", errorLineType=1,capWidth=1.2, lWidth=1.5, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1,normalize=FALSE, ...) {UseMethod("niceBar",x)}
+niceBar <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=list(bg="open",fill=setAlpha("grey",.8)), logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap="ball", errorLineType=1,capWidth=1.2, lWidth=1.5, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1,normalize=FALSE, ...) {UseMethod("niceBar",x)}
 
 #' @import dplyr
 #' @export
-niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median"),errFun=c("se","sd","range", "t95ci", "boot95ci"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=NULL, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=NULL, logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1, normalize=FALSE, ...) {
+niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median"),errFun=c("se","sd","range", "t95ci", "boot95ci"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=NULL, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=NULL, logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1, normalize=FALSE, ...) {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset", call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -115,6 +115,8 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   groupNames<-finalOptions$groupNames
   errorCap<-finalOptions$errorCap
 
+  statsData<-list(p.value=NA,test="none",results=NA)
+
   #Initialize legend variables so we can update based on options
   legendTitle<-"Legend"
   legendLabels<-NULL
@@ -170,7 +172,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
     #if(logScale>1) {prepedData<-log(prepedData+logAdjustment,logScale)}
     pData<-prepBarData(x=prepedData,by=by,errorMultiple=errorMultiple,upperErrorFun=upperErrorFun,lowerErrorFun=lowerErrorFun,aggFunction=aggFun,stack=stack,subgroup=subgroup)
 
-    #If all aggregated values are >= 0 then we want to interect the y-axis exactly at zero
+    #If all aggregated values are >= 0 then we want to intersect the y-axis exactly at zero
     dmin<-min(pData$plot$AData)
     bVal<-0
     dRange<-c(0,100)
@@ -252,12 +254,18 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   if(is.numeric(prepedData[[1]])){
     #CASE: by is a factor data is a numeric vector
     if(is.factor(by)) {
-      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by,calcType[1],verbose=verbose)}
+      if(calcType[1]!="none"){
+        statsData<-calcStats(prepedData[[1]],by,calcType[1],verbose=verbose)
+        pvalue<-statsData$p.value
+      }
       legend<-FALSE
       width<-.25*width
       facetLoc<-seq(1,length(groupNames))
     } else {
-      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[,1],calcType[1],verbose=verbose)}
+      if(calcType[1]!="none"){
+        statsData<-calcStats(prepedData[[1]],by[,1],calcType[1],verbose=verbose)
+        pvalue<-statsData$p.value
+      }
       #CASE: by is not a factor data is a numeric vector and subgroup is TRUE
       if(subgroup) {
         facetLoc<-facetSpacing(length(levels(by[,2])),length(groupNames))
@@ -427,7 +435,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)
 
   #formating the output list and setting class int npData
-  dataOut<-list(summary=pData[[2]],stats=pvalue,plotType="bar",options=ActiveOptions)
+  dataOut<-list(summary=pData[[2]],stats=statsData,plotType="bar",options=ActiveOptions)
   class(dataOut)<-c("npData","list")
 
   invisible(dataOut)
