@@ -214,10 +214,13 @@ calcStats<-function(x,by,type=c("Wilcox","Tukey","T.Test","ANOVA"),verbose=FALSE
     warning("Only one level detected in the factor.\nStatistics can not be calculated.")
   }
   if(!is.na(p[1]) & ! is.na(pvalue[1])) {
-    if(as.numeric(p[1])<0.00001){pvalue<-paste0(pvalue[1],"< 0.00001")}
-    else {pvalue<-paste0(pvalue[1],"= ",round(p,5)) }
-    return(list(p.value=pvalue,test=testType,results=testData))
+    if(as.numeric(p[1])<0.00001){
+      pvalue<-paste0(pvalue[1],"< 0.00001")
+    } else {
+      pvalue<-paste0(pvalue[1],"= ",round(p,5))
+    }
   }
+  return(list(p.value=pvalue,test=testType,results=testData))
 }
 
 #' @title Generate plotting locations for subgrouping data

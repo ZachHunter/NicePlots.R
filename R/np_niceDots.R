@@ -51,6 +51,7 @@
 #' @param pointShape positive integer; sets pty for plotting data points. Can be a vector to support additional graphical customization.
 #' @param drawPoints logical; draws a dot plot overlay of the data.
 #' @param pointHighlights logical; will use additional factors in \code{by} to highlight points in the dot plot
+#' @param highlightLabels character; An optional character vector to override the factor labels associated with point highlights if active.
 #' @param pointLaneWidth numeric; This controls how far data point dots can spread along the categorical axis when plotting. Used for \code{pointMethod} options 'jitter', 'beeswarm', and 'distribution'.
 #' @param ... additional options for S3 method variants.
 
@@ -66,14 +67,14 @@
 #' @importFrom purrr reduce
 #' @export
 #' @seealso \code{\link[graphics]{stripchart}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{quantileTrim}}, \code{\link{prepCategoryWindow}}, \code{\link[base]{jitter}}
-niceDots <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, errorBars=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("se","sd","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {UseMethod("niceDots",x)}
+niceDots <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, errorBars=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("se","sd","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, highlightLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {UseMethod("niceDots",x)}
 
 #' @importFrom dplyr mutate
 #' @importFrom magrittr %>%
 #' @importFrom purrr reduce
 #' @export
 #'@author Zachary Hunter
-niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, errorBars=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("se","sd","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {
+niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, errorBars=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("se","sd","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, highlightLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset", call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -84,7 +85,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
 
   #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, groupNames=groupNames, drawPoints=drawPoints, errorBars=errorBars,barWidth=barWidth, barType=barType, barThickness=barThickness, aggFun=aggFun,errFun=errFun, errorMultiple=errorMultiple, main=main,sub=sub, ylab=ylab, minorTick=minorTick, theme=theme, guides=guides, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth, na.rm=na.rm, flipFacts=flipFacts, verbose=verbose, legend=legend,logAdjustment=logAdjustment,errorCap=errorCap, errorLineType=errorLineType,capWidth=capWidth, lWidth=lWidth)
+  ActiveOptions<-list(x=x, by=by, groupNames=groupNames, drawPoints=drawPoints, errorBars=errorBars,barWidth=barWidth, barType=barType, barThickness=barThickness, aggFun=aggFun,errFun=errFun, errorMultiple=errorMultiple, main=main,sub=sub, ylab=ylab, minorTick=minorTick, theme=theme, guides=guides, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth, na.rm=na.rm, flipFacts=flipFacts, verbose=verbose, legend=legend,logAdjustment=logAdjustment,errorCap=errorCap, errorLineType=errorLineType,capWidth=capWidth, lWidth=lWidth,highlightLabels=highlightLabels)
 
   #Flight check and prep data. Removes NAs.
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = flipFacts)
@@ -96,7 +97,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
   ActiveOptions<-append(ActiveOptions,moreOptions)
 
   #Here we check to see if the user specified any options so that they not overwritten by the designated theme
-  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=pointShape,whiskerLineType=errorLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subgroup=subgroup,stack=FALSE,pointHighlights=pointHighlights,type="DP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=pointMethod,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow=swarmOverflow ,errorCap=errorCap,CLOptions=moreOptions)
+  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=pointShape,whiskerLineType=errorLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subgroup=subgroup,stack=FALSE,pointHighlights=pointHighlights,type="DP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=pointMethod,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow=swarmOverflow ,errorCap=errorCap,CLOptions=moreOptions,subgroupLabels=subgroupLabels,highlightLabels=highlightLabels)
   minorTick<-finalOptions$minorTick
   pointShape<-finalOptions$pointShape
   errorLineType<-finalOptions$whiskerLineType
@@ -107,11 +108,42 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
   theme<-finalOptions$theme
   plotColors<-finalOptions$plotColors
   groupNames<-finalOptions$groupNames
+  subgroupLabels<-finalOptions$subgroupLabels
+  highlightLabels<-finalOptions$highlightLabels
   errorCap<-finalOptions$errorCap
   pointMethod<-finalOptions$pointMethod
   swarmOverflow<-finalOptions$swarmOverflow
   pointLaneWidth<-finalOptions$pointLaneWidth
 
+  if((!is.null(ActiveOptions$groupNames) | !is.null(ActiveOptions$subgroupLabels) | !is.null(ActiveOptions$highlightLabels)) & !is.null(groupNames)) {
+    if(is.data.frame(by)) {
+      by[,1]<-factor(by[,1], labels=groupNames)
+    } else {
+      by<-factor(by, labels=groupNames)
+    }
+  }
+  if(!is.null(ActiveOptions$subgroupLabels) & !is.null(subgroupLabels)) {
+    if(is.data.frame(by) & subgroup==TRUE & !is.data.frame(x)) {
+      if(ncol(by) >= 2) {
+        by[,2]<-factor(by[,2], labels=subgroupLabels)
+      }
+    }
+  }
+  if(!is.null(ActiveOptions$highlightLabels) & !is.null(highlightLabels)) {
+    if(is.data.frame(by) & pointHighlights==TRUE) {
+      if(ncol(by)>=2) {
+        if(is.data.frame(x)) {
+          by[,2]<-factor(by[,2], labels=highlightLabels)
+        } else {
+          if(subgroup==FALSE) {
+            by[,2]<-factor(by[,2], labels=highlightLabels)
+          } else if(ncol(by)>=3) {
+            by[,3]<-factor(by[,3], labels=highlightLabels)
+          }
+        }
+      }
+    }
+  }
   statsData<-list(p.value=NA,test="none",results=NA)
 
   if(grepl("ball",errorCap,ignore.case = TRUE)) {
@@ -138,26 +170,6 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
   }
   if(!(errFun[1] %in% c("sd", "se", "range", "t95ci", "boot95ci"))) {
     stop(paste0("The errFun option needs to be equal to either 'se', 'se', 'range' or 'boot95ci'.\nCurrently errFun = ",aggFun,".\nSee documentation for details."))
-  }
-
-  #Capturing default group names
-  prepedData<-NULL
-  if(is.data.frame(by)) {
-    if(is.null(groupNames)){
-      if(is.factor(by[,1])) {
-        groupNames<-levels(by[,1])
-      } else {
-        groupNames<-levels(factor(by[,1]))
-      }
-    }
-  } else {
-    if(is.null(groupNames)) {
-      if(is.factor(by)) {
-        groupNames<-levels(by)
-      } else {
-        groupNames<-levels(factor(by))
-      }
-    }
   }
 
   #If we are adding this to an existing plot then we can't count on prepCategoryWindow to log transform the data

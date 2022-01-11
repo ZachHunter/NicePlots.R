@@ -117,25 +117,6 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgr
     if(is.data.frame(x) & useRgl[1]==FALSE & plotType[1]=="surface") {curvePoints<-round(curvePoints/4)}
   }
 
-  if(is.data.frame(by)) {
-    if(is.null(groupNames)){
-      if(is.factor(by[,1])) {
-        groupNames<-levels(by[,1])
-      } else {
-        groupNames<-levels(factor(by[,1]))
-      }
-    }
-  } else {
-    if(is.null(groupNames)) {
-      if(is.factor(by)) {
-        groupNames<-levels(by)
-      } else {
-        groupNames<-levels(factor(by))
-      }
-    }
-  }
-
-
   #Initialize legend variables so we can update based on options
   legendLabels<-groupNames
   legendTitle<-"Legend"

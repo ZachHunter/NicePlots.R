@@ -374,7 +374,7 @@ drawViolinPlot <- function(x,groups,at=seq(1,length(levels(groups))),h=NULL, plo
     }else{-1}
     )
   }
-  #Use polygon to plot symetrical kernal densities by category to draw violins
+  #Use polygon to plot symmetrical kernel densities by category to draw violins
   vioWidth<-purrr::map_dbl(kernals, function(z) if(!is.null(z) & !is.numeric(z)) {max(z$y)*2/width} else {
     return(0)
   })

@@ -41,6 +41,7 @@ niceDots(
   extendTicks = TRUE,
   subgroup = FALSE,
   subgroupLabels = NULL,
+  highlightLabels = NULL,
   expLabels = TRUE,
   sidePlot = FALSE,
   pointHighlights = FALSE,
@@ -129,6 +130,8 @@ niceDots(
 \item{subgroup}{logical; use additional column in \code{by} to group the data within each level of the major factor.}
 
 \item{subgroupLabels}{character vector; sets the labels used for the \code{subgroup} factor. Defaults to the levels of the factor.}
+
+\item{highlightLabels}{character; An optional character vector to override the factor labels associated with point highlights if active.}
 
 \item{expLabels}{logical; prints the major tick labels is \eqn{logScale^{x}}{logScale^x} instead of the raw value}
 
