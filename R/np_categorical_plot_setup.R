@@ -582,7 +582,7 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
     }
   }
 
-  #Make the plotting window while setting backgroud and canvass colors
+  #Make the plotting window while setting background and canvass colors
   oBg<-par("bg")
   par(bg=plotColors$marginBg)
   plot.new()
