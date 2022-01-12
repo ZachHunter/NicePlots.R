@@ -129,26 +129,26 @@ formatPlotColors<-function(plotColors, theme=NA){
   plotColors
 }
 
-#' @title Process ploting options
+#' @title Process plotting options
 #' @description Integrates theme and user arguments to finalize all options prior to plotting
 #'
 #' @details
 #' This is a private utility function used by NicePlots to integrate user options with theme defaults.
 #' Anything specified by the user is treated literally with no additional optimization.
-#' Colors, point shapes, fills, etc. are optimized to best enhance the relevant factor visualisations selected.
+#' Colors, point shapes, fills, etc. are optimized to best enhance the relevant factor visualizations selected.
 #' The finalized parameters are returned as a named list.
 #'
-#' @param x Data to be plotted which has been preprocessed by \code{\link{dataFlightCheck}}
-#' @param by factor or dataframe of factors; One or more factors that control how the data is grouped. The first column is the primary grouping factor and the second and thrid columns are used for sub-grouping and highlighting as needed.
-#' @param minorTick numeric; Number of minor tickmarks to be drawn between the major marks
+#' @param x Data to be plotted which has been pre-processed by \code{\link{dataFlightCheck}}
+#' @param by factor or \code{\link[base]{data.frame}} of factors; One or more factors that control how the data is grouped. The first column is the primary grouping factor and the second and thrid columns are used for sub-grouping and highlighting as needed.
+#' @param minorTick numeric; Number of minor tick marks to be drawn between the major marks
 #' @param pointShape numeric; vector of numbers corresponding to pty options for ploting data overlays.
 #' @param whiskerLineType numeric; number corresponding to lty option for drawing the whiskers and error bars for box plots and bar plots, respectively.
-#' @param lWidth numeric; number creesponding to the lwd option for ploting lines on the graph
+#' @param lWidth numeric; number corresponding to the lwd option for plotting lines on the graph
 #' @param capWidth numeric; Width of the cap relative to the bar/box width for box plots and bar plots.
 #' @param pointLaneWidth numeric; This controls how far data point dots can move along the categorical axis when plotting. Used for \code{pointMethod} options 'jitter', 'beeswarm', and 'distribution'.
-#' @param width numeric; A multiplier that controls how wide the ploting elements will be. Setting \code{width=1.1} would result in plot elements being 10\% wider.
+#' @param width numeric; A multiplier that controls how wide the plotting elements will be. Setting \code{width=1.1} would result in plot elements being 10\% wider.
 #' @param guides logical; Should guidelines be drawn at the major tick marks.
-#' @param pointSize numeric; vector of numerics controling the size of points on the data overlay
+#' @param pointSize numeric; A numeric vector controlling the size of points on the data overlay
 #' @param subgroup logical; Should the data be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}}.
 #' @param stack logical; Triggers stacked bar analysis for bar plots
 #' @param pointHighlights logical; will use additional factors in \code{by} to highlight points in the dot plot
@@ -158,7 +158,9 @@ formatPlotColors<-function(plotColors, theme=NA){
 #' @param pointMethod character; method to be used for ploting dots. Can be set to "jitter", "linear", "beeswarm" or "distribution".
 #' @param logScale numeric; Should a log scale use used (\code{TRUE}/\code{FALSE})? Otherwise indicates the base for the log transformation.
 #' @param drawPoints logical; draws a dot plot overlay of the data.
-#' @param groupNames character; A character vector for the primary group names
+#' @param groupNames character; A character vector to override factor labels for primary group names
+#' @param subgroupLabels character; A character vector to override factor labels for subgroup names
+#' @param highlightLabels character; A character vector to override factor labels for point highlights.
 #' @param swarmOverflow character; Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.
 #' @param errorCap character; Determines the style for the ends of the error bars. Valid options are \code{ball}, \code{bar} or \code{none}.
 #' @param CLOptions list; A list of command line options captured by \code{...} being passed along to allow for theme values to be set directly from the function call even if it is not an explicit option.
@@ -167,7 +169,7 @@ formatPlotColors<-function(plotColors, theme=NA){
 #' @importFrom magrittr %>%
 #' @importFrom purrr reduce map map_lgl map_dbl
 #' @seealso \code{\link{formatPlotColors}}, \code{\link{niceBox}}, \code{\link{niceDots}}, \code{\link{niceVio}}, \code{\link{niceBar}}
-procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWidth,pointLaneWidth,width,guides,pointSize,subgroup=FALSE,stack=F,pointHighlights=F,type=c("BP","VP","DP","Bar"),theme,plotColors,pointMethod,logScale,drawPoints,groupNames,swarmOverflow,errorCap=NULL,CLOptions=NULL){
+procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWidth,pointLaneWidth,width,guides,pointSize,subgroup=FALSE,stack=F,pointHighlights=F,type=c("BP","VP","DP","Bar"),theme,plotColors,pointMethod,logScale,drawPoints,groupNames,subgroupLabels=NULL,highlightLabels=NULL,swarmOverflow,errorCap=NULL,CLOptions=NULL){
   #Here we check to see if the user specified any options so that they are left unaltered if present
   defaultPoints<-FALSE
   defaultLines<-FALSE
@@ -348,9 +350,13 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
         #if(type=="DP") {
         #  plotColors$lines<-plotColors$lines[1]
         #}
-        myLevels<-length(levels(factor(by[,3])))
+        if(ncol(by)>=3) {
+          myLevels<-length(levels(factor(by[,3])))
+        }
       } else {
-        myLevels<-length(levels(factor(by[,2])))
+        if(ncol(by)>=2) {
+          myLevels<-length(levels(factor(by[,2])))
+        }
       }
       byLevel<-length(levels(by[,2]))
       byFactor<-length(levels(by[,1]))
@@ -481,13 +487,33 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
   if(length(pointShape)>1 & defaultShapes==FALSE){pointShape<-pointShape[1:myLevels]}
   if(length(plotColors$points)>1 & defaultPoints==FALSE){plotColors$points<-plotColors$points[1:myLevels]}
 
-  #Capturing default group names
+  theme$plotColors<-plotColors
+
+  #Finalizing and sanity checking group name assignments
+  if(!is.data.frame(by) & is.null(groupNames) & !is.null(subgroupLabels)){
+    groupNames<-subgroupLabels
+  } else if (!is.data.frame(by) & is.null(groupNames) & !is.null(highlightLabels)){
+    groupNames<-highlightLabels
+  }
+
   if(is.data.frame(by)) {
     if(is.null(groupNames)){
       if(is.factor(by[,1])) {
         groupNames<-levels(by[,1])
       } else {
         groupNames<-levels(factor(by[,1]))
+      }
+    } else {
+      if(!is.factor(by[,1])) {
+        by[,1] <-factor(by[,1])
+      }
+      if(length(groupNames) != length(levels(by[,1]))){
+        warning(paste0("groupNames (length ",length(groupNames),") is not the same length as the grouping factor selected (length ",length(levels(by[,1])),")!\nAdjusting naming vector to compensate..."), call.=FALSE)
+        if(length(groupNames) > length(levels(by[,1]))) {
+          groupNames<-groupNames[seq(length(levels(by[,1])))]
+        } else {
+          groupNames<-c(groupNames,levels(by[,1])[seq(length(groupNames)+1,length(levels(by[,1])))])
+        }
       }
     }
   } else {
@@ -497,9 +523,89 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
       } else {
         groupNames<-levels(factor(by))
       }
+    } else {
+      if(!is.factor(by)) {
+        by <-factor(by)
+      }
+      if(length(groupNames) != length(levels(by))){
+        warning(paste0("groupNames (length ",length(groupNames),") is not the same length as the grouping factor selected (length ",length(levels(by)),")!\nAdjusting naming vector to compensate..."), call.=FALSE)
+        if(length(groupNames) > length(levels(by))) {
+          groupNames<-groupNames[seq(length(levels(by)))]
+        } else {
+          groupNames<-c(groupNames,levels(by)[seq(length(groupNames)+1,length(levels(by)))])
+        }
+      }
     }
   }
-  theme$plotColors<-plotColors
-  list(groupNames=groupNames,minorTick=minorTick,pointShape=pointShape,whiskerLineType=whiskerLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subgroup=subgroup,stack=stack,pointHighlights=pointHighlights,theme=theme,plotColors=plotColors,pointMethod=pointMethod,swarmOverflow=swarmOverflow,errorCap=errorCap)
+
+  #Finalizing and sanity checking subgroup name assignments
+  if(is.data.frame(by)) {
+    if(ncol(by)>=2){
+      if(!is.null(subgroupLabels)) {
+        if(!is.factor(by[,2])) {
+          by[,2] <-factor(by[,2])
+        }
+        if(length(subgroupLabels) != length(levels(by[,2]))){
+          warning(paste0("subgroupLabels (length ",length(subgroupLabels),") is not the same length as the secondary grouping factor selected (length ",length(levels(by[,2])),")!\nAdjusting naming vector to compensate..."), call.=FALSE)
+          if(length(subgroupLabels) > length(levels(by[,2]))) {
+            subgroupLabels<-subgroupLabels[seq(length(levels(by[,2])))]
+          } else {
+            subgroupLabels<-c(subgroupLabels,levels(by[,2])[seq(length(subgroupLabels)+1,length(levels(by[,2])))])
+          }
+        }
+      } else {
+        subgroupLabels<-levels(factor(by[,2]))
+      }
+    } else {
+      subgroupLabels<-NULL
+    }
+  } else {
+    subgroupLabels<-NULL
+  }
+
+  #Finalizing and sanity checking point highlight name assignments
+  #Since the factor column for this can vary, there appropriate column is identified in advance and stored in highlightCol minimize code repetition.
+  #Note that stack settings for niceBar are treated like highlights here.
+  highlightCol<-2
+  if(is.data.frame(by)) {
+    if(ncol(by)>=2){
+      if(is.data.frame(x)){
+        if(!is.null(highlightLabels) & pointHighlights==TRUE) {
+          highlightCol<-2
+        }
+      } else {
+        if(!is.null(highlightLabels) & pointHighlights==TRUE) {
+          if(subgroup==TRUE & ncol(by)>=3) {
+            highlightCol<-3
+          } else if (subgroup==FALSE) {
+            highlightCol<-2
+          } else {
+            highlightCol<-0
+          }
+        }
+      }
+      if(!is.null(highlightLabels) & highlightCol>0) {
+        if(!is.factor(by[,highlightCol])) {
+          by[,highlightCol] <-factor(by[,highlightCol])
+        }
+        if(length(highlightLabels) != length(levels(by[,highlightCol]))){
+          warning(paste0("highlightLabels (length ",length(highlightLabels),") is not the same length as the corresponding grouping factor  (length ",length(levels(by[,highlightCol])),")!\nAdjusting naming vector to compensate..."), call.=FALSE)
+          if(length(highlightLabels) > length(levels(by[,highlightCol]))) {
+            highlightLabels<-highlightLabels[seq(length(levels(by[,highlightCol])))]
+          } else {
+            highlightLabels<-c(highlightLabels,levels(by[,highlightCol])[seq(length(highlightLabels)+1,length(levels(by[,highlightCol])))])
+          }
+        }
+      } else if(highlightCol>0) {
+        highlightLabels<-levels(factor(by[,highlightCol]))
+      }
+    } else {
+      highlightLabels<-NULL
+    }
+  } else {
+    highlightLabels<-NULL
+  }
+
+  list(groupNames=groupNames,subgroupLabels=subgroupLabels,highlightLabels=highlightLabels,minorTick=minorTick,pointShape=pointShape,whiskerLineType=whiskerLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subgroup=subgroup,stack=stack,pointHighlights=pointHighlights,theme=theme,plotColors=plotColors,pointMethod=pointMethod,swarmOverflow=swarmOverflow,errorCap=errorCap)
 }
 

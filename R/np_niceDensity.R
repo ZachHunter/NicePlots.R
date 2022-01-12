@@ -117,25 +117,6 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgr
     if(is.data.frame(x) & useRgl[1]==FALSE & plotType[1]=="surface") {curvePoints<-round(curvePoints/4)}
   }
 
-  if(is.data.frame(by)) {
-    if(is.null(groupNames)){
-      if(is.factor(by[,1])) {
-        groupNames<-levels(by[,1])
-      } else {
-        groupNames<-levels(factor(by[,1]))
-      }
-    }
-  } else {
-    if(is.null(groupNames)) {
-      if(is.factor(by)) {
-        groupNames<-levels(by)
-      } else {
-        groupNames<-levels(factor(by))
-      }
-    }
-  }
-
-
   #Initialize legend variables so we can update based on options
   legendLabels<-groupNames
   legendTitle<-"Legend"
@@ -298,7 +279,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgr
       stop("Error: plotType should be set to either \'contour\' or \'surface\' for 2D desntsity plots")
     }
   } else {
-  #Dealing with typical 1D densties
+  #Dealing with typical 1D densities
     if(logScaleX+logScaleY!=0) {
        x<-log(x + logAdjustment, logScaleX)
     }
@@ -384,8 +365,9 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgr
       }
       #plot(-1,-1,type="n",xlim=c(minx,maxx),ylim=c(0,maxy),main=main,sub=sub,ylab=ylab)
       densities2<-densities
-      if(sidePlot[1]==TRUE)
+      if(sidePlot[1]==TRUE) {
         densities2<-map(densities, function(d) data.frame(x=d$y, y=d$x))
+      }
       if(!is.na(plotColors$fill[1]) & !is.null(plotColors$fill[1])){
         walk2(.x=densities2,.y=plotColors$fill[1:n_groups],~polygon(.x,col=.y,border=0))
       }

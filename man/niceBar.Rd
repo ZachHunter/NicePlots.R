@@ -26,7 +26,7 @@ niceBar(
   trim = FALSE,
   axisText = c(NULL, NULL),
   showCalc = FALSE,
-  calcType = "none",
+  calcType = "wilcox",
   yLim = NULL,
   rotateLabels = FALSE,
   rotateY = TRUE,
@@ -35,6 +35,7 @@ niceBar(
   extendTicks = TRUE,
   subgroup = FALSE,
   subgroupLabels = NULL,
+  stackLabels = NULL,
   expLabels = FALSE,
   sidePlot = FALSE,
   errorBars = TRUE,
@@ -111,6 +112,8 @@ niceBar(
 
 \item{subgroupLabels}{character vector; sets the labels used for the \code{subgroup} factor. Defaults to the levels of the factor.}
 
+\item{stackLabels}{character; An optional character vector to override the factor labels associated with stacking factor if active.}
+
 \item{expLabels}{logical; prints the major tick labels is \eqn{logScale^{x}}{logScale^x} instead of the raw value}
 
 \item{sidePlot}{logical; switches the axis to plot horizontally instead of vertically.}
@@ -127,7 +130,7 @@ niceBar(
 
 \item{na.rm}{logical; Should \code{NA}s be removed from the data set? Both data input and the factor input from \code{by} with be checked.}
 
-\item{flipFacts}{logical; When a dataframe of values is given, column names are used as a secondary grouping factor by default. Setting \code{flipFacts=\link{TRUE}} makes the column names the primary factor and \code{by} the secondary factor.}
+\item{flipFacts}{logical; When a \code{\link{data.frame}} of values is given, column names are used as a secondary grouping factor by default. Setting \code{flipFacts=\link{TRUE}} makes the column names the primary factor and \code{by} the secondary factor.}
 
 \item{verbose}{logical; Prints summary and p-value calculations to the screen. All data is silently by the function returned either way.}
 

@@ -25,7 +25,7 @@ niceVio(
   pointMethod = NULL,
   axisText = c(NULL, NULL),
   showCalc = FALSE,
-  calcType = "none",
+  calcType = "wilcox",
   drawBox = TRUE,
   yLim = NULL,
   rotateLabels = FALSE,
@@ -39,6 +39,7 @@ niceVio(
   sidePlot = FALSE,
   drawPoints = TRUE,
   pointHighlights = FALSE,
+  highlightLabels = NULL,
   pointLaneWidth = 0.7,
   flipFacts = FALSE,
   na.rm = FALSE,
@@ -117,6 +118,8 @@ niceVio(
 \item{drawPoints}{logical; draws a dot plot overlay of the data for each box}
 
 \item{pointHighlights}{logical; will use additional factors in \code{by} to highlight points in the dot plot}
+
+\item{highlightLabels}{character; An optional character vector to override the factor labels associated with point highlights if active.}
 
 \item{pointLaneWidth}{numeric; This controls how far data point dots can move along the categorical axis when plotting. Used for \code{pointMethod} options 'jitter', 'beeswarm', and 'distribution'.}
 

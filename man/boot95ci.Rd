@@ -4,14 +4,16 @@
 \alias{boot95ci}
 \title{Calculate a basic bootstrap 95\% confidence interval}
 \usage{
-boot95ci(x, agg = "mean", upper = FALSE)
+boot95ci(x, agg = "mean", upper = FALSE, nBoot = 1000L)
 }
 \arguments{
 \item{x}{numeric vector}
 
-\item{agg}{character: A string corresponding to the aggregator function to be modeled (eg. \code{\link[stats]{median}}, \code{\link[base]{mean}}, etc.)}
+\item{agg}{character: A string corresponding to the aggregate or central tendency function to be modeled (eg. \code{\link[stats]{median}}, \code{\link[base]{mean}}, etc.)}
 
-\item{upper}{logical:}
+\item{upper}{logical: Should the upper or lower confidence interval boundary be returned}
+
+\item{nBoot}{numeric; An integer value indicating the number of boot strap resampling trails to run. Defaults to 1,000.}
 }
 \value{
 a number corresponding to the upper or lower bootrap 95\% confidence interval of the aggregator function given by \code{agg}.

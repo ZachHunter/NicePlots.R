@@ -262,6 +262,7 @@ prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=uppe
   if(upperErrorFun=="boot95ci") {
     optsU<-list(agg=aggFunction,upper=TRUE)
     optsL<-list(agg=aggFunction,upper=FALSE)
+    errorMultiple<-1
   }
 
   plotData<-NULL
@@ -359,33 +360,35 @@ prepBarData<-function(x,by,errorMultiple=1,upperErrorFun="sd",lowerErrorFun=uppe
 
   #Data for displaying a summary table is separated from plotData and formated accordingly
   printData<-plotData
-  if(upperErrorFun!=lowerErrorFun) {
-    plotData$upperError<- (plotData$upperError/errorMultiple - plotData$AData)*errorMultiple
-    plotData$lowerError<- (plotData$AData - plotData$lowerError/errorMultiple)*errorMultiple
+  if(upperErrorFun=="boot95ci"){
+    plotData$upperError<-plotData$upperError - plotData$AData
   }
+  if(lowerErrorFun=="boot95ci"){
+    plotData$lowerError<-plotData$AData-plotData$lowerError
+  }
+
   #based on options, the column position of AData can vary
   ADataLoc<-grep("AData",colnames(printData))
-  if(upperErrorFun==lowerErrorFun & upperErrorFun != "boot95ci") {
-    vars<-vars[-length(vars)]
-    colnames(printData)[c(ADataLoc,ADataLoc+1)]<-c(aggFunction,upperErrorFun)
+  if(upperErrorFun!=lowerErrorFun | (upperErrorFun=="boot95ci" & lowerErrorFun=="boot95ci")) {
+    colnames(printData)[ADataLoc:(ADataLoc+2)]<-c(aggFunction,paste0(upperErrorFun,"_upper"),paste0(lowerErrorFun,"_lower"))
+    vars[seq(length(vars)-2,length(vars))]<-c(aggFunction,paste0(upperErrorFun,"_upper"),paste0(lowerErrorFun,"_lower"))
   } else {
-    if(upperErrorFun == "boot95ci") {
-      vars[c(length(vars)-1,length(vars))]<-c("95ci_Upper","95ci_Lower")
-      colnames(printData)[ADataLoc:(ADataLoc+2)]<-c(aggFunction,vars[c(length(vars)-1,length(vars))])
-    } else {
-      colnames(printData)[ADataLoc:(ADataLoc+2)]<-c(aggFunction,upperErrorFun,lowerErrorFun)
-    }
+    colnames(printData)[ADataLoc:(ADataLoc+2)]<-c(aggFunction,upperErrorFun,lowerErrorFun)
   }
 
   #select out just the columns we want to print
   printData <- printData %>% select(!!vars)
+
   #based on options, the column position of aggFunction values can vary
   ADataLoc<-grep(aggFunction,colnames(printData))
   if(errorMultiple!=1){
-    colnames(printData)[ADataLoc+1]<-c(paste0(colnames(printData)[ADataLoc+1],"_",errorMultiple,"x"))
-    if(upperErrorFun!=lowerErrorFun) {
-      colnames(printData)[ADataLoc+2]<-paste0(colnames(printData)[ADataLoc+1],"_",errorMultiple,"x")
+    colnames(printData)[ADataLoc+1]<-c(paste0(colnames(printData)[ADataLoc+1],"_x",errorMultiple))
+    if(upperErrorFun!=lowerErrorFun | (upperErrorFun=="boot95ci" & lowerErrorFun=="boot95ci")) {
+      colnames(printData)[ADataLoc+2]<-paste0(colnames(printData)[ADataLoc+2],"_x",errorMultiple)
     }
+  }
+  if(colnames(printData)[1]=="fact"){
+    colnames(printData)[1]<-"group"
   }
   #plotData<-plotData %>% mutate(yt=AData,at=at,yb=bVal,UpperError=upperError,LowerError=lowerError)
   list(plot=plotData,print=printData)

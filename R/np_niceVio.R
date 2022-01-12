@@ -33,6 +33,7 @@
 #' @param ylab character; y-axis label.
 #' @param drawPoints logical; draws a dot plot overlay of the data for each box
 #' @param pointHighlights logical; will use additional factors in \code{by} to highlight points in the dot plot
+#' @param highlightLabels character; An optional character vector to override the factor labels associated with point highlights if active.
 #' @param pointLaneWidth numeric; This controls how far data point dots can move along the categorical axis when plotting. Used for \code{pointMethod} options 'jitter', 'beeswarm', and 'distribution'.
 #' @param flipFacts logical; When a dataframe of values is given, column names are used as a secondary grouping factor by default. Setting \code{flipFacts=\link{TRUE}} makes the column names the primary factor and \code{by} the secondary factor.
 #' @param na.rm logical; Should \code{NA}s be removed from the data set? Both data input and the factor input from \code{by} with be checked.
@@ -64,14 +65,14 @@
 #' @importFrom purrr reduce
 #' @export
 #' @seealso \code{\link{boxplot}}, \code{\link{niceBox}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{prepCategoryWindow}}
-niceVio <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=1.5, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=.7,flipFacts=FALSE, na.rm=FALSE, verbose=FALSE, legend=FALSE, trimViolins=TRUE, logAdjustment=1,...) {UseMethod("niceVio",x)}
+niceVio <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=1.5, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE,highlightLabels=NULL, pointLaneWidth=.7,flipFacts=FALSE, na.rm=FALSE, verbose=FALSE, legend=FALSE, trimViolins=TRUE, logAdjustment=1,...) {UseMethod("niceVio",x)}
 
 #' @importFrom dplyr bind_cols mutate
 #' @importFrom magrittr %>%
 #' @importFrom tidyr gather
 #' @importFrom purrr reduce
 #' @export
-niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=FALSE, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=NULL,flipFacts=FALSE,  na.rm=FALSE, verbose=FALSE,legend=FALSE, trimViolins=TRUE,logAdjustment=1, ...) {
+niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, theme=basicTheme, outliers=FALSE, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE,highlightLabels=NULL, pointLaneWidth=NULL,flipFacts=FALSE,  na.rm=FALSE, verbose=FALSE,legend=FALSE, trimViolins=TRUE,logAdjustment=1, ...) {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset", call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -82,7 +83,7 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
 
   #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, bandwidth=bandwidth, groupNames=groupNames, main=main,sub=sub, ylab=ylab, minorTick=minorTick, guides=guides, theme=theme, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, drawBox=drawBox, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, drawPoints=drawPoints, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth,flipFacts=flipFacts,  na.rm=na.rm, verbose=verbose,legend=legend, trimViolins=trimViolins,logAdjustment=logAdjustment)
+  ActiveOptions<-list(x=x, by=by, bandwidth=bandwidth, groupNames=groupNames,highlightLabels=highlightLabels, main=main,sub=sub, ylab=ylab, minorTick=minorTick, guides=guides, theme=theme, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, drawBox=drawBox, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, drawPoints=drawPoints, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth,flipFacts=flipFacts,  na.rm=na.rm, verbose=verbose,legend=legend, trimViolins=trimViolins,logAdjustment=logAdjustment)
   ActiveOptions<-append(ActiveOptions,moreOptions)
 
   #Flight check data, remove NAs.
@@ -94,7 +95,7 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
   lWidth<-NULL
 
   #Here we check to see if the user specified any options so that they not overwritten by the designated theme
-  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=pointShape,whiskerLineType=NULL,lWidth=lWidth,capWidth=NULL,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subgroup=subgroup,stack=F,pointHighlights=pointHighlights,type="VP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=pointMethod,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow=swarmOverflow, errorCap = "bar", CLOptions=moreOptions)
+  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=pointShape,whiskerLineType=NULL,lWidth=lWidth,capWidth=NULL,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subgroup=subgroup,stack=F,pointHighlights=pointHighlights,type="VP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=pointMethod,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow=swarmOverflow, errorCap = "bar", CLOptions=moreOptions,subgroupLabels=subgroupLabels,highlightLabels=highlightLabels)
   minorTick<-finalOptions$minorTick
   pointShape<-finalOptions$pointShape
   whiskerLineType<-finalOptions$whiskerLineType
@@ -107,6 +108,8 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
   theme<-finalOptions$theme
   plotColors<-finalOptions$plotColors
   groupNames<-finalOptions$groupNames
+  subgroupLabels<-finalOptions$subgroupLabels
+  highlightLabels<-finalOptions$highlightLabels
   pointMethod<-finalOptions$pointMethod
   swarmOverflow<-finalOptions$swarmOverflow
   theme$plotColors<-plotColors
@@ -119,24 +122,37 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
     curvePoints<-theme$curvePoints
   }
 
-  #Capturing default group names
-  if(is.data.frame(by)) {
-    if(is.null(groupNames)){
-      if(is.factor(by[,1])) {
-        groupNames<-levels(by[,1])
-      } else {
-        groupNames<-levels(factor(by[,1]))
-      }
+  if((!is.null(ActiveOptions$groupNames) | !is.null(ActiveOptions$subgroupLabels) | !is.null(ActiveOptions$highlightLabels)) & !is.null(groupNames)) {
+    if(is.data.frame(by)) {
+      by[,1]<-factor(by[,1], labels=groupNames)
+    } else {
+      by<-factor(by, labels=groupNames)
     }
-  } else {
-    if(is.null(groupNames)) {
-      if(is.factor(by)) {
-        groupNames<-levels(by)
-      } else {
-        groupNames<-levels(factor(by))
+  }
+  if(!is.null(ActiveOptions$subgroupLabels) & !is.null(subgroupLabels)) {
+    if(is.data.frame(by) & subgroup==TRUE & !is.data.frame(x)) {
+      if(ncol(by) >= 2) {
+        by[,2]<-factor(by[,2], labels=subgroupLabels)
       }
     }
   }
+  if(!is.null(ActiveOptions$highlightLabels) & !is.null(highlightLabels)) {
+    if(is.data.frame(by) & pointHighlights==TRUE) {
+      if(ncol(by)>=2) {
+        if(is.data.frame(x)) {
+          by[,2]<-factor(by[,2], labels=highlightLabels)
+        } else {
+          if(subgroup==FALSE) {
+            by[,2]<-factor(by[,2], labels=highlightLabels)
+          } else if(ncol(by)>=3) {
+            by[,3]<-factor(by[,3], labels=highlightLabels)
+          }
+        }
+      }
+    }
+  }
+  statsData<-list(p.value=NA,test="none",results=NA)
+
   #if(flipFacts==TRUE & is.data.frame(x)){subgroup<-TRUE}
   #Handling adding plots to existing graph
   if(add) {
@@ -181,9 +197,12 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
   #Data is set and ready to go. Plotting is handled based on cases handling if 'x' and 'by' are vectors or dataframes
   xypos<-c(1,1)
   if(is.numeric(prepedData[[1]])){
-    #CASE: by is a factor data is a numeric vector
+    #CASE: by is a factor & data is a numeric vector
     if(is.factor(by)) {
-      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by,calcType[1],verbose=verbose)}
+      if(calcType[1]!="none"){
+        statsData<-calcStats(prepedData[[1]],by,calcType[1],verbose=verbose)
+        pvalue<-statsData$p.value
+      }
       plotLoc<-seq(1,length(groupNames),by=1)
       names(plotLoc)<-groupNames
       plotData<-prepNiceData(prepedData=prepedData,by=by, subgroup=subgroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width*vioBoxWidth,verbose=verbose)
@@ -222,8 +241,11 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
       }
       xypos<-data.frame(xypos,ID=xyid)
     } else {
-      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[,1],calcType[1],verbose=verbose)}
-      #CASE: by is not a factor data is a numeric vector and subgroup is TRUE
+      if(calcType[1]!="none"){
+        statsData<-calcStats(prepedData[[1]],by[,1],calcType[1],verbose=verbose)
+        pvalue<-statsData$p.value
+      }
+      #CASE: by is not a factor & data is a numeric vector and subgroup is TRUE
       if(subgroup) {
         facetLoc<-facetSpacing(length(levels(by[,2])),length(groupNames))
         width<-width/(length(levels(by[,2]))+1)
@@ -266,16 +288,18 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
         }
         xypos<-data.frame(xypos,ID=xyid)
         if(legend!=FALSE) {
-          if(pointHighlights){
+          if(pointHighlights==TRUE & ncol(by)>=3){
             if(legend==TRUE){
               legendTitle<-colnames(by)[3]
             }
             legendLabels<-levels(by[,3])
           } else {
-            if(legend==TRUE){
-              legendTitle<-colnames(by)[2]
+            if(ncol(by)>=2) {
+              if(legend==TRUE){
+                legendTitle<-colnames(by)[2]
+              }
+              legendLabels<-levels(by[,2])
             }
-            legendLabels<-levels(by[,2])
           }
         }
       } else {
@@ -306,7 +330,7 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
             xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
             xFilter<-rowSums(is.na(as.data.frame(x)))==0
 
-        
+
           }
         }
         if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){            byFilter<-!is.na(ActiveOptions$by)
@@ -321,20 +345,23 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
           xyid<-rep(xyid,nrow(xypos)/length(xyid))
         }
         xypos<-data.frame(xypos,ID=xyid)
-      }
-      if(legend!=FALSE) {
-        if(pointHighlights==TRUE){
-          if(legend==TRUE){
-            legendTitle<-colnames(by)[2]
+        if(legend!=FALSE) {
+          if(pointHighlights==TRUE & ncol(by) >=2){
+            if(legend==TRUE){
+              legendTitle<-colnames(by)[2]
+            }
+            legendLabels<-levels(by[,2])
           }
-          legendLabels<-levels(by[,2])
         }
       }
     }
   } else {
     #CASE: data is a dataframe, by is a factor, subgroup is ignored
     if(is.factor(by)) {
-      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]][,1],by,calcType[1],verbose=verbose)}
+      if(calcType[1]!="none"){
+        statsData<-calcStats(prepedData[[1]][,1],by,calcType[1],verbose=verbose)
+        pvalue<-statsData$p.value
+      }
       facetLoc<-facetSpacing(length(prepedData[[1]]),length(groupNames))
       names(facetLoc)<-unlist(lapply(levels(by),FUN=function(y) paste0(y,names(x),sep=".")))
       width<-width/(length(names(x))+1)
@@ -396,7 +423,10 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
       #CASE: data is a dataframe, by is a dataframe, subgroup is ignored
       facetLoc<-facetSpacing(length(prepedData[[1]]),length(groupNames))
       names(facetLoc)<-unlist(lapply(levels(by[,1]),FUN=function(y) paste0(y,names(x),sep=".")))
-      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]][,1],by[,1],calcType[1], verbose=verbose)}
+      if(calcType[1]!="none"){
+        statsData<-calcStats(prepedData[[1]][,1],by[,1],calcType[1], verbose=verbose)
+        pvalue<-statsData$p.value
+      }
       width=width/(length(x)+1)
       plotData<-prepNiceData(prepedData=prepedData,by=by, subgroup=subgroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,flipFacts=flipFacts,verbose=verbose)
       cLoc<-facetLoc[plotData$facetLevel]
@@ -493,7 +523,7 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupNames=NULL, main=NU
   ActiveOptions$xypos<-xypos
 
   #formatting the output list and setting class int npData
-  dataOut<-list(summary=plotData,stats=pvalue,plotType="violin",options=ActiveOptions)
+  dataOut<-list(summary=plotData,stats=statsData,plotType="violin",options=ActiveOptions)
   class(dataOut)<-c("npData","list")
 
   invisible(dataOut)

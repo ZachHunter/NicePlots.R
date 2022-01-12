@@ -31,6 +31,7 @@
 #' @param ylab character; y-axis label.
 #' @param drawPoints logical; draws a dot plot overlay of the data for each box.
 #' @param pointHighlights logical; will use additional factors in \code{by} to highlight points in the dot plot
+#' @param highlightLabels character; An optional character vector to override the factor labels associated with point highlights if active.
 #' @param pointLaneWidth numeric; This controls how far data point dots can move along the categorical axis when plotting. Used for \code{pointMethod} options 'jitter', 'beeswarm', and 'distribution'.
 #' @param flipFacts logical; When a dataframe of values is given, column names are used as a secondary grouping factor by default. Setting \code{flipFacts=\link{TRUE}} makes the column names the primary factor and \code{by} the secondary factor.
 #' @param na.rm logical; Should \code{NA}s be removed from the data set? Both data input and the factor input from \code{by} with be checked.
@@ -59,13 +60,13 @@
 #' @importFrom purrr reduce map_chr
 #' @export
 #' @seealso \code{\link{boxplot}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{quantileTrim}}, \code{\link{prepCategoryWindow}}
-niceBox <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, theme=basicTheme, minorTick=FALSE, guides=TRUE, outliers=1.5, pointSize=1, width=1, pointShape=16, plotColors=list(bg="open"), logScale=FALSE, trim=FALSE, pointMethod="jitter", axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, expLabels=TRUE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=.7, flipFacts=FALSE, na.rm=FALSE, verbose=FALSE, legend=FALSE, logAdjustment=1,...) {UseMethod("niceBox",x)}
+niceBox <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, theme=basicTheme, minorTick=FALSE, guides=TRUE, outliers=1.5, pointSize=1, width=1, pointShape=16, plotColors=list(bg="open"), logScale=FALSE, trim=FALSE, pointMethod="jitter", axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL,highlightLabels=NULL, expLabels=TRUE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=.7, flipFacts=FALSE, na.rm=FALSE, verbose=FALSE, legend=FALSE, logAdjustment=1,...) {UseMethod("niceBox",x)}
 
 #' @importFrom magrittr %>%
 #' @importFrom dplyr bind_cols
 #' @importFrom purrr reduce map_chr
 #' @export
-niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, theme=basicTheme, minorTick=NULL, guides=NULL, outliers=1.5, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="none", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, expLabels=FALSE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=NULL, flipFacts=FALSE, na.rm=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1, ...) {
+niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, ylab=NULL, theme=basicTheme, minorTick=NULL, guides=NULL, outliers=1.5, pointSize=NULL, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", drawBox=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, highlightLabels=NULL, expLabels=FALSE, sidePlot=FALSE, drawPoints=TRUE, pointHighlights=FALSE, pointLaneWidth=NULL, flipFacts=FALSE, na.rm=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1, ...) {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset", call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -76,7 +77,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
 
   #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, groupNames=groupNames, main=main,sub=sub, ylab=ylab, theme=theme, minorTick=minorTick, guides=guides, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, drawBox=drawBox, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, drawPoints=drawPoints, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth, flipFacts=flipFacts, na.rm=na.rm, verbose=verbose, legend=legend,logAdjustment=logAdjustment)
+  ActiveOptions<-list(x=x, by=by, groupNames=groupNames, main=main,sub=sub, ylab=ylab, theme=theme, minorTick=minorTick, guides=guides, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, drawBox=drawBox, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, drawPoints=drawPoints, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth, flipFacts=flipFacts, na.rm=na.rm, verbose=verbose, legend=legend,logAdjustment=logAdjustment,highlightLabels=highlightLabels)
   ActiveOptions<-append(ActiveOptions,moreOptions)
 
 
@@ -91,7 +92,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
   swarmOverflow<-NULL
 
   #Here we check to see if the user specified any options so that they are left unaltered if present
-  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=pointShape,whiskerLineType=whiskerLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subgroup=subgroup,stack=F,pointHighlights=pointHighlights,type="BP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=pointMethod,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow = swarmOverflow,CLOptions=moreOptions)
+  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=pointShape,whiskerLineType=whiskerLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subgroup=subgroup,stack=F,pointHighlights=pointHighlights,type="BP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=pointMethod,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow = swarmOverflow,CLOptions=moreOptions,subgroupLabels=subgroupLabels,highlightLabels=highlightLabels)
   minorTick<-finalOptions$minorTick
   pointShape<-finalOptions$pointShape
   whiskerLineType<-finalOptions$whiskerLineType
@@ -104,6 +105,8 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
   theme<-finalOptions$theme
   plotColors<-finalOptions$plotColors
   groupNames<-finalOptions$groupNames
+  subgroupLabels<-finalOptions$subgroupLabels
+  highlightLabels<-finalOptions$highlightLabels
   pointMethod<-finalOptions$pointMethod
   swarmOverflow<-finalOptions$swarmOverflow
   capType<-finalOptions$errorCap
@@ -111,6 +114,37 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
   if(capType=="ball") {
     capWidth<-capWidth*6
   }
+
+  if((!is.null(ActiveOptions$groupNames) | !is.null(ActiveOptions$subgroupLabels) | !is.null(ActiveOptions$highlightLabels)) & !is.null(groupNames)) {
+    if(is.data.frame(by)) {
+      by[,1]<-factor(by[,1], labels=groupNames)
+    } else {
+      by<-factor(by, labels=groupNames)
+    }
+  }
+  if(!is.null(ActiveOptions$subgroupLabels) & !is.null(subgroupLabels)) {
+    if(is.data.frame(by) & subgroup==TRUE & !is.data.frame(x)) {
+      if(ncol(by) >= 2) {
+        by[,2]<-factor(by[,2], labels=subgroupLabels)
+      }
+    }
+  }
+  if(!is.null(ActiveOptions$highlightLabels) & !is.null(highlightLabels)) {
+    if(is.data.frame(by) & pointHighlights==TRUE) {
+      if(ncol(by)>=2) {
+        if(is.data.frame(x)) {
+          by[,2]<-factor(by[,2], labels=highlightLabels)
+        } else {
+          if(subgroup==FALSE) {
+            by[,2]<-factor(by[,2], labels=highlightLabels)
+          } else if(ncol(by)>=3) {
+            by[,3]<-factor(by[,3], labels=highlightLabels)
+          }
+        }
+      }
+    }
+  }
+  statsData<-list(p.value=NA,test="none",results=NA)
 
   #if(flipFacts & is.data.frame(x)){subgroup<-TRUE}
   #Handling adding plots to existing graph
@@ -156,7 +190,10 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
   if(is.numeric(prepedData[[1]])){
     #CASE: by is a factor and data is a numeric vector
     if(is.factor(by)) {
-      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by,calcType[1],verbose=verbose)}
+      if(calcType[1]!="none"){
+        statsData<-calcStats(prepedData[[1]],by,calcType[1],verbose=verbose)
+        pvalue<-statsData$p.value
+      }
       plotLoc<-seq(1,length(groupNames),by=1)
       names(plotLoc)<-groupNames
       legend<-FALSE
@@ -191,7 +228,10 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
       xypos<-data.frame(xypos,ID=xyid)
 
     } else {
-      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]],by[,1],calcType[1])}
+      if(calcType[1]!="none"){
+        statsData<-calcStats(prepedData[[1]],by[,1],calcType[1])
+        pvalue<-statsData$p.value
+      }
       #CASE: by is not a factor, data is a numeric vector and subgroup is TRUE
       if(subgroup) {
         facetLoc<-facetSpacing(length(levels(by[,2])),length(groupNames))
@@ -289,7 +329,10 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
   } else {
     #CASE: data is a dataframe, by is a factor, subgroup is ignored
     if(is.factor(by)) {
-      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]][,1],by,calcType[1],verbose=verbose)}
+      if(calcType[1]!="none"){
+        statsData<-calcStats(prepedData[[1]][,1],by,calcType[1],verbose=verbose)
+        pvalue<-statsData$p.value
+      }
       facetLoc<-facetSpacing(length(prepedData[[1]]),length(groupNames))
       names(facetLoc)<-unlist(lapply(levels(by),FUN=function(y) paste0(y,names(x),sep=".")))
       plotData<-prepNiceData(prepedData=prepedData,by=by, subgroup=subgroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,flipFacts=flipFacts,verbose=verbose)
@@ -342,7 +385,10 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
       #CASE: data is a data.frame, by is a dataframe, subgroup is ignored
       facetLoc<-facetSpacing(length(prepedData[[1]]),length(groupNames))
       names(facetLoc)<-unlist(lapply(levels(by[,1]),FUN=function(y) paste0(y,names(x),sep=".")))
-      if(calcType[1]!="none"){pvalue<-calcStats(prepedData[[1]][,1],by[,1],calcType[1])}
+      if(calcType[1]!="none"){
+        statsData<-calcStats(prepedData[[1]][,1],by[,1],calcType[1])
+        pvalue<-statsData$p.value
+      }
       plotData<-prepNiceData(prepedData=prepedData,by=by, subgroup=subgroup, outliers=outliers, filter=filter, groupNames=groupNames, plotLoc=plotLoc, width=width,flipFacts=flipFacts,verbose=verbose)
       cLoc<-facetLoc[plotData$facetLevel]
       plotData %>% bind_cols(at=cLoc,width=rep(.25*width/length(x),length(cLoc))) %>%
@@ -428,7 +474,7 @@ niceBox.default <- function(x, by=NULL, groupNames=NULL, main=NULL,sub=NULL, yla
   par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)
   ActiveOptions$xypos<-xypos
   #formatting the output list and setting class int npData
-  dataOut<-list(summary=plotData,stats=pvalue,plotType="box",options=ActiveOptions)
+  dataOut<-list(summary=plotData,stats=statsData,plotType="box",options=ActiveOptions)
   class(dataOut)<-c("npData","list")
 
   invisible(dataOut)

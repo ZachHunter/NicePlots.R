@@ -2,7 +2,7 @@
 % Please edit documentation in R/np_options_processing.R
 \name{procNiceOptions}
 \alias{procNiceOptions}
-\title{Process ploting options}
+\title{Process plotting options}
 \usage{
 procNiceOptions(
   x,
@@ -26,33 +26,35 @@ procNiceOptions(
   logScale,
   drawPoints,
   groupNames,
+  subgroupLabels = NULL,
+  highlightLabels = NULL,
   swarmOverflow,
   errorCap = NULL,
   CLOptions = NULL
 )
 }
 \arguments{
-\item{x}{Data to be plotted which has been preprocessed by \code{\link{dataFlightCheck}}}
+\item{x}{Data to be plotted which has been pre-processed by \code{\link{dataFlightCheck}}}
 
-\item{by}{factor or dataframe of factors; One or more factors that control how the data is grouped. The first column is the primary grouping factor and the second and thrid columns are used for sub-grouping and highlighting as needed.}
+\item{by}{factor or \code{\link[base]{data.frame}} of factors; One or more factors that control how the data is grouped. The first column is the primary grouping factor and the second and thrid columns are used for sub-grouping and highlighting as needed.}
 
-\item{minorTick}{numeric; Number of minor tickmarks to be drawn between the major marks}
+\item{minorTick}{numeric; Number of minor tick marks to be drawn between the major marks}
 
 \item{pointShape}{numeric; vector of numbers corresponding to pty options for ploting data overlays.}
 
 \item{whiskerLineType}{numeric; number corresponding to lty option for drawing the whiskers and error bars for box plots and bar plots, respectively.}
 
-\item{lWidth}{numeric; number creesponding to the lwd option for ploting lines on the graph}
+\item{lWidth}{numeric; number corresponding to the lwd option for plotting lines on the graph}
 
 \item{capWidth}{numeric; Width of the cap relative to the bar/box width for box plots and bar plots.}
 
 \item{pointLaneWidth}{numeric; This controls how far data point dots can move along the categorical axis when plotting. Used for \code{pointMethod} options 'jitter', 'beeswarm', and 'distribution'.}
 
-\item{width}{numeric; A multiplier that controls how wide the ploting elements will be. Setting \code{width=1.1} would result in plot elements being 10\% wider.}
+\item{width}{numeric; A multiplier that controls how wide the plotting elements will be. Setting \code{width=1.1} would result in plot elements being 10\% wider.}
 
 \item{guides}{logical; Should guidelines be drawn at the major tick marks.}
 
-\item{pointSize}{numeric; vector of numerics controling the size of points on the data overlay}
+\item{pointSize}{numeric; A numeric vector controlling the size of points on the data overlay}
 
 \item{subgroup}{logical; Should the data be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}}.}
 
@@ -72,7 +74,11 @@ procNiceOptions(
 
 \item{drawPoints}{logical; draws a dot plot overlay of the data.}
 
-\item{groupNames}{character; A character vector for the primary group names}
+\item{groupNames}{character; A character vector to override factor labels for primary group names}
+
+\item{subgroupLabels}{character; A character vector to override factor labels for subgroup names}
+
+\item{highlightLabels}{character; A character vector to override factor labels for point highlights.}
 
 \item{swarmOverflow}{character; Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.}
 
@@ -89,7 +95,7 @@ Integrates theme and user arguments to finalize all options prior to plotting
 \details{
 This is a private utility function used by NicePlots to integrate user options with theme defaults.
 Anything specified by the user is treated literally with no additional optimization.
-Colors, point shapes, fills, etc. are optimized to best enhance the relevant factor visualisations selected.
+Colors, point shapes, fills, etc. are optimized to best enhance the relevant factor visualizations selected.
 The finalized parameters are returned as a named list.
 }
 \seealso{

@@ -4,14 +4,14 @@
 \alias{ci}
 \title{Confidence interval helper function}
 \usage{
-ci(x, agg, indices)
+ci(x, indices, agg)
 }
 \arguments{
 \item{x}{numeric vector}
 
-\item{agg}{character: A string corresponding to the aggregator function to be modeled (eg. \code{\link[stats]{median}}, \code{\link[base]{mean}}, etc.)}
-
 \item{indices}{numeric vector: Indicies are passed to calculated individual bootstaps of \code{x}}
+
+\item{agg}{character: A string corresponding to the aggregate or central tendency function to be modeled (eg. \code{\link[stats]{median}}, \code{\link[base]{mean}}, etc.)}
 }
 \value{
 a number corresponding to a bootstrap iteration of the aggregator function given by \code{agg}
