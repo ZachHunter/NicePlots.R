@@ -7,7 +7,7 @@
 niceBar(
   x,
   by = NULL,
-  groupNames = NULL,
+  groupLabels = NULL,
   aggFun = c("mean", "median", "none"),
   errFun = c("sd", "se", "range"),
   theme = basicTheme,
@@ -54,9 +54,9 @@ niceBar(
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
 
-\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subgroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
+\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupLabels} is not specified. If \code{by} is a data frame and \code{subgroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
 
-\item{groupNames}{character vector; overrides the factor levels of \code{by} to label the groups}
+\item{groupLabels}{character vector; overrides the factor levels of \code{by} to label the groups}
 
 \item{aggFun}{character; Determines how the data is summarized by factor level. Valid options are \code{mean}, \code{median} or \code{none}.}
 

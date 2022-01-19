@@ -13,7 +13,7 @@ niceScatter(
   trendline = FALSE,
   sizeScale = 3,
   sizeLevels = 6,
-  groupNames = NULL,
+  groupLabels = NULL,
   subgroup = FALSE,
   bandwidth = NULL,
   useRgl = FALSE,
@@ -53,7 +53,7 @@ niceScatter(
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
 
-\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subgroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
+\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupLabels} is not specified. If \code{by} is a data frame and \code{subgroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
 
 \item{color}{factor or logical; if by is NULL, a factor suppolied to this option will populate by to color points by the factor levels. If by is defined then color should be set to TRUE or FALSE.}
 
@@ -67,7 +67,7 @@ niceScatter(
 
 \item{sizeLevels}{How many levels should be used to make the size scaling effect if the value given to size is numeric.}
 
-\item{groupNames}{character vector; overrides the factor levels of \code{by} to label the groups}
+\item{groupLabels}{character vector; overrides the factor levels of \code{by} to label the groups}
 
 \item{subgroup}{logical; use additional column in \code{by} to group the data within each level of the major factor.}
 

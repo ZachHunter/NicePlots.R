@@ -8,7 +8,7 @@ niceDensity(
   x,
   by = NULL,
   drawPoints = TRUE,
-  groupNames = NULL,
+  groupLabels = NULL,
   subgroup = FALSE,
   bandwidth = NULL,
   drawRug = FALSE,
@@ -45,11 +45,11 @@ niceDensity(
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
 
-\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subgroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
+\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupLabels} is not specified. If \code{by} is a data frame and \code{subgroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
 
 \item{drawPoints}{logical; draws a dot plot overlay for contour plots}
 
-\item{groupNames}{character vector; overrides the factor levels of \code{by} to label the groups}
+\item{groupLabels}{character vector; overrides the factor levels of \code{by} to label the groups}
 
 \item{subgroup}{logical; Will use the factor levels in \code{by} to plot a series of distributions from the data in \code{x}.}
 
