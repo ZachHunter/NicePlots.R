@@ -67,14 +67,14 @@
 #' @importFrom purrr reduce
 #' @export
 #' @seealso \code{\link[graphics]{stripchart}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{quantileTrim}}, \code{\link{prepCategoryWindow}}, \code{\link[base]{jitter}}
-niceDots <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, errorBars=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("se","sd","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, highlightLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {UseMethod("niceDots",x)}
+niceDots <- function(x, by=NULL, groupLabels=NULL, drawPoints=TRUE, errorBars=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("se","sd","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, highlightLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {UseMethod("niceDots",x)}
 
 #' @importFrom dplyr mutate
 #' @importFrom magrittr %>%
 #' @importFrom purrr reduce
 #' @export
 #'@author Zachary Hunter
-niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, errorBars=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("se","sd","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, highlightLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {
+niceDots.default <- function(x, by=NULL, groupLabels=NULL, drawPoints=TRUE, errorBars=TRUE,barWidth=.33, barType=c("bar","dot"), barThickness=2, aggFun=c("mean","median","none"),errFun=c("se","sd","range"), errorMultiple=2, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, theme=basicTheme, guides=TRUE, outliers=1.5, pointSize=1, width=NULL, pointShape=NULL, plotColors=NULL, logScale=FALSE, trim=FALSE, pointMethod=NULL, axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", yLim=NULL, rotateLabels=FALSE, rotateY=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL, highlightLabels=NULL, expLabels=TRUE, sidePlot=FALSE, pointHighlights=FALSE, pointLaneWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE, legend=FALSE,logAdjustment=1,errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, ...) {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset", call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -85,7 +85,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
 
   #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, groupNames=groupNames, drawPoints=drawPoints, errorBars=errorBars,barWidth=barWidth, barType=barType, barThickness=barThickness, aggFun=aggFun,errFun=errFun, errorMultiple=errorMultiple, main=main,sub=sub, ylab=ylab, minorTick=minorTick, theme=theme, guides=guides, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth, na.rm=na.rm, flipFacts=flipFacts, verbose=verbose, legend=legend,logAdjustment=logAdjustment,errorCap=errorCap, errorLineType=errorLineType,capWidth=capWidth, lWidth=lWidth,highlightLabels=highlightLabels)
+  ActiveOptions<-list(x=x, by=by, groupLabels=groupLabels, drawPoints=drawPoints, errorBars=errorBars,barWidth=barWidth, barType=barType, barThickness=barThickness, aggFun=aggFun,errFun=errFun, errorMultiple=errorMultiple, main=main,sub=sub, ylab=ylab, minorTick=minorTick, theme=theme, guides=guides, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth, na.rm=na.rm, flipFacts=flipFacts, verbose=verbose, legend=legend,logAdjustment=logAdjustment,errorCap=errorCap, errorLineType=errorLineType,capWidth=capWidth, lWidth=lWidth,highlightLabels=highlightLabels)
 
   #Flight check and prep data. Removes NAs.
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = flipFacts)
@@ -97,7 +97,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
   ActiveOptions<-append(ActiveOptions,moreOptions)
 
   #Here we check to see if the user specified any options so that they not overwritten by the designated theme
-  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=pointShape,whiskerLineType=errorLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subgroup=subgroup,stack=FALSE,pointHighlights=pointHighlights,type="DP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=pointMethod,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow=swarmOverflow ,errorCap=errorCap,CLOptions=moreOptions,subgroupLabels=subgroupLabels,highlightLabels=highlightLabels)
+  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=pointShape,whiskerLineType=errorLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subgroup=subgroup,stack=FALSE,pointHighlights=pointHighlights,type="DP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=pointMethod,drawPoints=drawPoints,groupLabels=groupLabels,swarmOverflow=swarmOverflow ,errorCap=errorCap,CLOptions=moreOptions,subgroupLabels=subgroupLabels,highlightLabels=highlightLabels)
   minorTick<-finalOptions$minorTick
   pointShape<-finalOptions$pointShape
   errorLineType<-finalOptions$whiskerLineType
@@ -107,7 +107,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
   guides<-finalOptions$guides
   theme<-finalOptions$theme
   plotColors<-finalOptions$plotColors
-  groupNames<-finalOptions$groupNames
+  groupLabels<-finalOptions$groupLabels
   subgroupLabels<-finalOptions$subgroupLabels
   highlightLabels<-finalOptions$highlightLabels
   errorCap<-finalOptions$errorCap
@@ -115,11 +115,11 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
   swarmOverflow<-finalOptions$swarmOverflow
   pointLaneWidth<-finalOptions$pointLaneWidth
 
-  if((!is.null(ActiveOptions$groupNames) | !is.null(ActiveOptions$subgroupLabels) | !is.null(ActiveOptions$highlightLabels)) & !is.null(groupNames)) {
+  if((!is.null(ActiveOptions$groupLabels) | !is.null(ActiveOptions$subgroupLabels) | !is.null(ActiveOptions$highlightLabels)) & !is.null(groupLabels)) {
     if(is.data.frame(by)) {
-      by[,1]<-factor(by[,1], labels=groupNames)
+      by[,1]<-factor(by[,1], labels=groupLabels)
     } else {
-      by<-factor(by, labels=groupNames)
+      by<-factor(by, labels=groupLabels)
     }
   }
   if(!is.null(ActiveOptions$subgroupLabels) & !is.null(subgroupLabels)) {
@@ -209,8 +209,8 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
     }
 
     #RStudio seems not to update the graphics devices properly
-    if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOveride"]])) {graphics.off()}
-    prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, expLabels=expLabels,sidePlot=sidePlot,subgroupLabels=subgroupLabels,strictLimits=FALSE,theme=theme,legend=legend,logAdjustment=logAdjustment, pointHighlights=pointHighlights)
+    if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOverride"]])) {graphics.off()}
+    prepedData<-prepCategoryWindow(x,by=by, groupLabels=groupLabels, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, expLabels=expLabels,sidePlot=sidePlot,subgroupLabels=subgroupLabels,strictLimits=FALSE,theme=theme,legend=legend,logAdjustment=logAdjustment, pointHighlights=pointHighlights)
   }
   pvalue<-NULL
   if(subgroup==TRUE){width<-width*2}
@@ -249,8 +249,8 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
         pvalue<-statsData$p.value
       }
       legend<-FALSE
-      facetLoc<-seq(1,length(groupNames),by=1)
-      names(facetLoc)<-groupNames
+      facetLoc<-seq(1,length(groupLabels),by=1)
+      names(facetLoc)<-groupLabels
       width<-.25*width
     } else {
       if(calcType[1]!="none"){
@@ -259,14 +259,14 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
       }
       #CASE: by is not a factor data is a numeric vector and subgroup is TRUE
       if(subgroup) {
-        facetLoc<-facetSpacing(length(levels(by[,2])),length(groupNames))
+        facetLoc<-facetSpacing(length(levels(by[,2])),length(groupLabels))
         names(facetLoc)<-unlist(lapply(levels(by[,1]),FUN=function(x) paste0(x,levels(by[,2]),sep=".")))
         width<-width*(facetLoc[2]-facetLoc[1])/4
       } else {
         #CASE: by is not a factor, data is a numeric vector and subgroup is FALSE
-        facetLoc<-seq(1,length(groupNames),by=1)
-        names(facetLoc)<-groupNames
-        if (length(groupNames)>1) {
+        facetLoc<-seq(1,length(groupLabels),by=1)
+        names(facetLoc)<-groupLabels
+        if (length(groupLabels)>1) {
           width<-width*(facetLoc[2]-facetLoc[1])/4
         } else {
           width<-width/4
@@ -300,7 +300,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
   } else {
     #CASE: data is a dataframe, by is a factor, subgroup is ignored
     if(is.factor(by)) {
-      facetLoc<-facetSpacing(length(prepedData[[1]]),length(groupNames))
+      facetLoc<-facetSpacing(length(prepedData[[1]]),length(groupLabels))
       names(facetLoc)<-unlist(lapply(levels(by),FUN=function(y) paste0(y,names(x),sep=".")))
       width<-width*(facetLoc[2]-facetLoc[1])/4
       if(legend!=FALSE) {
@@ -318,7 +318,7 @@ niceDots.default <- function(x, by=NULL, groupNames=NULL, drawPoints=TRUE, error
       }
     } else {
       #CASE: data is a dataframe, by is a dataframe, subgroup is ignored
-      facetLoc<-facetSpacing(length(prepedData[[1]]),length(groupNames))
+      facetLoc<-facetSpacing(length(prepedData[[1]]),length(groupLabels))
       names(facetLoc)<-unlist(lapply(levels(by[,1]),FUN=function(y) paste0(y,names(x),sep=".")))
       width<-width*(facetLoc[2]-facetLoc[1])/4
       if(legend!=FALSE) {

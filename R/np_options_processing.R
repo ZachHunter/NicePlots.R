@@ -158,7 +158,7 @@ formatPlotColors<-function(plotColors, theme=NA){
 #' @param pointMethod character; method to be used for ploting dots. Can be set to "jitter", "linear", "beeswarm" or "distribution".
 #' @param logScale numeric; Should a log scale use used (\code{TRUE}/\code{FALSE})? Otherwise indicates the base for the log transformation.
 #' @param drawPoints logical; draws a dot plot overlay of the data.
-#' @param groupNames character; A character vector to override factor labels for primary group names
+#' @param groupLabels character; A character vector to override factor labels for primary group names
 #' @param subgroupLabels character; A character vector to override factor labels for subgroup names
 #' @param highlightLabels character; A character vector to override factor labels for point highlights.
 #' @param swarmOverflow character; Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.
@@ -169,7 +169,7 @@ formatPlotColors<-function(plotColors, theme=NA){
 #' @importFrom magrittr %>%
 #' @importFrom purrr reduce map map_lgl map_dbl
 #' @seealso \code{\link{formatPlotColors}}, \code{\link{niceBox}}, \code{\link{niceDots}}, \code{\link{niceVio}}, \code{\link{niceBar}}
-procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWidth,pointLaneWidth,width,guides,pointSize,subgroup=FALSE,stack=F,pointHighlights=F,type=c("BP","VP","DP","Bar"),theme,plotColors,pointMethod,logScale,drawPoints,groupNames,subgroupLabels=NULL,highlightLabels=NULL,swarmOverflow,errorCap=NULL,CLOptions=NULL){
+procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWidth,pointLaneWidth,width,guides,pointSize,subgroup=FALSE,stack=F,pointHighlights=F,type=c("BP","VP","DP","Bar"),theme,plotColors,pointMethod,logScale,drawPoints,groupLabels,subgroupLabels=NULL,highlightLabels=NULL,swarmOverflow,errorCap=NULL,CLOptions=NULL){
   #Here we check to see if the user specified any options so that they are left unaltered if present
   defaultPoints<-FALSE
   defaultLines<-FALSE
@@ -490,49 +490,49 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
   theme$plotColors<-plotColors
 
   #Finalizing and sanity checking group name assignments
-  if(!is.data.frame(by) & is.null(groupNames) & !is.null(subgroupLabels)){
-    groupNames<-subgroupLabels
-  } else if (!is.data.frame(by) & is.null(groupNames) & !is.null(highlightLabels)){
-    groupNames<-highlightLabels
+  if(!is.data.frame(by) & is.null(groupLabels) & !is.null(subgroupLabels)){
+    groupLabels<-subgroupLabels
+  } else if (!is.data.frame(by) & is.null(groupLabels) & !is.null(highlightLabels)){
+    groupLabels<-highlightLabels
   }
 
   if(is.data.frame(by)) {
-    if(is.null(groupNames)){
+    if(is.null(groupLabels)){
       if(is.factor(by[,1])) {
-        groupNames<-levels(by[,1])
+        groupLabels<-levels(by[,1])
       } else {
-        groupNames<-levels(factor(by[,1]))
+        groupLabels<-levels(factor(by[,1]))
       }
     } else {
       if(!is.factor(by[,1])) {
         by[,1] <-factor(by[,1])
       }
-      if(length(groupNames) != length(levels(by[,1]))){
-        warning(paste0("groupNames (length ",length(groupNames),") is not the same length as the grouping factor selected (length ",length(levels(by[,1])),")!\nAdjusting naming vector to compensate..."), call.=FALSE)
-        if(length(groupNames) > length(levels(by[,1]))) {
-          groupNames<-groupNames[seq(length(levels(by[,1])))]
+      if(length(groupLabels) != length(levels(by[,1]))){
+        warning(paste0("groupLabels (length ",length(groupLabels),") is not the same length as the grouping factor selected (length ",length(levels(by[,1])),")!\nAdjusting naming vector to compensate..."), call.=FALSE)
+        if(length(groupLabels) > length(levels(by[,1]))) {
+          groupLabels<-groupLabels[seq(length(levels(by[,1])))]
         } else {
-          groupNames<-c(groupNames,levels(by[,1])[seq(length(groupNames)+1,length(levels(by[,1])))])
+          groupLabels<-c(groupLabels,levels(by[,1])[seq(length(groupLabels)+1,length(levels(by[,1])))])
         }
       }
     }
   } else {
-    if(is.null(groupNames)) {
+    if(is.null(groupLabels)) {
       if(is.factor(by)) {
-        groupNames<-levels(by)
+        groupLabels<-levels(by)
       } else {
-        groupNames<-levels(factor(by))
+        groupLabels<-levels(factor(by))
       }
     } else {
       if(!is.factor(by)) {
         by <-factor(by)
       }
-      if(length(groupNames) != length(levels(by))){
-        warning(paste0("groupNames (length ",length(groupNames),") is not the same length as the grouping factor selected (length ",length(levels(by)),")!\nAdjusting naming vector to compensate..."), call.=FALSE)
-        if(length(groupNames) > length(levels(by))) {
-          groupNames<-groupNames[seq(length(levels(by)))]
+      if(length(groupLabels) != length(levels(by))){
+        warning(paste0("groupLabels (length ",length(groupLabels),") is not the same length as the grouping factor selected (length ",length(levels(by)),")!\nAdjusting naming vector to compensate..."), call.=FALSE)
+        if(length(groupLabels) > length(levels(by))) {
+          groupLabels<-groupLabels[seq(length(levels(by)))]
         } else {
-          groupNames<-c(groupNames,levels(by)[seq(length(groupNames)+1,length(levels(by)))])
+          groupLabels<-c(groupLabels,levels(by)[seq(length(groupLabels)+1,length(levels(by)))])
         }
       }
     }
@@ -606,6 +606,6 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
     highlightLabels<-NULL
   }
 
-  list(groupNames=groupNames,subgroupLabels=subgroupLabels,highlightLabels=highlightLabels,minorTick=minorTick,pointShape=pointShape,whiskerLineType=whiskerLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subgroup=subgroup,stack=stack,pointHighlights=pointHighlights,theme=theme,plotColors=plotColors,pointMethod=pointMethod,swarmOverflow=swarmOverflow,errorCap=errorCap)
+  list(groupLabels=groupLabels,subgroupLabels=subgroupLabels,highlightLabels=highlightLabels,minorTick=minorTick,pointShape=pointShape,whiskerLineType=whiskerLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=pointLaneWidth,width=width,guides=guides,pointSize=pointSize,subgroup=subgroup,stack=stack,pointHighlights=pointHighlights,theme=theme,plotColors=plotColors,pointMethod=pointMethod,swarmOverflow=swarmOverflow,errorCap=errorCap)
 }
 
