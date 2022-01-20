@@ -145,7 +145,7 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
 #' loc<-seq(1,length(levels(iris$Species)))
 #' data<-list(data=iris[,1:4])
 #' #\donttest{myData<-prepNiceData(data,by=iris$Species,filter=filter,plotLoc=loc,
-#' #     groupNames=levels(iris$Species),outliers=FALSE)}
+#' #     groupLabels=levels(iris$Species),outliers=FALSE)}
 #' #\donttest{print(myData)}
 #'
 #' @param prepedData list; a list object returned by \code{\link{prepCategoryWindow}}
@@ -153,7 +153,7 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
 #' @param subgroup logical; Should the data be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}}.
 #' @param outliers positive numeric; number of interquartile ranges (IQR) past the Q1 (25\%) and Q3 (75\%) cumulative distribution values. Outliers are often defined as \eqn{1.5 \times IQR}{1.5 * IQR} and extreme outliers are more than \eqn{3 \times IQR}{3 * IQR} away from the inner 50\% data range.
 #' @param filter logical vector; Used to further filter the data if necissary.
-#' @param groupNames character; A character vector for the primary group names
+#' @param groupLabels character; A character vector for the primary group names
 #' @param plotLoc numeric vector; A vector indicating where each element should be plotted
 #' @param width numeric; A multiplier that controls how wide the ploting elements will be. Setting \code{width=1.1} would result in plot elements being 10\% wider.
 #' @param flipFacts logical; When a dataframe of values is given, column names are used as a secondary grouping factor by default. Setting \code{flipFacts=\link{TRUE}} makes the column names the primary factor and \code{by} the secondary factor.
@@ -164,7 +164,7 @@ dataFlightCheck<-function(data,by,flipFacts,na.rm=FALSE) {
 #' @importFrom tidyr gather
 #' @importFrom grDevices boxplot.stats
 #' @seealso \code{\link{niceBox}}, \code{\link{niceVio}}, \code{\link{niceDots}}, \code{\link[grDevices]{boxplot.stats}}
-prepNiceData<- function(prepedData,by, subgroup=FALSE,outliers=TRUE,filter,groupNames,plotLoc,width=1,flipFacts=FALSE,verbose=FALSE){
+prepNiceData<- function(prepedData,by, subgroup=FALSE,outliers=TRUE,filter,groupLabels,plotLoc,width=1,flipFacts=FALSE,verbose=FALSE){
   #CASE: by is a factor; data is a numeric vector
   if(is.numeric(prepedData[[1]])){
     if(is.factor(by)) {

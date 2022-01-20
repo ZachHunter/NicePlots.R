@@ -18,7 +18,7 @@
 #'
 #'
 #' @inheritParams prepNiceWindow
-#' @param groupNames character vector; overrides the factor levels of \code{by} to label the groups
+#' @param groupLabels character vector; overrides the factor levels of \code{by} to label the groups
 #' @param drawPoints logical; draws a dot plot overlay for contour plots
 #' @param subgroup logical; Will use the factor levels in \code{by} to plot a series of distributions from the data in \code{x}.
 #' @param bandwidth numeric; Manually sets the bandwith for the kernal density estimation overiding default calculations. For 2D plots \code{bandwidth} should be a vector of length 2. Set to \code{\link{NULL}} or \code{\link{NA}} to enable default calculations.
@@ -68,7 +68,7 @@
 #' @importFrom purrr walk2 map_dbl
 #' @importFrom graphics polygon contour lines persp rug
 #' @export
-niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subgroup=FALSE, bandwidth=NULL, drawRug=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=TRUE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, sidePlot=FALSE, ...) {UseMethod("niceDensity",x)}
+niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupLabels=NULL, subgroup=FALSE, bandwidth=NULL, drawRug=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=TRUE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, sidePlot=FALSE, ...) {UseMethod("niceDensity",x)}
 
 #' @importFrom dplyr bind_cols mutate arrange
 #' @importFrom magrittr %>%
@@ -77,14 +77,14 @@ niceDensity<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL, subgroup=FAL
 #' @importFrom tidyr gather
 #' @importFrom graphics polygon contour lines persp rug
 #' @export
-niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgroup=FALSE, bandwidth=NULL, drawRug=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), rotateLabels=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=TRUE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, sidePlot=FALSE, ...)  {
+niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupLabels=NULL,subgroup=FALSE, bandwidth=NULL, drawRug=FALSE, useRgl=FALSE, plotType=c("contour","surface"),theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), rotateLabels=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=TRUE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, strictLimits=FALSE, legend=FALSE,trimCurves=TRUE, sidePlot=FALSE, ...)  {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset",call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
 
   #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, drawPoints=drawPoints, groupNames=groupNames,subgroup=subgroup, useRgl=useRgl, plotType=plotType,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimCurves=trimCurves)
+  ActiveOptions<-list(x=x, by=by, drawPoints=drawPoints, groupLabels=groupLabels,subgroup=subgroup, useRgl=useRgl, plotType=plotType,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimCurves=trimCurves)
   ActiveOptions<-append(ActiveOptions,moreOptions)
 
   #Flight check data and remove na.
@@ -99,7 +99,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgr
   finalSummary<-NULL
 
   #Here we check to see if the user specified any options so that they not overwritten by the designated theme
-  finalOptions<-procNiceOptions(x=rep(1,length(by)),by=by,minorTick=minorTick,pointShape=NULL,whiskerLineType=NULL,lWidth=lWidth,capWidth=NULL,pointLaneWidth=FALSE,width=NULL,guides=guides,pointSize=NULL,subgroup=subgroup,stack=F,pointHighlights=FALSE,type="VP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=NULL,drawPoints=drawPoints,groupNames=groupNames,swarmOverflow=NULL, errorCap = NULL, CLOptions=moreOptions)
+  finalOptions<-procNiceOptions(x=rep(1,length(by)),by=by,minorTick=minorTick,pointShape=NULL,whiskerLineType=NULL,lWidth=lWidth,capWidth=NULL,pointLaneWidth=FALSE,width=NULL,guides=guides,pointSize=NULL,subgroup=subgroup,stack=F,pointHighlights=FALSE,type="VP",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=NULL,drawPoints=drawPoints,groupLabels=groupLabels,swarmOverflow=NULL, errorCap = NULL, CLOptions=moreOptions)
   minorTick<-finalOptions$minorTick
   pointShape<-finalOptions$pointShape
   lWidth<-finalOptions$lWidth
@@ -107,7 +107,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgr
   pointSize<-finalOptions$pointSize
   theme<-finalOptions$theme
   plotColors<-finalOptions$plotColors
-  groupNames<-finalOptions$groupNames
+  groupLabels<-finalOptions$groupLabels
   pointMethod<-finalOptions$pointMethod
   theme$plotColors<-plotColors
   curvePoints<-50
@@ -118,7 +118,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgr
   }
 
   #Initialize legend variables so we can update based on options
-  legendLabels<-groupNames
+  legendLabels<-groupLabels
   legendTitle<-"Legend"
   if(!is.null(by) & (subgroup==TRUE | is.data.frame(x))){
     if(legend[1]==FALSE | is.null(legend[1])) {
@@ -172,7 +172,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgr
     if(is.null(ylab)) {ylab<-colnames(x)[2]}
     if(add[1]==FALSE) {
       #RStudio seems not to update the graphics devices properly
-      if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOveride"]])) {graphics.off()}
+      if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOverride"]])) {graphics.off()}
 
       x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
       title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$axisLabels)
@@ -348,7 +348,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgr
       maxy<-max(map_dbl(densities, function(z) if(!is.list(z)){0}else{if(is.na(max(z$y)) | is.infinite(max(z$y))){0}else{max(z$y)}}))
       if(add[1]==FALSE) {
         #RStudio seems not to update the graphics devices properly
-        if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOveride"]])) {graphics.off()}
+        if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOverride"]])) {graphics.off()}
 
         if(is.null(xLim)){xLim<-c(minx,maxx)}
         if(is.null(yLim)){yLim<-c(0,maxy)}
@@ -399,7 +399,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupNames=NULL,subgr
 
       if(add[1]==FALSE) {
         #RStudio seems not to update the graphics devices properly
-        if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOveride"]])) {graphics.off()}
+        if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOverride"]])) {graphics.off()}
 
         if(is.null(xLim)){xLim<-c(minx,maxx)}
         if(is.null(yLim)){yLim<-c(0,maxy)}

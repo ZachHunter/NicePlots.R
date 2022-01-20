@@ -10,7 +10,7 @@ prepNiceData(
   subgroup = FALSE,
   outliers = TRUE,
   filter,
-  groupNames,
+  groupLabels,
   plotLoc,
   width = 1,
   flipFacts = FALSE,
@@ -28,7 +28,7 @@ prepNiceData(
 
 \item{filter}{logical vector; Used to further filter the data if necissary.}
 
-\item{groupNames}{character; A character vector for the primary group names}
+\item{groupLabels}{character; A character vector for the primary group names}
 
 \item{plotLoc}{numeric vector; A vector indicating where each element should be plotted}
 
@@ -52,7 +52,7 @@ filter<-rep(TRUE,length(iris$Species))
 loc<-seq(1,length(levels(iris$Species)))
 data<-list(data=iris[,1:4])
 #\donttest{myData<-prepNiceData(data,by=iris$Species,filter=filter,plotLoc=loc,
-#     groupNames=levels(iris$Species),outliers=FALSE)}
+#     groupLabels=levels(iris$Species),outliers=FALSE)}
 #\donttest{print(myData)}
 
 }

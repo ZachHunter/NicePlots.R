@@ -8,7 +8,7 @@ niceVio(
   x,
   by = NULL,
   bandwidth = NULL,
-  groupNames = NULL,
+  groupLabels = NULL,
   main = NULL,
   sub = NULL,
   ylab = NULL,
@@ -53,11 +53,11 @@ niceVio(
 \arguments{
 \item{x}{numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.}
 
-\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupNames} is not specified. If \code{by} is a data frame and \code{subgroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
+\item{by}{factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupLabels} is not specified. If \code{by} is a data frame and \code{subgroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.}
 
 \item{bandwidth}{numeric; Used to override the default bandwidth calculation in \code{\link[vioplot]{vioplot}}. Default value is \code{\link{NULL}}.}
 
-\item{groupNames}{character vector; overrides the factor levels of \code{by} to label the groups}
+\item{groupLabels}{character vector; overrides the factor levels of \code{by} to label the groups}
 
 \item{main}{character; title for the graph which is supplied to the \code{main} argument.}
 

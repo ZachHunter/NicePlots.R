@@ -46,11 +46,11 @@
 #' @importFrom dplyr mutate
 #' @export
 #' @seealso \code{\link[vioplot]{vioplot}}, \code{\link{boxplot}}, \code{\link{niceBox}}, \code{\link[beeswarm]{beeswarm}}, \code{\link{prepCategoryWindow}}
-niceBar <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=list(bg="open",fill=setAlpha("grey",.8)), logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL,stackLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap="ball", errorLineType=1,capWidth=1.2, lWidth=1.5, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1,normalize=FALSE, ...) {UseMethod("niceBar",x)}
+niceBar <- function(x, by=NULL, groupLabels=NULL, aggFun=c("mean","median","none"),errFun=c("sd","se","range"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=TRUE, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=list(bg="open",fill=setAlpha("grey",.8)), logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL,stackLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap="ball", errorLineType=1,capWidth=1.2, lWidth=1.5, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1,normalize=FALSE, ...) {UseMethod("niceBar",x)}
 
 #' @import dplyr
 #' @export
-niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median"),errFun=c("se","sd","range", "t95ci", "boot95ci"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=NULL, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=NULL, logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL,stackLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1, normalize=FALSE, ...) {
+niceBar.default <- function(x, by=NULL, groupLabels=NULL, aggFun=c("mean","median"),errFun=c("se","sd","range", "t95ci", "boot95ci"), theme=basicTheme, legend=FALSE, stack=FALSE, main=NULL,sub=NULL, ylab=NULL, minorTick=FALSE, guides=NULL, outliers=FALSE, width=NULL, errorMultiple=2, plotColors=NULL, logScale=FALSE, trim=FALSE, axisText=c(NULL,NULL), showCalc=FALSE, calcType="wilcox", yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, add=FALSE, minorGuides=NULL, extendTicks=TRUE, subgroup=FALSE, subgroupLabels=NULL,stackLabels=NULL, expLabels=FALSE, sidePlot=FALSE, errorBars=TRUE, errorCap=NULL, errorLineType=NULL,capWidth=NULL, lWidth=NULL, na.rm=FALSE, flipFacts=FALSE, verbose=FALSE,logAdjustment=1, normalize=FALSE, ...) {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset", call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -59,7 +59,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   if(is.null(normalize)) {normalize<-FALSE}
   #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, groupNames=groupNames, aggFun=aggFun,errFun=errFun, theme=theme, legend=legend, stack=stack, main=main,sub=sub, ylab=ylab, minorTick=minorTick, guides=guides, outliers=outliers, width=width, errorMultiple=errorMultiple, plotColors=plotColors, logScale=logScale, trim=trim, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, errorBars=errorBars, errorCap=errorCap, errorLineType=errorLineType,capWidth=capWidth, lWidth=lWidth, na.rm=na.rm, flipFacts=flipFacts, verbose=verbose,logAdjustment=logAdjustment, normalize=normalize,stackLabels=stackLabels)
+  ActiveOptions<-list(x=x, by=by, groupLabels=groupLabels, aggFun=aggFun,errFun=errFun, theme=theme, legend=legend, stack=stack, main=main,sub=sub, ylab=ylab, minorTick=minorTick, guides=guides, outliers=outliers, width=width, errorMultiple=errorMultiple, plotColors=plotColors, logScale=logScale, trim=trim, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, errorBars=errorBars, errorCap=errorCap, errorLineType=errorLineType,capWidth=capWidth, lWidth=lWidth, na.rm=na.rm, flipFacts=flipFacts, verbose=verbose,logAdjustment=logAdjustment, normalize=normalize,stackLabels=stackLabels)
   ActiveOptions<-append(ActiveOptions,moreOptions)
 
   if(is.data.frame(x) | is.matrix(x)) {
@@ -103,7 +103,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
     plotColors$fill<-cPoint
   }
   #Note we are using stack here for pointHighlights as they have the same priority.
-  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=1,whiskerLineType=errorLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=1,width=width,guides=guides,pointSize=1,subgroup=subgroup,stack=stack,pointHighlights=stack,type="Bar",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod="jitter",drawPoints=FALSE,groupNames=groupNames,swarmOverflow="random" ,errorCap=errorCap,CLOptions=moreOptions,highlightLabels=stackLabels,subgroupLabels=subgroupLabels)
+  finalOptions<-procNiceOptions(x=x,by=by,minorTick=minorTick,pointShape=1,whiskerLineType=errorLineType,lWidth=lWidth,capWidth=capWidth,pointLaneWidth=1,width=width,guides=guides,pointSize=1,subgroup=subgroup,stack=stack,pointHighlights=stack,type="Bar",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod="jitter",drawPoints=FALSE,groupLabels=groupLabels,swarmOverflow="random" ,errorCap=errorCap,CLOptions=moreOptions,highlightLabels=stackLabels,subgroupLabels=subgroupLabels)
   minorTick<-finalOptions$minorTick
   pointShape<-finalOptions$pointShape
   errorLineType<-finalOptions$whiskerLineType
@@ -113,16 +113,16 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
   guides<-finalOptions$guides
   theme<-finalOptions$theme
   plotColors<-finalOptions$plotColors
-  groupNames<-finalOptions$groupNames
+  groupLabels<-finalOptions$groupLabels
   subgroupLabels<-finalOptions$subgroupLabels
   stackLabels<-finalOptions$highlightLabels
   errorCap<-finalOptions$errorCap
 
-  if((!is.null(ActiveOptions$groupNames) | !is.null(ActiveOptions$subgroupLabels) | !is.null(ActiveOptions$stackLabels)) & !is.null(groupNames)) {
+  if((!is.null(ActiveOptions$groupLabels) | !is.null(ActiveOptions$subgroupLabels) | !is.null(ActiveOptions$stackLabels)) & !is.null(groupLabels)) {
     if(is.data.frame(by)) {
-      by[,1]<-factor(by[,1], labels=groupNames)
+      by[,1]<-factor(by[,1], labels=groupLabels)
     } else {
-      by<-factor(by, labels=groupNames)
+      by<-factor(by, labels=groupLabels)
     }
   }
   if(!is.null(ActiveOptions$subgroupLabels) & !is.null(subgroupLabels)) {
@@ -243,9 +243,9 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       strictBase<-FALSE
     }
     #RStudio seems not to update the graphics devices properly
-    if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOveride"]])) {graphics.off()}
+    if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOverride"]])) {graphics.off()}
 
-    prepedData<-prepCategoryWindow(x,by=by, groupNames=groupNames, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, expLabels=expLabels,sidePlot=sidePlot,subgroupLabels=subgroupLabels,strictLimits=strictBase,theme=theme,legend=legend,logAdjustment=logAdjustment, stack=stack, pointHighlights=stack)
+    prepedData<-prepCategoryWindow(x,by=by, groupLabels=groupLabels, minorTick=minorTick, guides=guides, plotColors=plotColors, yLim=dRange, rotateLabels=rotateLabels, rotateY=rotateY, trim=trim, logScale=logScale, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, expLabels=expLabels,sidePlot=sidePlot,subgroupLabels=subgroupLabels,strictLimits=strictBase,theme=theme,legend=legend,logAdjustment=logAdjustment, stack=stack, pointHighlights=stack)
   }
   pvalue<-NULL
   if(subgroup==TRUE){width<-width*2}
@@ -273,7 +273,7 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       }
       legend<-FALSE
       width<-.25*width
-      facetLoc<-seq(1,length(groupNames))
+      facetLoc<-seq(1,length(groupLabels))
     } else {
       if(calcType[1]!="none"){
         statsData<-calcStats(prepedData[[1]],by[,1],calcType[1],verbose=verbose)
@@ -281,12 +281,12 @@ niceBar.default <- function(x, by=NULL, groupNames=NULL, aggFun=c("mean","median
       }
       #CASE: by is not a factor data is a numeric vector and subgroup is TRUE
       if(subgroup) {
-        facetLoc<-facetSpacing(length(levels(by[,2])),length(groupNames))
+        facetLoc<-facetSpacing(length(levels(by[,2])),length(groupLabels))
         width<-width*(facetLoc[2]-facetLoc[1])/4
       } else {
         #CASE: by is not a factor, data is a numeric vector and subgroup is FALSE
-        facetLoc<-seq(1,length(groupNames))
-        if(length(groupNames)>1) {
+        facetLoc<-seq(1,length(groupLabels))
+        if(length(groupLabels)>1) {
           width<-width*(facetLoc[2]-facetLoc[1])/4
         } else {
           width<-width/4

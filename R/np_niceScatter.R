@@ -20,7 +20,7 @@
 #' @param shape factor or logical; if by is NULL, a factor suppolied to this option will populate by to control the shape of the points points by the factor levels. If by is defined then shape should be set to TRUE or FALSE.
 #' @param size factor or logical; if by is NULL, a factor suppolied to this option will populate by to control the size of the points by the factor levels. If by is defined then color should be set to TRUE or FALSE.
 #' @param trendline To do.
-#' @param groupNames character vector; overrides the factor levels of \code{by} to label the groups
+#' @param groupLabels character vector; overrides the factor levels of \code{by} to label the groups
 #' @param bandwidth numeric; Manually sets the bandwith for the kernal density estimation overiding default calculations. For 2D plots \code{bandwidth} should be a vector of length 2. Set to \code{\link{NULL}} or \code{\link{NA}} to enable default calculations.
 #' @param useRgl logical; Should the library \code{\link[rgl]{rgl}} be used to make 3D surface plots.
 #' @param type character;
@@ -70,7 +70,7 @@
 #' @importFrom stats lm predict cor.test
 #' @importFrom scatterplot3d scatterplot3d
 #' @export
-niceScatter<-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=3, sizeLevels=6, groupNames=NULL, subgroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL,  minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=TRUE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL,zLim=NULL, strictLimits=FALSE, legend=FALSE ,trimTrendLines=TRUE, showTrendConfidence=TRUE, drawPoints=TRUE, corMethod="pearson", ...) {UseMethod("niceScatter",x)}
+niceScatter<-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=3, sizeLevels=6, groupLabels=NULL, subgroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL,  minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=TRUE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL,zLim=NULL, strictLimits=FALSE, legend=FALSE ,trimTrendLines=TRUE, showTrendConfidence=TRUE, drawPoints=TRUE, corMethod="pearson", ...) {UseMethod("niceScatter",x)}
 
 #' @importFrom magrittr %>%
 #' @importFrom purrr map_lgl map_dbl map walk
@@ -80,7 +80,7 @@ niceScatter<-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FA
 #' @importFrom stats lm predict cor.test
 #' @importFrom scatterplot3d scatterplot3d
 #' @export
-niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=3, sizeLevels=6, groupNames=NULL, subgroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=TRUE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, zLim=NULL, strictLimits=FALSE, legend=FALSE, trimTrendLines=TRUE, showTrendConfidence=TRUE, drawPoints=TRUE, corMethod="pearson", ...) {
+niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=3, sizeLevels=6, groupLabels=NULL, subgroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=TRUE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, zLim=NULL, strictLimits=FALSE, legend=FALSE, trimTrendLines=TRUE, showTrendConfidence=TRUE, drawPoints=TRUE, corMethod="pearson", ...) {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset",call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -170,7 +170,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
 
   #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
-  ActiveOptions<-list(x=x, by=by, groupNames=groupNames,subgroup=subgroup,color=color,shape=shape,size=size, useRgl=useRgl, type=type,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick,trendline=trendline, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimTrendLines=trimTrendLines, showTrendConfidence=showTrendConfidence, drawPoints=drawPoints, corMethod=corMethod)
+  ActiveOptions<-list(x=x, by=by, groupLabels=groupLabels,subgroup=subgroup,color=color,shape=shape,size=size, useRgl=useRgl, type=type,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick,trendline=trendline, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimTrendLines=trimTrendLines, showTrendConfidence=showTrendConfidence, drawPoints=drawPoints, corMethod=corMethod)
   ActiveOptions<-append(ActiveOptions,moreOptions)
 
   preFlightBy<-by
@@ -184,7 +184,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
 
 
   #Here we check to see if the user specified any options so that they not overwritten by the designated theme
-  finalOptions<-procNiceOptions(x=rep(1,length(by)),by=by,minorTick=minorTick,pointShape=NULL,whiskerLineType=NULL,lWidth=lWidth,capWidth=NULL,pointLaneWidth=FALSE,width=NULL,guides=guides,pointSize=NULL,subgroup=subgroup,stack=F,pointHighlights=FALSE,type="2D",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=NULL,drawPoints=TRUE,groupNames=groupNames,swarmOverflow=NULL, errorCap = NULL, CLOptions=moreOptions)
+  finalOptions<-procNiceOptions(x=rep(1,length(by)),by=by,minorTick=minorTick,pointShape=NULL,whiskerLineType=NULL,lWidth=lWidth,capWidth=NULL,pointLaneWidth=FALSE,width=NULL,guides=guides,pointSize=NULL,subgroup=subgroup,stack=F,pointHighlights=FALSE,type="2D",theme=theme,plotColors=plotColors,logScale=logScale,pointMethod=NULL,drawPoints=TRUE,groupLabels=groupLabels,swarmOverflow=NULL, errorCap = NULL, CLOptions=moreOptions)
   minorTick<-finalOptions$minorTick
   pointShape<-finalOptions$pointShape
   lWidth<-finalOptions$lWidth
@@ -192,7 +192,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
   pointSize<-finalOptions$pointSize
   theme<-finalOptions$theme
   plotColors<-finalOptions$plotColors
-  groupNames<-finalOptions$groupNames
+  groupLabels<-finalOptions$groupLabels
   pointMethod<-finalOptions$pointMethod
   lineType<-theme$errorBarLineType2D
   theme$plotColors<-plotColors
@@ -203,26 +203,26 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
   }
 
   if(is.data.frame(by)) {
-    if(is.null(groupNames)){
+    if(is.null(groupLabels)){
       if(is.factor(by[,1])) {
-        groupNames<-levels(by[,1])
+        groupLabels<-levels(by[,1])
       } else {
-        groupNames<-levels(factor(by[,1]))
+        groupLabels<-levels(factor(by[,1]))
       }
     }
   } else {
-    if(is.null(groupNames)) {
+    if(is.null(groupLabels)) {
       if(is.factor(by)) {
-        groupNames<-levels(by)
+        groupLabels<-levels(by)
       } else {
-        groupNames<-levels(factor(by))
+        groupLabels<-levels(factor(by))
       }
     }
   }
 
 
   #Initialize legend variables so we can update based on options
-  legendLabels<-groupNames
+  legendLabels<-groupLabels
   legendTitle<-"Legend"
   if(!is.null(by)){
     if(legend[1]==FALSE | is.null(legend[1])) {
@@ -383,7 +383,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
       #2D plot handling
       if(add[1]==FALSE) {
         #RStudio seems not to update the graphics devices properly
-        if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOveride"]])) {graphics.off()}
+        if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOverride"]])) {graphics.off()}
 
         x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment, strictLimits=strictLimits)
         title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$axisLabels)
@@ -400,7 +400,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
     myColors<-plotColors$points[1]
     if(add[1]==FALSE) {
       #RStudio seems not to update the graphics devices properly
-      if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOveride"]])) {graphics.off()}
+      if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOverride"]])) {graphics.off()}
 
       x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
       title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$axisLabels)

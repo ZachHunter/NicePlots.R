@@ -25,7 +25,7 @@ procNiceOptions(
   pointMethod,
   logScale,
   drawPoints,
-  groupNames,
+  groupLabels,
   subgroupLabels = NULL,
   highlightLabels = NULL,
   swarmOverflow,
@@ -74,7 +74,7 @@ procNiceOptions(
 
 \item{drawPoints}{logical; draws a dot plot overlay of the data.}
 
-\item{groupNames}{character; A character vector to override factor labels for primary group names}
+\item{groupLabels}{character; A character vector to override factor labels for primary group names}
 
 \item{subgroupLabels}{character; A character vector to override factor labels for subgroup names}
 
