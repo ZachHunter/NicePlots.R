@@ -376,38 +376,32 @@ niceBar.default <- function(x, by=NULL, groupLabels=NULL, aggFun=c("mean","media
     print(pData[[2]])
   }
 
-  #Calculating data point positions comparability with npData specs.
-  xypos<-addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc, plotColors=plotColors, drawPoints=TRUE,pointMethod = "linear", calcOnly=TRUE)
+  #Calculating data point positions compatability with npData specs.
+  xypos <- addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=FALSE, pointMethod="jitter", pointShape=pointShape, pointSize=1, width=width, pointLaneWidth=1, plotColors=plotColors, drawPoints=FALSE, outliers=outliers,swarmOverflow = "gutter")
   xyid<-1
   xFilter<-1
   byFilter<-1
   if(is.vector(ActiveOptions$x) | is.factor(ActiveOptions$x)) {
     xyid<-seq(length(ActiveOptions$x))
-    xFilter<-!is.na(x)
+    xFilter<-!is.na(ActiveOptions$x)
   } else {
     if(flipFacts==TRUE) {
       xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
-      xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+      xFilter<-rep(rowSums(is.na(as.data.frame(ActiveOptions$x)))==0,ncol(ActiveOptions$x))
     } else {
       xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
-      xFilter<-rowSums(is.na(as.data.frame(x)))==0
+      xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$x)))==0
     }
   }
   if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){
     byFilter<-!is.na(ActiveOptions$by)
   } else {
-    xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
+    byFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
   }
   xyid<-xyid[xFilter ==TRUE & byFilter ==TRUE]
   xyid<-xyid[filter]
-  xyLength<-1
-  if(is.numeric(xypos) & !is.matrix(xypos)){
-    xyLength<-length(xypos)
-  } else {
-    xyLength<-nrow(xypos)
-  }
-  if(length(xyid)<xyLength){
-    xyid<-rep(xyid,xyLength/length(xyid))
+  if(length(xyid)<nrow(xypos)){
+    xyid<-rep(xyid,nrow(xypos)/length(xyid))
   }
   ActiveOptions$xypos<-data.frame(xypos,ID=xyid)
 
