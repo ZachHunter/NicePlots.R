@@ -13,8 +13,12 @@ prepNiceWindow(
   xLim = NULL,
   rotateLabels = FALSE,
   theme = NA,
-  plotColors = if (is.na(theme)) {     list(bg = "open", guides = "black", lines =
-    "gray22", points = "darkgrey", fill = "white") } else {     theme$plotColors },
+  plotColors = if (is.na(theme)) {
+     list(bg = "open", guides = "black", lines =
+    "gray22", points = "darkgrey", fill = "white")
+ } else {
+     theme$plotColors
+ },
   logScaleX = FALSE,
   logScaleY = FALSE,
   axisText = list(x = c(NULL, NULL), y = c(NULL, NULL)),

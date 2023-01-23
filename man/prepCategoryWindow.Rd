@@ -14,8 +14,12 @@ prepCategoryWindow(
   rotateLabels = FALSE,
   rotateY = TRUE,
   theme = NA,
-  plotColors = if (is.na(theme)) {     list(bg = "open", guides = "black", lines =
-    "gray22", points = "darkgrey", fill = "white") } else {     theme$plotColors },
+  plotColors = if (is.na(theme)) {
+     list(bg = "open", guides = "black", lines =
+    "gray22", points = "darkgrey", fill = "white")
+ } else {
+     theme$plotColors
+ },
   trim = FALSE,
   logScale = FALSE,
   axisText = c(NULL, NULL),

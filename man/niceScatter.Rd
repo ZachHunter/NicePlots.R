@@ -161,8 +161,8 @@ data(iris)
 niceScatter(iris[,1:2], color=iris$Species, shape=iris$Species,
    size=iris[,3], trendline = "color",theme=npColorTheme)
 
-#Same thing but defining the by input explicitly and makeing a single trandlline for the group.
-#Note that seting trendline to color as before would produce a exact replica of the first graph.
+#Same thing but defining the by input explicitly and making a single trend line for the group.
+#Note that setting trend line to color as before would produce a exact replica of the first graph.
 niceScatter(iris[,1:2],by=data.frame(iris$Species,iris$Species,iris[,3]),
    color=TRUE, shape=TRUE, size=TRUE, theme=npColorTheme, trendline = TRUE)
 
