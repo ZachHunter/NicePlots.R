@@ -2,7 +2,7 @@
 % Please edit documentation in R/np_categorical_plot_setup.R
 \name{makeNiceLegend}
 \alias{makeNiceLegend}
-\title{Draw a nice plot legened}
+\title{Draw a nice plot legend}
 \usage{
 makeNiceLegend(
   labels,
@@ -12,41 +12,66 @@ makeNiceLegend(
   lineCol = NA,
   bg = NA,
   col = makeColorMatrix()[, 3],
-  shape = "rect",
-  size = 0.66,
-  spacing = 0.2
+  shape = "c",
+  size = 0.75,
+  spacing = 0.2,
+  fontFamily = "sans",
+  sizeScale = NA,
+  shapeScale = NA,
+  scaleDefaultColor = "black"
 )
 }
 \arguments{
-\item{labels}{character vector; The names of the levels decribed in the legend. Typically factor levels.}
+\item{labels}{character vector; The names of the levels describe in the legend. Typically factor levels.}
 
-\item{title}{character; The title of the legend. This defaults to "Legend" if unspecificed.}
+\item{title}{character; The title of the legend. This defaults to "Legend" if unspecified.}
 
 \item{fontCol}{R color; Color of the legend text.}
 
-\item{border}{R color; The color of the rectanglar border surrounding the legend. Defaults to \code{\link{NULL}} which supresses this feature}
+\item{border}{R color; The color of the rectangular border surrounding the legend. Defaults to \code{\link{NULL}} which suppresses this feature}
 
 \item{lineCol}{R color; The color of the line colors for the color key. Optional. Defaults to \code{\link{NA}}.}
 
-\item{bg}{R color; Sets the background color for the legend aread. Note that this can be distinct the the margin background.}
+\item{bg}{R color; Sets the background color for the legend area. Note that this can be distinct the the margin background.}
 
 \item{col}{R color vector; A vector of colors determining the color of the color code boxes.}
 
-\item{shape}{character; Determins if the color code is rectangles or circles. Valid ptions are "rect", "rectangle", "circ", or "circle". Not there is no funcitonal difference between the synonyms.}
+\item{shape}{character; Determines what kind of legend to draw. "c" is colors - colored rectangle default; "s" is point shape (pch); "z" is size scaling (cex). These can be combined so a color and point shape together is "cs".}
 
-\item{size}{numeric; Sets the legend font cex sizing.}
+\item{size}{numeric; Sets the overall legend font cex sizing.}
 
-\item{spacing}{numeric; Determins the total amount of padding (sum of upper and lower padding) surrounding each line. in the legend in units of font line hight.}
+\item{spacing}{numeric; Determines the total amount of padding (sum of upper and lower padding) surrounding each line. in the legend in units of font line height.}
+
+\item{fontFamily}{character; font family used for string height calculations. Possible values are "sans", "mono", or "serif"}
+
+\item{sizeScale}{numeric; This is the cex values for size scaling legends.}
+
+\item{shapeScale}{numeric; This is the pch value for legends including point shape.}
+
+\item{scaleDefaultColor}{color; This is the color shape and size indicators will be if they are not linked to a color scale. Defaults to black.}
 }
 \description{
-Draws a customizable legend in the margins based on factor levels.
+Draws a legend in the margins based on factor levels.
 }
 \details{
-This functions works with plot enviroment initializing functions such as \code{\link{prepCategoryWindow}}
-to expand the right margin to accomodate a figure legend.
+This functions works with plot environment initializing functions such as \code{\link{prepCategoryWindow}}
+to expand the right margin to accommodate a figure legend. While designed to be used by nicePlots and bvt plotting
+functions, it can also be used indpendantly as in the example below.
 }
 \examples{
-ToDo<-1
+oMar<-par("mar")
+nMar<-oMar
+nMar[4]<-5.1
+par(mar=nMar)
+data(iris)
+plot(iris$Sepal.Length,iris$Sepal.Width, col=iris$Species, cex=0, main="Iris Legend Example")
+iSpec<-levels(iris$Species)
+for(i in seq(length(iSpec))) {
+  points(iris[iris$Species==iSpec[i],1],iris[iris$Species==iSpec[i],2],
+    pch=14+i,col=makeColorMatrix()[i,2])
+}
+par(mar=oMar)
+makeNiceLegend(iSpec,col=makeColorMatrix()[1:3,2],shapeScale=15:17,size=1, shape="cs")
 
 }
 \seealso{

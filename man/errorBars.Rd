@@ -27,7 +27,7 @@ errorBars(
 
 \item{lType}{positive integer; corresponds to lty line type in base R.}
 
-\item{width}{positive numeric; corresponds to lwd line width setting in base R.\#'}
+\item{width}{positive numeric; corresponds to lwd line width setting in base R.}
 }
 \description{
 Draws error bars with an optional cap at one end

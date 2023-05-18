@@ -34,6 +34,9 @@ prepCategoryWindow(
   pointHighlights = FALSE,
   logAdjustment = 1,
   stack = FALSE,
+  preferMulti = TRUE,
+  maxSize = FALSE,
+  sizeColumn,
   ...
 )
 }
@@ -85,6 +88,12 @@ prepCategoryWindow(
 \item{logAdjustment}{= numeric; This number is added to the input data prior to log transformation. Default value is 1.}
 
 \item{stack}{logical; Used for stack stacked bar plots. Used exclusively by \code{\link{niceBar}}.}
+
+\item{preferMulti}{logical; Are multiple legends preferred}
+
+\item{maxSize}{numeric; This is largest size scaling value for size scale legends. Defaults to \code{\link{FALSE}}}
+
+\item{sizeColumn}{numeric; This indicates which column should be used for the size scaling.}
 
 \item{...}{additional options mostly to be passed along to subsequent functions}
 }

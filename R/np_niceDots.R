@@ -416,7 +416,7 @@ niceDots.default <- function(x, by=NULL, groupLabels=NULL, drawPoints=TRUE, erro
     if(is.na(legendTitle) | legendTitle=="factTwo") {
       legendTitle<="Legend"
     }
-    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=theme$legendBorder, lineCol=plotColors$LegendLineCol, bg=plotColors$LegendBG, col=legendColors, shape="rect",size=theme$legendSize,spacing=theme$legendSpacing)
+    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=theme$legendBorder, lineCol=plotColors$LegendLineCol, bg=plotColors$LegendBG, col=legendColors, shape="c",size=theme$legendSize,spacing=theme$legendSpacing)
   }
 
   #Add titles, sub and ylab

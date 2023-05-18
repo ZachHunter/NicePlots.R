@@ -30,10 +30,10 @@ basicTheme<- list(
   legendSpacing=.2, #Relative spacing padding legend entries
 
   #Plot Specific Defaults
-  pointSizeBP=.7, #cex-like Numeric; size of points in overlay for boxplots
-  pointSizeVP=.6, #cex-like Numeric; size of points in overlay for violin plots
-  pointSizeDP=.5, #cex-like Numeric; size of points in overlay for dot plots
-  pointSize2D=.5, #cex-like Numeric; size of points in overlay for scatter plots
+  pointSizeBP=.8, #cex-like Numeric; size of points in overlay for boxplots
+  pointSizeVP=.8, #cex-like Numeric; size of points in overlay for violin plots
+  pointSizeDP=.8, #cex-like Numeric; size of points in overlay for dot plots
+  pointSize2D=.8, #cex-like Numeric; size of points in overlay for scatter plots
   widthBP=.85, #Relative box width of each category for box plots
   widthVP=.85, #Relative violin width of each category for violin plots
   widthDP=.45, #Relative category width of each category for dot plots

@@ -50,23 +50,26 @@ makeLogTicks<-function(dataRange,minorCount=10,logScale=2,axisText=c(NULL,NULL),
 #' Calculate margin needed to plot a NicePlots legend
 #'
 #' @details
-#' This is a utility function used by the window setup routines to calculate how much space the legend will take up in the margin and setting the \code{par(mai)} setting accordingly.
+#' This is a utility function used by the window setup routines to calculate how much space the legend will take up in the margin and setting the \code{par(mai)} accordingly.
 #'
 #' @param x numeric vector or data frame; The input to \code{prepCategoryWindow} can be a numeric vector a  data frame of numeric vectors.
 #' @param by factor or data frame of factors; used as the primary grouping factor and the factor levels will be used as group names if \code{groupLabels} is not specified. If \code{by} is a data frame and \code{subgroup=\link{TRUE}}, the second column is assumed to be a secondary grouping factor, breaking out the data into sub-categories within each major group determined by the levels of the first column.
 #' @param theme list object; Themes are are an optional way of storing graphical preset options that are compatible with all nicePlot graphing functions.
-#' @param pointHighlights logical; Is pointHightlights turned on? This is used to determin with column of \code{by} should be used for legend factor levels.
+#' @param pointHighlights logical; Is pointHightlights turned on? This is used to determine with column of \code{by} should be used for legend factor levels.
 #' @param subgroup subgroup logical; use additional column in \code{by} to group the data within each level of the major factor.
 #' @param stack logical; Used for stack stacked bar plots. Used exclusively by \code{\link{niceBar}}.
-#' @param legend character; Title for the legend collumn. Set to \code{\link{TRUE}} if no header is desired.
+#' @param legend character; Title for the legend column. Set to \code{\link{TRUE}} if no header is desired.
 #' @param is2D logical; Is this for a 2D scatterplot or density plot? The first column of \code{by} will be use if set to \code{\link{TRUE}}.
+#' @param preferMulti logical; Are multiple legends preferred
+#' @param maxSize numeric; This is largest size scaling value for size scale legends. Defaults to \code{\link{FALSE}}
+#' @param sizeColumn numeric; This indicates which column should be used for the size scaling.
 #'
 #' @return Does not return a value but changes the global \code{par(mai)} settings.
 #' @examples
 #' TODO<-1
 #' @importFrom magrittr %>%
 #' @importFrom purrr map_dbl
-prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subgroup=TRUE,stack=FALSE, is2D=FALSE){
+prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subgroup=TRUE,stack=FALSE, is2D=FALSE, preferMulti=FALSE, maxSize=FALSE, sizeColumn=FALSE) {
   legendIndex<-1
   legendTitle<-""
   legendLevels<-NULL
@@ -78,7 +81,7 @@ prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subgroup=TR
   if(!is.na(theme[1])){
     legendSize<-theme$legendSize
   }
-  if(legend!=FALSE) {
+  if(legend[1]!=FALSE) {
     maxLabelW<-0
     maxLabelH<-0
     if(stack==FALSE) {
@@ -119,20 +122,48 @@ prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subgroup=TR
         legendLevels<-levels(by)
       }
     }
-    #Note that this should be updated to allow for multiple legend if necessary.
+
     if(is2D==TRUE) {
       legendTitle<-"Legend"
       if(is.factor(by)){legendLevels<-levels(by)}
       else {legendLevels<-levels(by[,1])}
     }
-    if(!(is.na(legend) | is.null(legend) | legend==TRUE)) {
+    if(!(is.na(legend[1]) & ! is.null(legend[1]) & legend[1]!=TRUE) & legend[1]!=FALSE) {
       legendTitle<-legend
+    } else {
+      legendTitle<-"Legend"
     }
-    maxLabelW<-purrr::map_dbl(legendLevels,strwidth,cex=legendSize,units="in") %>% max()
-    titleW<-strwidth(legendTitle,font=2,cex=legendSize,units="in")
-    if(titleW>maxLabelW){maxLabelW<-titleW}
+
+    iRange<-par("pin")[1]
+    uRange<-par("usr")[2]-par("usr")[1]
+    ConvertW<-iRange/uRange
+    iRange<-par("pin")[2]
+    uRange<-par("usr")[4]-par("usr")[3]
+    ConvertH<-iRange/uRange
+
+    maxLabelW<-purrr::map_dbl(legendLevels, strwidth, cex=legendSize,units="in") %>% max()
+    titleW<-purrr::map_dbl(legendTitle, strwidth, font=2, cex=legendSize,units="in") %>% max()
+
     maxLabelH<-purrr::map_dbl(legendLevels, strheight,cex=legendSize,units="in") %>% max()
-    titleH<-strheight(legendTitle,font=2,cex=legendSize,units="in")
+    titleH<-strheight(legendTitle,font=2,cex=legendSize,units="in") %>% max()
+    if((preferMulti[1] == TRUE | is2D[1] == TRUE) & is.data.frame(by)) {
+      if(is2D[1] == TRUE) {
+        maxLabelW<-purrr::map_dbl(seq(ncol(by)), function(i) purrr::map_dbl(levels(by[,i]),strwidth,cex=legendSize,units="in") %>% max()) %>% max()
+        maxLabelH<-purrr::map_dbl(seq(ncol(by)), function(i) purrr::map_dbl(legendLevels, strheight,cex=legendSize,units="in") %>% max()) %>% max()
+      } else {
+        maxLabelW<-purrr::map_dbl(seq(2,ncol(by)), function(i) purrr::map_dbl(levels(by[,i]),strwidth,cex=legendSize,units="in") %>% max()) %>% max()
+        maxLabelH<-purrr::map_dbl(seq(2,ncol(by)), function(i) purrr::map_dbl(legendLevels, strheight,cex=legendSize,units="in") %>% max()) %>% max()
+      }
+    }
+    if(maxSize[1] != FALSE) {
+      sizeLabelW<-purrr::map_dbl(legendLevels,strwidth,cex=maxSize[1],units="in") %>% max()
+      maxSizeLabelH<-purrr::map_dbl(legendLevels,strheight,cex=maxSize[1],units="in") %>% max()
+      sizeLabelW<-sizeLabelW*.7 + maxSizeLabelH/ConvertW-maxLabelH/ConvertW
+      if(sizeLabelW>maxLabelW) {
+        maxLabelW<-sizeLabelW
+      }
+    }
+    if(titleW>maxLabelW){maxLabelW<-titleW}
     nMai<-oMai
     nMai[4]<-nMai[4]+maxLabelW
     par(mai=nMai,family=oFont)
@@ -169,6 +200,10 @@ prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subgroup=TR
 #' @param pointHighlights logical; Is pointHightlights turned on? This is used to determin with column of \code{by} should be used for legend factor levels.
 #' @param logAdjustment = numeric; This number is added to the input data prior to log transformation. Default value is 1.
 #' @param stack logical; Used for stack stacked bar plots. Used exclusively by \code{\link{niceBar}}.
+#' @param preferMulti logical; Are multiple legends preferred
+#' @param maxSize numeric; This is largest size scaling value for size scale legends. Defaults to \code{\link{FALSE}}
+#' @param sizeColumn numeric; This indicates which column should be used for the size scaling.
+
 #' @param ... additional options mostly to be passed along to subsequent functions
 #'
 #' @return formats the plotting area and returns a named list with 'data' and 'labels' corresponding to the trimmed and/or transformed data and the labels for the primary factors, respectively.
@@ -182,7 +217,7 @@ prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subgroup=TR
 #' @importFrom utils data str
 #'
 #' @seealso \code{\link[grDevices]{axisTicks}}, \code{\link[graphics]{axis}}, \code{\link{makeLogTicks}}, \code{\link{facetSpacing}}
-prepCategoryWindow<-function(x,by=NULL, groupLabels=levels(by), minorTick=FALSE, guides=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, theme=NA, plotColors=if(is.na(theme)){list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white")}else{theme$plotColors}, trim=FALSE, logScale=FALSE, axisText=c(NULL,NULL), minorGuides=FALSE, extendTicks=FALSE,subgroup=FALSE, expLabels=TRUE,sidePlot=FALSE,subgroupLabels=NULL,strictLimits=FALSE, legend=FALSE, pointHighlights=FALSE, logAdjustment=1, stack=FALSE,...) {
+prepCategoryWindow<-function(x,by=NULL, groupLabels=levels(by), minorTick=FALSE, guides=TRUE, yLim=NULL, rotateLabels=FALSE, rotateY=TRUE, theme=NA, plotColors=if(is.na(theme)){list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white")}else{theme$plotColors}, trim=FALSE, logScale=FALSE, axisText=c(NULL,NULL), minorGuides=FALSE, extendTicks=FALSE,subgroup=FALSE, expLabels=TRUE,sidePlot=FALSE,subgroupLabels=NULL,strictLimits=FALSE, legend=FALSE, pointHighlights=FALSE, logAdjustment=1, stack=FALSE,preferMulti=TRUE,maxSize=FALSE,sizeColumn,...) {
   levelCount<-1
   tData<-x
   tBy<-by
@@ -194,9 +229,9 @@ prepCategoryWindow<-function(x,by=NULL, groupLabels=levels(by), minorTick=FALSE,
   }
 
   #Set margins for legends now
-  prepLegendMarigins(x=x,by=by,theme=theme,legend=legend,pointHighlights=pointHighlights,subgroup=subgroup,stack=stack)
+  prepLegendMarigins(x=x,by=by,theme=theme,legend=legend,pointHighlights=pointHighlights,subgroup=subgroup,stack=stack,preferMulti=preferMulti,maxSize=maxSize,sizeColumn=sizeColumn)
 
-  #capture data range for plot formating
+  #capture data range for plot formatting
   dataRange<-NULL
   if(is.null(yLim)==FALSE) {
     dataRange<-yLim
@@ -352,7 +387,7 @@ prepCategoryWindow<-function(x,by=NULL, groupLabels=levels(by), minorTick=FALSE,
     subLabLoc<-facetSpacing(length(levels(by[,2])),length(groupLabels))
     if(is.null(subgroupLabels)){subgroupLabels<-levels(by[,2])}
     if(sidePlot) {
-      if(legend==FALSE | (legend!=FALSE & pointHighlights==TRUE)) {
+      if(legend[1]==FALSE | (legend[1]!=FALSE & pointHighlights==TRUE)) {
         axis(side=2,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=groupCex)
         mtext(side=2,at=seq(1:levelCount),text=groupLabels,las=rotateLabels,line=sideGroupLine, col=plotColors$labels,cex=groupCex)
         axis(side=2,at=subLabLoc,labels=F,lwd=0,lwd.ticks=1,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=subgroupCex)
@@ -362,7 +397,7 @@ prepCategoryWindow<-function(x,by=NULL, groupLabels=levels(by), minorTick=FALSE,
         mtext(side=2,at=seq(1:levelCount),line=groupLine,text=groupLabels,las=rotateLabels,cex=groupCex,col=plotColors$labels)
       }
     } else {
-      if(legend==FALSE | (legend!=FALSE & pointHighlights==TRUE)) {
+      if(legend[1]==FALSE | (legend[1]!=FALSE & pointHighlights==TRUE)) {
         axis(side=1,at=seq(1:levelCount),labels=F,las=rotateLabels,lwd=0,col=plotColors$axis,col.ticks=plotColors$majorTicks,cex.axis=groupCex)
         mtext(side=1,at=seq(1:levelCount),text=groupLabels,las=rotateLabels,line=groupLine,col=plotColors$labels, cex=groupCex)
         axis(side=1,at=subLabLoc,labels=F,lwd=0,lwd.ticks=1,cex.axis=theme$subgroupLabSize,col=plotColors$axis,col.ticks=plotColors$majorTick,cex.axis=subgroupCex)
@@ -501,7 +536,10 @@ prepCategoryWindow<-function(x,by=NULL, groupLabels=levels(by), minorTick=FALSE,
 #' @param strictLimits logical; eliminates padding on the value axis so 0 can be flush with the x-axis. Defaults to \code{\link{FALSE}}.
 #' @param legend logical/character; Draw a legend in the plot margins. If a character string is given it will overide the factor name default for the legend title.
 #' @param logAdjustment numeric; This number is added to the input data prior to log transformation. Default value is 1.
-#' @param makePlot logical; This format the data and ploting area without drawing anything if set to \code{\link{FALSE}}.
+#' @param makePlot logical; This formats the data and plotting area without drawing anything if set to \code{\link{FALSE}}.
+#' @param preferMulti logical; Are multiple legends preferred
+#' @param maxSize numeric; This is largest size scaling value for size scale legends. Defaults to \code{\link{FALSE}}
+#' @param sizeColumn numeric; This indicates which column should be used for the size scaling.
 #' @param ... additional options mostly to be passed along to subsequent functions
 #'
 #' @return formats the plotting area and returns a named list with 'data' and 'labels' corresponding to the trimmed and/or transformed data and the labels for the primary factors, respectively.
@@ -515,7 +553,7 @@ prepCategoryWindow<-function(x,by=NULL, groupLabels=levels(by), minorTick=FALSE,
 #' @importFrom utils data str
 #'
 #' @seealso \code{\link[grDevices]{axisTicks}}, \code{\link[graphics]{axis}}, \code{\link{makeLogTicks}}, \code{\link{facetSpacing}}
-prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLim=NULL,rotateLabels=FALSE, theme=NA, plotColors=if(is.na(theme)){list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white")}else{theme$plotColors}, logScaleX=FALSE,logScaleY=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), minorGuides=FALSE, extendTicks=F,subgroup=FALSE, expLabels=TRUE,strictLimits=F, legend=FALSE, logAdjustment=1,makePlot=TRUE,...) {
+prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLim=NULL,rotateLabels=FALSE, theme=NA, plotColors=if(is.na(theme)){list(bg="open",guides="black",lines="gray22",points="darkgrey",fill="white")}else{theme$plotColors}, logScaleX=FALSE,logScaleY=FALSE, axisText=list(x=c(NULL,NULL),y=c(NULL,NULL)), minorGuides=FALSE, extendTicks=F,subgroup=FALSE, expLabels=TRUE,strictLimits=F, legend=FALSE, logAdjustment=1,makePlot=TRUE,preferMulti=TRUE,maxSize=FALSE,sizeColumn=FALSE,...) {
   levelCount<-1
   xData<-x[,1]
   yData<-x[,2]
@@ -530,7 +568,7 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
     minorGuides<-guides
   }
   #Set margins for legends now
-  prepLegendMarigins(x=x,by=by,theme=theme,legend=legend,pointHighlights=FALSE,subgroup=TRUE, is2D=TRUE)
+  prepLegendMarigins(x=x,by=by,theme=theme,legend=legend,pointHighlights=FALSE,subgroup=TRUE, is2D=TRUE, preferMulti = preferMulti, maxSize=maxSize, sizeColumn = sizeColumn)
 
   #Calculate the data ranges for x and y
   dataRange<-list(x=c(NULL,NULL),y=c(NULL,NULL))
@@ -734,41 +772,82 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
   return(data.frame(x=xData,y=yData))
 }
 
-#' @title Draw a nice plot legened
-#' @description Draws a customizable legend in the margins based on factor levels.
-#' @details This functions works with plot enviroment initializing functions such as \code{\link{prepCategoryWindow}}
-#' to expand the right margin to accomodate a figure legend.
+#' @title Draw a nice plot legend
+#' @description Draws a legend in the margins based on factor levels.
+#' @details This functions works with plot environment initializing functions such as \code{\link{prepCategoryWindow}}
+#' to expand the right margin to accommodate a figure legend. While designed to be used by nicePlots and bvt plotting
+#' functions, it can also be used indpendantly as in the example below.
 #'
 #' @examples
-#' ToDo<-1
+#' oMar<-par("mar")
+#' nMar<-oMar
+#' nMar[4]<-5.1
+#' par(mar=nMar)
+#' data(iris)
+#' plot(iris$Sepal.Length,iris$Sepal.Width, col=iris$Species, cex=0, main="Iris Legend Example")
+#' iSpec<-levels(iris$Species)
+#' for(i in seq(length(iSpec))) {
+#'   points(iris[iris$Species==iSpec[i],1],iris[iris$Species==iSpec[i],2],
+#'     pch=14+i,col=makeColorMatrix()[i,2])
+#' }
+#' par(mar=oMar)
+#' makeNiceLegend(iSpec,col=makeColorMatrix()[1:3,2],shapeScale=15:17,size=1, shape="cs")
 #'
-#' @param labels character vector; The names of the levels decribed in the legend. Typically factor levels.
-#' @param title character; The title of the legend. This defaults to "Legend" if unspecificed.
+#' @param labels character vector; The names of the levels describe in the legend. Typically factor levels.
+#' @param title character; The title of the legend. This defaults to "Legend" if unspecified.
 #' @param fontCol R color; Color of the legend text.
-#' @param border R color; The color of the rectanglar border surrounding the legend. Defaults to \code{\link{NULL}} which supresses this feature
+#' @param border R color; The color of the rectangular border surrounding the legend. Defaults to \code{\link{NULL}} which suppresses this feature
 #' @param lineCol R color; The color of the line colors for the color key. Optional. Defaults to \code{\link{NA}}.
-#' @param bg R color; Sets the background color for the legend aread. Note that this can be distinct the the margin background.
+#' @param bg R color; Sets the background color for the legend area. Note that this can be distinct the the margin background.
 #' @param col R color vector; A vector of colors determining the color of the color code boxes.
-#' @param shape character; Determins if the color code is rectangles or circles. Valid ptions are "rect", "rectangle", "circ", or "circle". Not there is no funcitonal difference between the synonyms.
-#' @param size numeric; Sets the legend font cex sizing.
-#' @param spacing numeric; Determins the total amount of padding (sum of upper and lower padding) surrounding each line. in the legend in units of font line hight.
+#' @param shape character; Determines what kind of legend to draw. "c" is colors - colored rectangle default; "s" is point shape (pch); "z" is size scaling (cex). These can be combined so a color and point shape together is "cs".
+#' @param size numeric; Sets the overall legend font cex sizing.
+#' @param spacing numeric; Determines the total amount of padding (sum of upper and lower padding) surrounding each line. in the legend in units of font line height.
+#' @param fontFamily character; font family used for string height calculations. Possible values are "sans", "mono", or "serif"
+#' @param sizeScale numeric; This is the cex values for size scaling legends.
+#' @param shapeScale numeric; This is the pch value for legends including point shape.
+#' @param scaleDefaultColor color; This is the color shape and size indicators will be if they are not linked to a color scale. Defaults to black.
 #'
+#' @export
 #' @importFrom magrittr %>%
-#' @importFrom graphics rect text
+#' @importFrom graphics rect text points
 #' @importFrom purrr map_dbl
 #' @seealso \code{\link{legend}}, \code{\link{prepCategoryWindow}}, \code{\link{niceBox}}, \code{\link{niceDots}}, \code{\link{niceBar}}, \code{\link{niceVio}}
-makeNiceLegend<-function(labels, title="Legend", fontCol="black", border=NULL, lineCol=NA, bg=NA, col=makeColorMatrix()[,3], shape="rect",size=.66,spacing=.2) {
-  maxLabelW<-map_dbl(c(labels),strwidth,cex=size,units="in") %>% max()
-  titleW<-strwidth(title,font=2,cex=size,units="in")
-  if(titleW>maxLabelW){maxLabelW<-titleW}
-  maxLabelH<-map_dbl(labels, strheight,cex=size,units="in") %>% max()
-  titleH<-strheight(title,font=2,cex=size,units="in")
-  oMai<-par("mai")
-  nMai<-oMai
-  nMai[4]<-nMai[4]+maxLabelW #+maxLabelH
-  par(mai=nMai)
+makeNiceLegend<-function(labels, title="Legend", fontCol="black", border=NULL, lineCol=NA, bg=NA, col=makeColorMatrix()[,3], shape="c",size=.75,spacing=.2, fontFamily="sans",sizeScale=NA,shapeScale=NA, scaleDefaultColor="black") {
+  #Making sure the legend titles are fully populated
+  if(is.list(labels) & length(labels) > length(title)) {
+    warning("Legend titles are not populated for all levels.\nDefaulting to Legend\nThis may be a bug.", call.=FALSE)
+    title<-c(title,rep("Legend",length(labels)-length(title)))
+  }
+  #Checking to make sure the size scale is properly set
+  if(sum(grepl("z",shape))>0) {
+    if(is.na(sizeScale[1]) | length(sizeScale)<2){
+      warning("Size scale levels are not set or are not the right length and a size scale Legend is active.\nMaking default scale to match...\nThis may be a bug.",call.=FALSE)
+      if(is.list(labels)) {
+        sizeScale<-rev(seq(.5*size,1.5*size,length.out=length(labels[[grep("z",shape)[1]]])))
+      } else {
+        sizeScale<-rev(seq(.5*size,1.5*size,length.out=length(labels)))
+      }
+    }
+  }
+  #Checking to make sure the shape values are set properly
+  if(sum(grepl("s",shape))>0) {
+    if(is.list(labels)) {
+      if(is.na(shapeScale[1]) | length(shapeScale)!=length(labels[[grep("s",shape)[1]]])){
+        warning("Shape scale levels are not set or are not the right length and a shaped Legend is active.\nMaking default shape vector to match...\nThis may be a bug.",call.=FALSE)
+        shapeScale<-seq(length(labels[[grep("z",shape)[1]]]))
+      }
+    } else if(is.na(shapeScale[1]) | length(shapeScale)!=length(labels)) {
+      warning("Shape scale levels are not set or are not the right length and a shaped Legend is active.\nMaking default shape vector to match...\nThis may be a bug.",call.=FALSE)
+      shapeScale<-seq(length(labels))
+    }
+  }
+  ofm<-par("family")
+  par(family=fontFamily)
 
-  par(xpd=NA)
+  #Calculating conversion factors
+  par(xpd=TRUE)
+  oMai<-par("mai")
   iRange<-par("pin")[1]
   uRange<-par("usr")[2]-par("usr")[1]
   ConvertW<-iRange/uRange
@@ -777,23 +856,192 @@ makeNiceLegend<-function(labels, title="Legend", fontCol="black", border=NULL, l
   ConvertH<-iRange/uRange
   LegendCo<-oMai[4]/3/ConvertW +par("usr")[2]
 
-  totalLegendH<-maxLabelH*1.2*length(labels)+titleH
-  startH<-0
-  if(totalLegendH/2>iRange/3){
-    startH<-par("usr")[4]
+  #Next we work out what the max height and width for legend titles and labels are
+  if(is.list(labels)){
+    maxLabelW<-map_dbl(labels,
+      function(l) map_dbl(c(l),strwidth, cex=size,units="in") %>% max()
+    ) %>% max()
+    titleW<-map_dbl(c(title), function(x) strwidth(x,font=2, cex=size,units="in")) %>% max()
+    if(titleW>maxLabelW){maxLabelW<-titleW}
+    maxLabelH<-map_dbl(labels,
+      function(l) map_dbl(c(l),strheight,cex=size,units="in") %>% max()
+    ) %>% max()
+    titleH<-map_dbl(c(title), function(x) strheight(x,font=2,cex=size,units="in")) %>% max()
   } else {
-    startH<-par("usr")[4]-iRange/3/ConvertH + totalLegendH/2/ConvertH
+    maxLabelW<-map_dbl(c(labels),strwidth, cex=size,units="in") %>% max()
+    titleW<-strwidth(title,font=2, cex=size,units="in") %>% max()
+    if(titleW>maxLabelW){maxLabelW<-titleW}
+    maxLabelH<-map_dbl(labels, strheight,cex=size,units="in") %>% max()
+    titleH<-strheight(title,font=2,cex=size,units="in") %>% max()
   }
-  if(!is.null(border)){
-    rect(LegendCo-oMai[4]/9/ConvertW,startH-totalLegendH/ConvertH-oMai[4]/9/ConvertH*1.1,LegendCo+maxLabelH/ConvertW+maxLabelW/ConvertW+oMai[4]/9/ConvertW*2, startH+oMai[4]/9/ConvertH*2,col=bg,border=border)
-  }
-  text(LegendCo, startH, label=title,cex=size, font=2, offset=0, pos=4, col=fontCol)
-  for(i in 1:length(labels)){
-    cH<-startH-titleH/ConvertH*(1+ spacing/2)-.5*maxLabelH/ConvertH-(i-1)*maxLabelH/ConvertH*(1+ spacing)
-    rect(LegendCo, cH-.3*maxLabelH/ConvertH,LegendCo+maxLabelH/ConvertW, cH +.7* maxLabelH/ConvertH, border=lineCol,col=col[i])
-    text(LegendCo+maxLabelH/ConvertW, cH,labels=labels[i],cex=size,pos=4,offset=.2,col=fontCol)
+  maxSizeLabelH<-maxLabelH
+  if(sum(grepl("z",shape))>0 & max(sizeScale) > size +.3) {
+    if(is.list(labels)) {
+      sizeLabels<-labels[[grep("z", shape)[1]]]
+    } else {
+      sizeLabels<-labels
+    }
+    maxSizeLabelH<-map_dbl(sizeLabels, function(x) strheight(x,cex=max(sizeScale),units="in")*.7) %>% max()
+    maxSizeLabelW<-map_dbl(sizeLabels, function(x) strwidth(x,cex=max(sizeScale),units="in")*.7) %>% max()
+    maxSizeLabelW<-maxSizeLabelW+maxSizeLabelH/ConvertW-maxLabelH/ConvertW
+    if(maxLabelW<maxSizeLabelW) {
+      maxLabelW<-maxSizeLabelW
+    }
+    if(maxSizeLabelH<maxLabelH){
+      maxSizeLabelH<-maxLabelH
+    }
   }
 
-  par(xpd=F,mai=oMai)
+  nMai<-oMai
+  nMai[4]<-nMai[4]+maxLabelW #+maxLabelH
+  par(mai=nMai)
+
+
+  #Draw the labels. StartH is the top of the legend area. LegendCo is the left edge start. Stars at the top and works its way keeping track of the line height and spacing
+  if(is.list(labels)){
+    totalLegendH<-maxLabelH*1.2*length(labels)+titleH + 2*titleH*(length(labels)-1)
+    totalLegendH<-totalLegendH + sum(map_dbl(labels, function(l) maxLabelH*1.2*length(l)))
+    #adjusting for the fact the size scale labels often run larger that the line height and need adjustment
+    if(sum(grepl("z", shape))>0 & max(sizeScale) > size +.3){
+      totalLegendH<-totalLegendH - maxLabelH*1.2*length(sizeLabels) + maxSizeLabelH*1.2*length(sizeLabels)
+    }
+    startH<-0
+    if(totalLegendH/2>iRange/3){
+      startH<-par("usr")[4]
+    } else {
+      startH<-par("usr")[4]-iRange/3/ConvertH + totalLegendH/2/ConvertH
+    }
+    if(!is.null(border)){
+      rect(LegendCo-oMai[4]/9/ConvertW,startH-totalLegendH/ConvertH-oMai[4]/9/ConvertH*1.1,LegendCo+maxLabelH/ConvertW+maxLabelW/ConvertW+oMai[4]/9/ConvertW*2, startH+oMai[4]/9/ConvertH*2,col=bg,border=border)
+    }
+    cH<-startH
+    for (l in seq(length(labels))) {
+      text(LegendCo, cH, label=title[l],cex=size, font=2, offset=0, pos=4, col=fontCol)
+      if(grepl("z",shape[l])[1]) {
+        cH<-cH-titleH/ConvertH*(1+ spacing/2)-.5*maxSizeLabelH/ConvertH
+      } else {
+        cH<-cH-titleH/ConvertH*(1+ spacing/2)-.5*maxLabelH/ConvertH
+      }
+
+      for(i in seq(length(labels[[l]]))){
+        if(shape[l]=="c") {
+          rect(LegendCo, cH-.3*maxLabelH/ConvertH,LegendCo+maxLabelH/ConvertW, cH +.7* maxLabelH/ConvertH, border=lineCol,col=col[i])
+        } else if(shape[l] %in% c("cs", "sc")) {
+          points(x=LegendCo+maxLabelH/ConvertW/2, y = cH, cex=size, pch=shapeScale[i],col=col[i])
+        } else if(shape[l] %in% c("csz", "czs", "scz", "szc", "zsc", "zcs")) {
+          if(max(sizeScale>size+.3)) {
+            points(x=LegendCo+maxSizeLabelH/ConvertW/2, y = cH+maxSizeLabelH/ConvertH/6, cex=sizeScale[i], pch=shapeScale[i], col=col[i])
+          } else {
+            points(x=LegendCo+maxLabelH/ConvertW/2, y = cH+maxLabelH/ConvertH/6, cex=sizeScale[i], pch=shapeScale[i], col=col[i])
+          }
+        } else if(shape[l]=="s") {
+          points(x=LegendCo+maxLabelH/ConvertW/2, y = cH+maxLabelH/ConvertH/6, cex=size, pch=shapeScale[i],col=scaleDefaultColor)
+        } else if(shape[l]=="z") {
+          if(max(sizeScale>size+.3)) {
+            points(x=LegendCo+maxSizeLabelH/ConvertW/2, y = cH+maxSizeLabelH/ConvertH/6, cex=sizeScale[i], pch=16, col=scaleDefaultColor)
+          } else {
+            points(x=LegendCo+maxLabelH/ConvertW/2, y = cH+maxLabelH/ConvertH/6, cex=sizeScale[i], pch=16, col=scaleDefaultColor)
+          }
+        } else if(shape[l] %in% c("sz", "zs")) {
+          if(max(sizeScale>size+.3)) {
+            points(x=LegendCo+maxSizeLabelH/ConvertW/2, y = cH+maxSizeLabelH/ConvertH/6, cex=sizeScale[i], pch=shapeScale[i], col=scaleDefaultColor)
+          } else {
+            points(x=LegendCo+maxLabelH/ConvertW/2, y = cH+maxLabelH/ConvertH/6, cex=sizeScale[i], pch=shapeScale[i], col=scaleDefaultColor)
+          }
+        } else if(shape[l] %in% c("cz","zc")) {
+          if(max(sizeScale>size+.3)) {
+            points(x=LegendCo+maxSizeLabelH/ConvertW/2, y = cH+maxSizeLabelH/ConvertH/6, cex=sizeScale[i], pch=16, col=col[i])
+          } else {
+            points(x=LegendCo+maxLabelH/ConvertW/2, y = cH+maxLabelH/ConvertH/6, cex=sizeScale[i], pch=16, col=col[i])
+          }
+        } else {
+          warning("Unable to make sense of the legend type option shape.\nThis may be a bug.", call. = FALSE)
+        }
+        if(grepl("z", shape[l])[1] & max(sizeScale)>size+.3) {
+          text(LegendCo+maxSizeLabelH/ConvertW, cH+(maxSizeLabelH-maxLabelH)/6/ConvertH,labels=labels[[l]][i],cex=size, pos=4,offset=.2,col=fontCol)
+          cH<-cH - maxSizeLabelH/ConvertH*.75*(1+ spacing)
+        } else {
+          text(LegendCo+maxLabelH/ConvertW, cH,labels=labels[[l]][i],cex=size, pos=4,offset=.2,col=fontCol)
+          cH<-cH - maxLabelH/ConvertH*(1+ spacing)
+        }
+      }
+      cH<-cH-titleH/ConvertH
+    }
+  } else {
+    totalLegendH<-maxLabelH*1.2*length(labels)+titleH
+    #adjusting for the fact the size scale labels often run larger that the line height and need adjustment
+    if(sum(grepl("z", shape))>0 & max(sizeScale) > size +.3){
+      totalLegendH<-totalLegendH - maxLabelH*1.2*length(sizeLabels) + maxSizeLabelH*1.2*length(sizeLabels)
+    }
+    startH<-0
+    if(totalLegendH/2>iRange/3){
+      startH<-par("usr")[4]
+    } else {
+      startH<-par("usr")[4]-iRange/3/ConvertH + totalLegendH/2/ConvertH
+    }
+    if(!is.null(border)){
+      rect(LegendCo-oMai[4]/9/ConvertW,startH-totalLegendH/ConvertH-oMai[4]/9/ConvertH*1.1,LegendCo+maxLabelH/ConvertW+maxLabelW/ConvertW+oMai[4]/9/ConvertW*2, startH+oMai[4]/9/ConvertH*2,col=bg,border=border)
+    }
+    cH<-startH
+    text(LegendCo, cH, label=title[1],cex=size, font=2, offset=0, pos=4, col=fontCol)
+    if(grepl("z",shape[1])[1]) {
+      cH<-cH-titleH/ConvertH*(1+ spacing/2)-.5*maxSizeLabelH/ConvertH
+    } else {
+      cH<-cH-titleH/ConvertH*(1+ spacing/2)-.5*maxLabelH/ConvertH
+    }
+    for(i in 1:length(labels)){
+      if(shape[1]=="c") {
+        rect(LegendCo, cH-.3*maxLabelH/ConvertH,LegendCo+maxLabelH/ConvertW, cH +.7* maxLabelH/ConvertH, border=lineCol,col=col[i])
+      } else if(shape[1] %in% c("cs","sc")) {
+        points(x=LegendCo+maxLabelH/ConvertW/2, y = cH, cex=size, pch=shapeScale[i],col=col[i])
+      } else if(shape[1] %in% c("csz","czs","scz","szc","zsc","zcs")) {
+        if(max(sizeScale>size+.3)) {
+          points(x=LegendCo+maxSizeLabelH/ConvertW/2, y = cH, cex=sizeScale[i], pch=shapeScale[i], col=col[i])
+          #points(x=LegendCo+maxSizeLabelH/ConvertW/2, y = cH+maxSizeLabelH/ConvertH/6, cex=sizeScale[i], pch=shapeScale[i], col=col[i])
+        } else {
+          points(x=LegendCo+maxLabelH/ConvertW/2, y = cH, cex=sizeScale[i], pch=shapeScale[i], col=col[i])
+          #points(x=LegendCo+maxLabelH/ConvertW/2, y = cH+maxLabelH/ConvertH/6, cex=sizeScale[i], pch=shapeScale[i], col=col[i])
+        }
+      } else if(shape[1]=="s") {
+        points(x=LegendCo+maxLabelH/ConvertW/2, y = cH, cex=size, pch=shapeScale[i],col=scaleDefaultColor)
+        #points(x=LegendCo+maxLabelH/ConvertW/2, y = cH+maxLabelH/ConvertH/6, cex=size, pch=shapeScale[i],col=scaleDefaultColor)
+      } else if(shape[1]=="z") {
+        if(max(sizeScale>size+.3)) {
+          points(x=LegendCo+maxSizeLabelH/ConvertW/2, y = cH, cex=sizeScale[i], pch=16, col=scaleDefaultColor)
+          #points(x=LegendCo+maxSizeLabelH/ConvertW/2, y = cH+maxSizeLabelH/ConvertH/6, cex=sizeScale[i], pch=16, col=scaleDefaultColor)
+        } else {
+          points(x=LegendCo+maxLabelH/ConvertW/2, y = cH, cex=sizeScale[i], pch=16, col=scaleDefaultColor)
+          #points(x=LegendCo+maxLabelH/ConvertW/2, y = cH+maxLabelH/ConvertH/6, cex=sizeScale[i], pch=16, col=scaleDefaultColor)
+        }
+      } else if(shape[1] %in% c("sz","zs")) {
+        if(max(sizeScale>size+.3)) {
+          points(x=LegendCo+maxSizeLabelH/ConvertW/2, y = cH, cex=sizeScale[i], pch=shapeScale[i], col=scaleDefaultColor)
+          #points(x=LegendCo+maxSizeLabelH/ConvertW/2, y = cH+maxSizeLabelH/ConvertH/6, cex=sizeScale[i], pch=shapeScale[i], col=scaleDefaultColor)
+        } else {
+          points(x=LegendCo+maxLabelH/ConvertW/2, y = cH, cex=sizeScale[i], pch=shapeScale[i], col=scaleDefaultColor)
+          #points(x=LegendCo+maxLabelH/ConvertW/2, y = cH+maxLabelH/ConvertH/6, cex=sizeScale[i], pch=shapeScale[i], col=scaleDefaultColor)
+        }
+      } else if(shape[1] %in% c("cz","zc")) {
+        if(max(sizeScale>size+.3)) {
+          points(x=LegendCo+maxSizeLabelH/ConvertW/2, y = cH, cex=sizeScale[i], pch=16, col=col[i])
+          #points(x=LegendCo+maxSizeLabelH/ConvertW/2, y = cH+maxSizeLabelH/ConvertH/6, cex=sizeScale[i], pch=16, col=col[i])
+        } else {
+          points(x=LegendCo+maxLabelH/ConvertW/2, y = cH, cex=sizeScale[i], pch=16, col=col[i])
+          #points(x=LegendCo+maxLabelH/ConvertW/2, y = cH+maxLabelH/ConvertH/6, cex=sizeScale[i], pch=16, col=col[i])
+        }
+      } else {
+        warning("Unable to make sense of the legend type option shape.\nThis may be a bug.", call. = FALSE)
+      }
+      if(grepl("z", shape[1])[1] & max(sizeScale)>size+.3) {
+        text(LegendCo+maxSizeLabelH/ConvertW, cH+(maxSizeLabelH-maxLabelH)/6/ConvertH,labels=labels[i],cex=size, pos=4,offset=.2,col=fontCol)
+        cH<-cH - maxSizeLabelH/ConvertH*.75*(1+ spacing)
+      } else {
+        text(LegendCo+maxLabelH/ConvertW, cH,labels=labels[i],cex=size, pos=4,offset=.2,col=fontCol)
+        cH<-cH - maxLabelH/ConvertH*(1+ spacing)
+      }
+    }
+  }
+
+  par(xpd=FALSE,mai=oMai,family=ofm)
 
 }

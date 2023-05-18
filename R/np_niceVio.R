@@ -507,7 +507,7 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupLabels=NULL, main=N
     if(is.na(legendTitle) | legendTitle=="factTwo") {
       legendTitle<="Legend"
     }
-    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=theme$legendBorder, lineCol=plotColors$legendLineCol, bg=plotColors$legendBG, col=legendColors, shape="rect",size=theme$legendSize,spacing=theme$legendSpacing)
+    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=theme$legendBorder, lineCol=plotColors$legendLineCol, bg=plotColors$legendBG, col=legendColors, shape="c",size=theme$legendSize,spacing=theme$legendSpacing)
   }
   if(add==FALSE) {
     if(is.null(sub) & showCalc==T & is.null(pvalue)==FALSE){
