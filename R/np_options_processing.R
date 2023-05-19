@@ -126,6 +126,11 @@ formatPlotColors<-function(plotColors, theme=NA){
     else if (is.null(theme$legendLineCol)) {plotColors$legendLineCol<-NA}
     else {plotColors$legendLineCol<-theme$legendLineCol}
   }
+  if(is.null(plotColors$scaleDefaultColor)){
+    if(is.na(theme[1])) {plotColors$scaleDefaultColor<-NA}
+    else if (is.null(theme$legendLineCol)) {plotColors$scaleDefaultColor<-NA}
+    else {plotColors$scaleDefaultColor<-theme$scaleDefaultColor}
+  }
   plotColors
 }
 
@@ -181,7 +186,7 @@ procNiceOptions<-function(x,by,minorTick,pointShape,whiskerLineType,lWidth,capWi
     if(!("lines" %in% pcNames)){defaultLines<-TRUE}
     if(!("fill" %in% pcNames)){defaultFill<-TRUE}
   }
-  #Formating all options
+  #Formatting all options
   if(!is.list(theme) | !("npTheme" %in% class(theme))) {
     plotColors<-formatPlotColors(plotColors)
     if(is.null(minorTick)){minorTick<-FALSE}

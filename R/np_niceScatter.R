@@ -237,7 +237,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
   logScaleZ<-NULL
   if(is.null(logScale[1])){logScale[1]<-FALSE}
   if(length(logScale)>1 & is.null(logScale[2])) {logScale[2]<-FALSE}
-  if((length(logScale)>1 & sum(logScale[1:3])>0) | logScale[1]!=FALSE) {
+  if((length(logScale)>1 & sum(logScale[1:3],na.rm = TRUE)>0) | logScale[1]!=FALSE) {
     if(length(logScale)==1) {
       if(logScale[1]!=FALSE){
         logScaleX<-logScale
@@ -353,6 +353,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
         } else {
           sizes<-seq(length(levels(by$size)))
           mySize<-(as.numeric(by$size)-1)/max(sizes)*(abs(sizeScale[1]-pointSize[1])) + pointSize[1]
+          sizes<-levels(by$size)
         }
         if(color[1]==TRUE) {
           if(shape[1]==TRUE) {
@@ -462,6 +463,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
         } else {
           sizes<-seq(length(levels(by)))
           mySize<-(as.numeric(by)-1)/max(sizes)*(abs(sizeScale[1]-pointSize[1])) + pointSize[1]
+          sizes<-levels(by)
         }
         if(color[1] == TRUE) {
           if(shape[1] == TRUE) {
@@ -542,6 +544,8 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
     if(is.null(ylab)) {ylab<-colnames(x)[2]}
     myShapes<-pointShape[1]
     mySize<-pointSize[1]
+    legendTitleTracker<-NA
+    legendTracker<-list(c=1)
     myColors<-plotColors$points[1]
     if(add[1]==FALSE) {
       #RStudio seems not to update the graphics devices properly
@@ -603,6 +607,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
             } else {
               sizes<-seq(length(levels(by$size)))
               mySize<-(sizes-1)/max(sizes)*(abs(sizeScale[1]-pointSize[1])) + pointSize[1]
+              sizes<-levels(by$size)
             }
 
             if(color[1]==TRUE) {
@@ -684,6 +689,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
             } else {
               sizes<-seq(length(levels(by)))
               mySize<-(as.numeric(by)-1)/max(sizes)*(abs(sizeScale[1]-pointSize[1])) + pointSize[1]
+              sizes<-levels(by)
             }
             if(color[1]==TRUE) {
               if(shape[1] ==TRUE) {
@@ -857,7 +863,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
       shapeScaleLegend<-FALSE
     }
 
-    makeNiceLegend(labels=legendTracker, title=legendTitleTracker, fontCol=plotColors$labels, border=plotColors$legendBorder, lineCol=plotColors$legendLineCol, bg=plotColors$legendBG, col=legendColors, shape=names(legendTracker),size=theme$legendSize,spacing=theme$legendSpacing, fontFamily = theme$fontFamily, sizeScale = mySizeScaleLegend,shapeScale=shapeScaleLegend,scaleDefaultColor="black")
+    makeNiceLegend(labels=legendTracker, title=legendTitleTracker, fontCol=plotColors$labels, border=plotColors$legendBorder, lineCol=plotColors$legendLineCol, bg=plotColors$legendBG, col=legendColors, shape=names(legendTracker),size=theme$legendSize,spacing=theme$legendSpacing, fontFamily = theme$fontFamily, sizeScale = mySizeScaleLegend,shapeScale=shapeScaleLegend,scaleDefaultColor=plotColors$scaleDefaultColor)
 
   }
   par(col.sub=oSubCol, col.lab=oLabCol,col.main=oMainCol,family=oFont,cex.main=oCexMain,cex.lab=oCexlab,cex.sub=oCexSub)

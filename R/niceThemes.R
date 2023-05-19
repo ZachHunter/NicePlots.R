@@ -87,7 +87,8 @@ basicTheme<- list(
     legendLineCol=NA, #Border color for the legend color boxes
     legendBG=NA, #Legend background color
     vioBoxFill=setAlpha("black",.8), #Color of interquartile box for violin plots
-    vioBoxLineCol="black" #Line color for boxplot overlay in violin plots
+    vioBoxLineCol="black", #Line color for boxplot overlay in violin plots
+    scaleDefaultColor="black" #Color of non-color scales such as shape and size in the legend
   ))
 )
 class(basicTheme)<-c("npTheme","list")
@@ -177,7 +178,8 @@ npColorTheme<- list(
     legendLineCol=NA, #Border color for the legend color boxes
     legendBG=NA, #Legend background color
     vioBoxFill=purrr::map_chr(RColorBrewer::brewer.pal(9,"Set1"),function(x) setAlpha(x,.3)), #Color of interquartile box for violin plots
-    vioBoxLineCol=RColorBrewer::brewer.pal(9,"Set1") #Line color for boxplot overlay in violin plots
+    vioBoxLineCol=RColorBrewer::brewer.pal(9,"Set1"), #Line color for boxplot overlay in violin plots
+    scaleDefaultColor="black" #Color of non-color scales such as shape and size in the legend
   ))
 )
 class(npColorTheme)<-c("npTheme","list")
@@ -267,7 +269,8 @@ npStataTheme<- list(
     legendLineCol=NA, #Border color for the legend color boxes
     legendBG="white", #Legend background color
     vioBoxFill=setAlpha("black",.8), #Color of interquartile box for violin plots
-    vioBoxLineCol="black" #Line color for boxplot overlay in violin plots
+    vioBoxLineCol="black", #Line color for boxplot overlay in violin plots
+    scaleDefaultColor="black" #Color of non-color scales such as shape and size in the legend
   ))
 )
 class(npStataTheme)<-c("npTheme","list")
@@ -357,7 +360,8 @@ npGGTheme<- list(
     legendLineCol="lightgrey", #Border color for the legend color boxes
     legendBG=NA, #Legend background color
     vioBoxFill=setAlpha("black",.8), #Color of interquartile box for violin plots
-    vioBoxLineCol="black" #Line color for boxplot overlay in violin plots
+    vioBoxLineCol="black", #Line color for boxplot overlay in violin plots
+    scaleDefaultColor="black" #Color of non-color scales such as shape and size in the legend
   ))
 )
 class(npGGTheme)<-c("npTheme","list")
