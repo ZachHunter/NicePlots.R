@@ -161,6 +161,7 @@ niceBar.default <- function(x, by=NULL, groupLabels=NULL, aggFun=c("mean","media
   if(upperErrorFun[1]=="range"){
     upperErrorFun<-"max"
     lowerErrorFun<-"min"
+    errorMultiple<-1
   }
 
   #Checking to make sure that the error and aggregator functions are valid
@@ -212,8 +213,30 @@ niceBar.default <- function(x, by=NULL, groupLabels=NULL, aggFun=c("mean","media
         }
       }
     } else {
-      #find the size of error bars arround the aggregated data to calculate plotting window ranges
-      dRange<-c(min(pData$plot$AData-pData$plot$lowerError),max(pData$plot$AData+pData$plot$upperError))
+      #find the size of error bars around the aggregated data to calculate plotting window ranges
+      #At this point we need to change the range measurements to be distance from the aggregate function to in in line with other error measure types
+      if(errFun[1]=="range"){
+        pData$plot$upperError<-pData$plot$upperError-pData$plot$AData
+        pData$plot$lowerError<-pData$plot$AData - pData$plot$lowerError
+      }
+      suppressWarnings(dRange<-c(min(pData$plot$AData-pData$plot$lowerError,na.rm=TRUE),max(pData$plot$AData+pData$plot$upperError,na.rm=TRUE)))
+      #If error bar data is missing or Inf we can handle it here
+      if(sum(is.null(dRange))>0 | sum(abs(dRange)==Inf)>0) {
+        if(is.null(dRange[1]) | abs(dRange[1])==Inf) {
+          if(all(pData$plot$AData>=0)) {
+            dRange[1]<-0
+          } else {
+            dRange[1]<-min(pData$plot$AData,na.rm=TRUE) * 1.04
+          }
+        }
+        if(is.null(dRange[2]) | abs(dRange[2])==Inf) {
+          if(all(pData$plot$AData<0)) {
+            dRange[2]<-0
+          } else {
+            dRange[2]<-max(pData$plot$AData,na.rm=TRUE) * 1.04
+          }
+        }
+      }
     }
 
     if(!is.null(yLim)){
@@ -262,8 +285,12 @@ niceBar.default <- function(x, by=NULL, groupLabels=NULL, aggFun=c("mean","media
 
   #Here we calculated all the data to print
   pData<-prepBarData(x=prepedData[[1]],by=by,errorMultiple=errorMultiple,upperErrorFun=upperErrorFun,lowerErrorFun=lowerErrorFun,aggFunction=aggFun,stack=stack,subgroup=subgroup)
-
-  #Now we just need to perform some slight customizations to legend and width options based on inputs.
+  #At this point we need to change the range measurements to be distance from the aggregate function to in in line with other error measure types
+  if(errFun[1]=="range"){
+    pData$plot$upperError<-pData$plot$upperError-pData$plot$AData
+    pData$plot$lowerError<-pData$plot$AData - pData$plot$lowerError
+  }
+  #Now we just need to perform some slight customization to legend and width options based on inputs.
   if(is.numeric(prepedData[[1]])){
     #CASE: by is a factor data is a numeric vector
     if(is.factor(by)) {
