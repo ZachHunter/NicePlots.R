@@ -12,7 +12,10 @@ prepLegendMarigins(
   pointHighlights = FALSE,
   subgroup = TRUE,
   stack = FALSE,
-  is2D = FALSE
+  is2D = FALSE,
+  preferMulti = FALSE,
+  maxSize = FALSE,
+  sizeColumn = FALSE
 )
 }
 \arguments{
@@ -22,15 +25,21 @@ prepLegendMarigins(
 
 \item{theme}{list object; Themes are are an optional way of storing graphical preset options that are compatible with all nicePlot graphing functions.}
 
-\item{legend}{character; Title for the legend collumn. Set to \code{\link{TRUE}} if no header is desired.}
+\item{legend}{character; Title for the legend column. Set to \code{\link{TRUE}} if no header is desired.}
 
-\item{pointHighlights}{logical; Is pointHightlights turned on? This is used to determin with column of \code{by} should be used for legend factor levels.}
+\item{pointHighlights}{logical; Is pointHightlights turned on? This is used to determine with column of \code{by} should be used for legend factor levels.}
 
 \item{subgroup}{subgroup logical; use additional column in \code{by} to group the data within each level of the major factor.}
 
 \item{stack}{logical; Used for stack stacked bar plots. Used exclusively by \code{\link{niceBar}}.}
 
 \item{is2D}{logical; Is this for a 2D scatterplot or density plot? The first column of \code{by} will be use if set to \code{\link{TRUE}}.}
+
+\item{preferMulti}{logical; Are multiple legends preferred}
+
+\item{maxSize}{numeric; This is largest size scaling value for size scale legends. Defaults to \code{\link{FALSE}}}
+
+\item{sizeColumn}{numeric; This indicates which column should be used for the size scaling.}
 }
 \value{
 Does not return a value but changes the global \code{par(mai)} settings.
@@ -39,7 +48,7 @@ Does not return a value but changes the global \code{par(mai)} settings.
 Calculate margin needed to plot a NicePlots legend
 }
 \details{
-This is a utility function used by the window setup routines to calculate how much space the legend will take up in the margin and setting the \code{par(mai)} setting accordingly.
+This is a utility function used by the window setup routines to calculate how much space the legend will take up in the margin and setting the \code{par(mai)} accordingly.
 }
 \examples{
 TODO<-1

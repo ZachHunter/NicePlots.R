@@ -13,8 +13,12 @@ prepNiceWindow(
   xLim = NULL,
   rotateLabels = FALSE,
   theme = NA,
-  plotColors = if (is.na(theme)) {     list(bg = "open", guides = "black", lines =
-    "gray22", points = "darkgrey", fill = "white") } else {     theme$plotColors },
+  plotColors = if (is.na(theme)) {
+     list(bg = "open", guides = "black", lines =
+    "gray22", points = "darkgrey", fill = "white")
+ } else {
+     theme$plotColors
+ },
   logScaleX = FALSE,
   logScaleY = FALSE,
   axisText = list(x = c(NULL, NULL), y = c(NULL, NULL)),
@@ -26,6 +30,9 @@ prepNiceWindow(
   legend = FALSE,
   logAdjustment = 1,
   makePlot = TRUE,
+  preferMulti = TRUE,
+  maxSize = FALSE,
+  sizeColumn = FALSE,
   ...
 )
 }
@@ -68,7 +75,13 @@ prepNiceWindow(
 
 \item{logAdjustment}{numeric; This number is added to the input data prior to log transformation. Default value is 1.}
 
-\item{makePlot}{logical; This format the data and ploting area without drawing anything if set to \code{\link{FALSE}}.}
+\item{makePlot}{logical; This formats the data and plotting area without drawing anything if set to \code{\link{FALSE}}.}
+
+\item{preferMulti}{logical; Are multiple legends preferred}
+
+\item{maxSize}{numeric; This is largest size scaling value for size scale legends. Defaults to \code{\link{FALSE}}}
+
+\item{sizeColumn}{numeric; This indicates which column should be used for the size scaling.}
 
 \item{...}{additional options mostly to be passed along to subsequent functions}
 }

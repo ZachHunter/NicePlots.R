@@ -50,8 +50,8 @@
 #' niceScatter(iris[,1:2], color=iris$Species, shape=iris$Species,
 #'    size=iris[,3], trendline = "color",theme=npColorTheme)
 #'
-#' #Same thing but defining the by input explicitly and makeing a single trandlline for the group.
-#' #Note that seting trendline to color as before would produce a exact replica of the first graph.
+#' #Same thing but defining the by input explicitly and making a single trend line for the group.
+#' #Note that setting trend line to color as before would produce a exact replica of the first graph.
 #' niceScatter(iris[,1:2],by=data.frame(iris$Species,iris$Species,iris[,3]),
 #'    color=TRUE, shape=TRUE, size=TRUE, theme=npColorTheme, trendline = TRUE)
 #'
@@ -70,7 +70,7 @@
 #' @importFrom stats lm predict cor.test
 #' @importFrom scatterplot3d scatterplot3d
 #' @export
-niceScatter<-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=3, sizeLevels=6, groupLabels=NULL, subgroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL,  minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=TRUE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL,zLim=NULL, strictLimits=FALSE, legend=FALSE ,trimTrendLines=TRUE, showTrendConfidence=TRUE, drawPoints=TRUE, corMethod="pearson", ...) {UseMethod("niceScatter",x)}
+niceScatter<-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=2, sizeLevels=5, groupLabels=NULL, subgroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL,  minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=TRUE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL,zLim=NULL, strictLimits=FALSE, legend=FALSE ,trimTrendLines=TRUE, showTrendConfidence=TRUE, drawPoints=TRUE, corMethod="pearson", ...) {UseMethod("niceScatter",x)}
 
 #' @importFrom magrittr %>%
 #' @importFrom purrr map_lgl map_dbl map walk
@@ -80,7 +80,7 @@ niceScatter<-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FA
 #' @importFrom stats lm predict cor.test
 #' @importFrom scatterplot3d scatterplot3d
 #' @export
-niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=3, sizeLevels=6, groupLabels=NULL, subgroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=TRUE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, zLim=NULL, strictLimits=FALSE, legend=FALSE, trimTrendLines=TRUE, showTrendConfidence=TRUE, drawPoints=TRUE, corMethod="pearson", ...) {
+niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,trendline=FALSE, sizeScale=2, sizeLevels=5, groupLabels=NULL, subgroup=FALSE, bandwidth=NULL, useRgl=FALSE, type="p",theme=basicTheme, main=NULL,sub=NULL, ylab=NULL, xlab=NULL, zlab=NULL, minorTick=FALSE, guides=NULL, plotColors=NULL, logScale=FALSE, axisText=c(NULL,NULL), rotateLabels=FALSE, add=FALSE, minorGuides=FALSE, extendTicks=TRUE, expLabels=FALSE, lWidth=NULL, na.rm=TRUE, verbose=FALSE,logAdjustment=1,xLim=NULL,yLim=NULL, zLim=NULL, strictLimits=FALSE, legend=FALSE, trimTrendLines=TRUE, showTrendConfidence=TRUE, drawPoints=TRUE, corMethod="pearson", ...) {
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset",call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
@@ -223,12 +223,10 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
 
   #Initialize legend variables so we can update based on options
   legendLabels<-groupLabels
-  legendTitle<-"Legend"
+  legendTitle<-"NA"
   if(!is.null(by)){
-    if(legend[1]==FALSE | is.null(legend[1])) {
+    if(is.null(legend[1])) {
       legend<-TRUE
-    } else if (legend[1]!=TRUE) {
-      legendTitle<-legend
     }
   }
   legendColors<-plotColors$points
@@ -239,7 +237,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
   logScaleZ<-NULL
   if(is.null(logScale[1])){logScale[1]<-FALSE}
   if(length(logScale)>1 & is.null(logScale[2])) {logScale[2]<-FALSE}
-  if((length(logScale)>1 & sum(logScale[1:3])>0) | logScale[1]!=FALSE) {
+  if((length(logScale)>1 & sum(logScale[1:3],na.rm = TRUE)>0) | logScale[1]!=FALSE) {
     if(length(logScale)==1) {
       if(logScale[1]!=FALSE){
         logScaleX<-logScale
@@ -285,7 +283,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
     par(col.sub=plotColors$labels, col.lab=plotColors$labels,col.main=plotColors$labels,cex.main=theme$titleSize, cex.lab=theme$axisLabelSize, cex.sub=theme$subSize, family=theme$fontFamily)
   }
 
-  #initialize custom formating vectors and determine plot details for the input
+  #initialize custom formatting vectors and determine plot details for the input
   myColors<-NULL
   myShapes<-NULL
   mySize<-NULL
@@ -298,58 +296,203 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
     myShapes<-pointShape[1]
     myColors<-plotColors$points[1]
     mySize<-pointSize[1]
+    legendTracker<-list(c=1)
+    legendTitleTracker<-NA
     if(is.data.frame(by)) {
       #The strategy here is to calculate the shape, color, and size vectors in advance and then call points()
-      if(shape[1]==TRUE) {
-        if (length(pointShape)<length(levels(by$shape))) {
-          warning("Not enough shape values to uniquely define all levels!\nUse the 'pointShape' argument to define a longer vector of shape values.\n", call. = FALSE)
-          pointShape<-rep(pointShape,trunc(length(levels(by$shape))/length(pointShape))+1)
-        }
-        myShapes<-pointShape[by$shape]
-      }
       if(color[1]==TRUE) {
         if (length(plotColors$points)<length(levels(by$color))) {
           warning("Not enough color values to uniquely define all levels!\nUse 'plotColors=list(points=c('color1','color2',...)) to define an alternate point color vector.\nSee the help section on themes and formating for more information.\n", call. = FALSE)
           plotColors$points<-rep(plotColors$points,trunc(length(levels(by$color))/length(plotColors$points))+1)
         }
         myColors<-plotColors$points[by$color]
+        legendTracker<-list("c"=levels(by$color))
+        if(legend[1] != TRUE & legend[1] !=FALSE) {
+          legendTitleTracker<-legend[1]
+        } else if (legend[1] !=FALSE) {
+          legendTitleTracker<-"Legend"
+        }
+      }
+      if(shape[1]==TRUE) {
+        if (length(pointShape)<length(levels(by$shape))) {
+          warning("Not enough shape values to uniquely define all levels!\nUse the 'pointShape' argument to define a longer vector of shape values.\n", call. = FALSE)
+          pointShape<-rep(pointShape,trunc(length(levels(by$shape))/length(pointShape))+1)
+        }
+        myShapes<-pointShape[by$shape]
+        shapeScaleLegend<-pointShape[seq(length(levels(by$shape)))]
+        #legendTracker<-list("s"=levels(by$shape))
+        if(color[1]==TRUE) {
+          if(all.equal(by$color,by$shape)[1] == TRUE) {
+            names(legendTracker)[1]<-"cs"
+          } else {
+            legendTracker[["s"]]<-levels(by$shape)
+            if(length(legend)>=2) {
+              legendTitleTracker[2]<-legend[2]
+            } else {
+              legendTitleTracker[2]<-" "
+            }
+          }
+        } else {
+          legendTracker<-list("s"=levels(by$shape))
+          if(legend[1] != TRUE & legend[1] != FALSE) {
+            legendTitleTracker<-legend[1]
+          } else {
+            legendTitleTracker<-"Legend"
+          }
+        }
       }
       if(size[1]==TRUE) {
         #Size needs to be scaled to go from the default to sizeScale times larger
         #If the input vector is a numeric or a factor determines how it gets handled
         #I'm sure there is a better way to do this. Revisit later?
         if(is.numeric(preFlightBy$size)) {
-          sizes<-cut(as.numeric(as.character(by$size)),breaks=sizeLevels,labels=FALSE)
-          mySize<-((sizes-1)/(sizeLevels-1)*(sizeScale-1))*pointSize[1]+pointSize[1]
+          #sizes<-cut(as.numeric(as.character(by$size)),breaks=sizeLevels,labels=FALSE)
+          sizes<-seq(min(as.numeric(as.character(by$size))), max(as.numeric(as.character(by$size))), length.out=sizeLevels)
+          mySize<-(as.numeric(as.character(by$size))-min(as.numeric(as.character(by$size)),na.rm = TRUE))/max(as.numeric(as.character(by$size)),na.rm=TRUE)*(abs(sizeScale[1]-pointSize[1])) + pointSize[1]
+          #mySize<-((sizes-1)/(sizeLevels-1)*(sizeScale-1))*pointSize[1]+pointSize[1]
         } else {
-          sizes<-as.numeric(by$size)
-          mySize<-((sizes-1)/(length(levels(by$size))-1))*(sizeScale-1)*pointSize[1]+pointSize[1]
-
+          sizes<-seq(length(levels(by$size)))
+          mySize<-(as.numeric(by$size)-1)/max(sizes)*(abs(sizeScale[1]-pointSize[1])) + pointSize[1]
+          sizes<-levels(by$size)
+        }
+        if(color[1]==TRUE) {
+          if(shape[1]==TRUE) {
+            if(names(legendTracker)[1]=="cs") {
+              if(all.equal(by$color,by$size)[1]==TRUE) {
+                names(legendTracker)[1]<-"csz"
+              } else {
+                legendTracker[["z"]]<-sizes
+                if(length(legend)>=2) {
+                  legendTitleTracker[2]<-legend[2]
+                } else {
+                  legendTitleTracker[2]<-" "
+                }
+              }
+            } else {
+              #All 3 are active cs is not called
+              if(all.equal(by$color, by$size)[1]==TRUE) {
+                names(legendTracker)[1]<-"cz"
+              } else if(all.equal(by$shape, by$size)[1]==TRUE) {
+                names(legendTracker)[2]<-"sz"
+              } else {
+                legendTracker[["z"]]<-sizes
+                if(length(legend)>=3) {
+                  legendTitleTracker[3]<-legend[3]
+                } else {
+                  legendTitleTracker[3]<-" "
+                }
+              }
+            }
+          } else {
+            #shape is off by color is on
+            if(all.equal(by$color,by$size)[1]==TRUE) {
+              names(legendTracker)[1]<-"cz"
+            } else {
+              legendTracker[["z"]]<-sizes
+              if(length(legend)>=2) {
+                legendTitleTracker[2]<-legend[2]
+              } else {
+                legendTitleTracker[2]<-" "
+              }
+            }
+          }
+        } else {
+          #color is off by shape is on
+          if(shape[1]==TRUE) {
+            if(all.equal(by$shape,by$size)[1] == TRUE) {
+              names(legendTracker)[1]<-"sz"
+            } else {
+              legendTracker[["z"]]<-sizes
+              if(length(legend)>=2) {
+                legendTitleTracker[2]<-legend[2]
+              } else {
+                legendTitleTracker[2]<-" "
+              }
+            }
+          } else {
+            #color is off and shape is off
+            legendTracker<-list("z"=sizes)
+            if(legend[1] !="TRUE" & legend[1] !=FALSE) {
+              legendTitleTracker<-legend
+            } else if (legend[1] !=FALSE) {
+              legend<-"Legend"
+            }
+          }
         }
       }
     } else if(!is.null(by)) {
       #If by is just a factor.
-      if(shape[1]==TRUE) {
-        if (length(pointShape)<length(levels(by))) {
-          warning("Not enough shape values to uniquely define all levels!\nUse the 'pointShape' argument to define a longer vector of shape values.\n", call. = FALSE)
-          pointShape<-rep(pointShape,trunc(length(levels(by))/length(pointShape))+1)
-        }
-        myShapes<-pointShape[by]
-      }
       if(color[1]==TRUE) {
         if (length(plotColors$points)<length(levels(by))) {
           warning("Not enough color values to uniquely define all levels!\nUse 'plotColors=list(points=c('color1','color2',...)) to define an alternate point color vector.\nSee the help section on themes and formating for more information.\n", call. = FALSE)
           plotColors$points<-rep(plotColors$points,trunc(length(levels(by))/length(plotColors$points))+1)
         }
         myColors<-plotColors$points[by]
+        legendTracker<-list("c"=levels(by))
+        if(legend[1] != TRUE & legend[1] != FALSE) {
+          legendTitleTracker<-legend[1]
+        } else if(legend[1] != FALSE) {
+          legendTitleTracker<-"Legend"
+        }
+      }
+      if(shape[1]==TRUE) {
+        if (length(pointShape)<length(levels(by))) {
+          warning("Not enough shape values to uniquely define all levels!\nUse the 'pointShape' argument to define a longer vector of shape values.\n", call. = FALSE)
+          pointShape<-rep(pointShape,trunc(length(levels(by))/length(pointShape))+1)
+        }
+        myShapes<-pointShape[by]
+        shapeScaleLegend<-pointShape[seq(length(levels(by)))]
+        if(color[1]==TRUE) {
+          names(legendTracker)[1]<-"cs"
+        } else {
+          legendTracker<-list("s"= levels(by))
+          if(legend[1] != TRUE & legend[1] != FALSE) {
+            legendTitleTracker<-legend[1]
+          } else if(legend[1] != FALSE) {
+            legendTitleTracker<-"Legend"
+          }
+        }
       }
       if(size[1]==TRUE) {
-        sizes<-as.numeric(by)
-        mySize<-((sizes-1)/(length(levels(by))-1)*(sizeScale-1))*pointSize[1]+pointSize[1]
+        if(is.numeric(preFlightBy)) {
+
+          #sizes<-cut(as.numeric(as.character(by)),breaks=sizeLevels,labels=FALSE)
+          sizes<-seq(min(as.numeric(as.character(by))),max(as.numeric(as.character(by))),length.out=sizeLevels)
+          mySize<-(as.numeric(as.character(by))-min(as.numeric(as.character(by)),na.rm = TRUE))/max(as.numeric(as.character(by)),na.rm=TRUE)*(abs(sizeScale[1]-pointSize[1])) + pointSize[1]
+          #mySize<-((sizes-1)/(sizeLevels-1)*(sizeScale-1))*pointSize[1]+pointSize[1]
+        } else {
+          sizes<-seq(length(levels(by)))
+          mySize<-(as.numeric(by)-1)/max(sizes)*(abs(sizeScale[1]-pointSize[1])) + pointSize[1]
+          sizes<-levels(by)
+        }
+        if(color[1] == TRUE) {
+          if(shape[1] == TRUE) {
+            names(legendTracker)[1]<-"csz"
+          } else {
+            names(legendTracker)[1]<-"cz"
+          }
+        } else {
+          if(shape[1] ==TRUE) {
+            names(legendTracker)[1]<-"sz"
+          } else {
+            legendTracker<-list("z" = sizes)
+            if(legend[1] != TRUE & legend[1] != FALSE) {
+              legendTitleTracker<-legend[1]
+            } else if(legend[1] != FALSE) {
+              legendTitleTracker<-"Legend"
+            }
+          }
+        }
       }
     }
     if (dim(x)[2]>2){
-      x_temp<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment, strictLimits=strictLimits, makePlot=FALSE)
+
+      maxSizeScale<-FALSE
+      if(grepl("z",names(legendTracker))[1]){
+        sizeColumn<-grep("z",names(legendTracker))[1]
+        maxSizeScale<-sizeScale
+      }
+      x_temp<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment, strictLimits=strictLimits, makePlot=FALSE, maxSizeScale=maxSizeScale, sizeColumn=sizeColumn)
       if(logScaleZ!=FALSE) {
         x[,3]<-log(x[,3] + logAdjustment,logScaleZ)
       }
@@ -384,8 +527,12 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
       if(add[1]==FALSE) {
         #RStudio seems not to update the graphics devices properly
         if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOverride"]])) {graphics.off()}
-
-        x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment, strictLimits=strictLimits)
+        maxSizeScale<-FALSE
+        if(grepl("z",names(legendTracker))[1]){
+          sizeColumn<-grep("z",names(legendTracker))[1]
+          maxSizeScale<-sizeScale
+        }
+        x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment, strictLimits=strictLimits,maxSizeScale=maxSizeScale, sizeColumn=sizeColumn)
         title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$axisLabels)
       }
     }
@@ -397,63 +544,178 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
     if(is.null(ylab)) {ylab<-colnames(x)[2]}
     myShapes<-pointShape[1]
     mySize<-pointSize[1]
+    legendTitleTracker<-NA
+    legendTracker<-list(c=1)
     myColors<-plotColors$points[1]
     if(add[1]==FALSE) {
       #RStudio seems not to update the graphics devices properly
       if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOverride"]])) {graphics.off()}
 
-      x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
-      title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$axisLabels)
-      if(is.data.frame(by)) {
+        if(is.data.frame(by)) {
         #The strategy here is to calculate the shape, color, and size vectors in advance and then call points()
         #Here we assume by is a data.frame
-        if(shape[1]==TRUE) {
-          if (length(pointShape)<length(levels(by$shape))) {
-            warning("Not enough shape values to uniquely define all levels!\nUse the 'pointShape' argument to define a longer vector of shape values.\n", call. = FALSE)
-            pointShape<-rep(pointShape,trunc(length(levels(by$shape))/length(pointShape))+1)
+          if(color[1]==TRUE) {
+            if (length(plotColors$points)<length(levels(by$color))) {
+              warning("Not enough color values to uniquely define all levels!\nUse 'plotColors=list(points=c('color1','color2',...)) to define an alternate point color vector.\nSee the help section on themes and formating for more information.\n", call. = FALSE)
+              plotColors$points<-rep(plotColors$points,trunc(length(levels(by$color))/length(plotColors$points))+1)
+            }
+            myColors<-plotColors$points[by$color]
+            legendTracker<-list("c"=levels(by$color))
+            if(legend[1] != TRUE & legend[1] != FALSE) {
+              legendTitleTracker<-legend[1]
+            } else if(legend[1] != FALSE) {
+              legendTitleTracker<-"Legend"
+            }
           }
-          myShapes<-pointShape[by$shape]
-        }
-        if(color[1]==TRUE) {
-          if (length(plotColors$points)<length(levels(by$color))) {
-            warning("Not enough color values to uniquely define all levels!\nUse 'plotColors=list(points=c('color1','color2',...)) to define an alternate point color vector.\nSee the help section on themes and formating for more information.\n", call. = FALSE)
-            plotColors$points<-rep(plotColors$points,trunc(length(levels(by$color))/length(plotColors$points))+1)
+          if(shape[1]==TRUE) {
+            if (length(pointShape)<length(levels(by$shape))) {
+              warning("Not enough shape values to uniquely define all levels!\nUse the 'pointShape' argument to define a longer vector of shape values.\n", call. = FALSE)
+              pointShape<-rep(pointShape,trunc(length(levels(by$shape))/length(pointShape))+1)
+            }
+            myShapes<-pointShape[by$shape]
+            shapeScaleLegend<-pointShape[seq(length(levels(by$shape)))]
+            if(color[1]==TRUE) {
+              if(all.equal(by$color, by$shape)[1]==TRUE) {
+                legendTracker<-list("cs"=levels(by$shape))
+              } else {
+                legendTracker[["s"]]<-levels(by$shape)
+                if(legend[1]!=TRUE & legend[1]!=FALSE & length(legend)>=2) {
+                  legendTitleTracker[2]<-legend[2]
+                } else if (legend[1]!=FALSE) {
+                  legendTitleTracker[2]<-" "
+                }
+              }
+            } else {
+              legendTracker<-list("s"=levels(by$shape))
+              if(legend[1] != TRUE & legend[1] != FALSE) {
+                legendTitleTracker<-legend[1]
+              } else if(legend[1] != FALSE) {
+                legendTitleTracker<-"Legend"
+              }
+            }
           }
-          myColors<-plotColors$points[by$color]
-        }
-        if(size[1]==TRUE) {
-          #Size needs to be scaled to go from the default to sizeScale times larger
-          #If the input vector is a numeric or a factor determines how it gets handled
-          #I'm sure there is a better way to do this. Revisit later?
-          if(is.numeric(preFlightBy$size)) {
-            sizes<-cut(as.numeric(as.character(by$size)),breaks=sizeLevels,labels=FALSE)
-            mySize<-((sizes-1)/(sizeLevels-1)*(sizeScale-1))*pointSize[1]+pointSize[1]
-          } else {
-            sizes<-as.numeric(by$size)
-            mySize<-((sizes-1)/(length(levels(by$size))-1)*(sizeScale-1))*pointSize[1]+pointSize[1]
+
+          if(size[1]==TRUE) {
+            #Size needs to be scaled to go from the default to sizeScale times larger
+            #If the input vector is a numeric or a factor determines how it gets handled
+            #I'm sure there is a better way to do this. Revisit later?
+            if(is.numeric(preFlightBy$size)) {
+              #sizes<-cut(as.numeric(as.character(preFlightBy$size)),breaks=sizeLevels,labels=FALSE)
+              sizes<-seq(min(as.numeric(as.character(by$size))), max(as.numeric(as.character(by$size))), length.out=sizeLevels)
+              mySize<-(as.numeric(as.character(by$size))-min(as.numeric(as.character(by$size)),na.rm = TRUE))/max(as.numeric(as.character(by$size)),na.rm=TRUE)*(abs(sizeScale[1]-pointSize[1])) + pointSize[1]
+              #mySize<-((sizes-1)/(sizeLevels-1)*(sizeScale-1))*pointSize[1]+pointSize[1]
+            } else {
+              sizes<-seq(length(levels(by$size)))
+              mySize<-(sizes-1)/max(sizes)*(abs(sizeScale[1]-pointSize[1])) + pointSize[1]
+              sizes<-levels(by$size)
+            }
+
+            if(color[1]==TRUE) {
+              if(shape[1]==TRUE) {
+                if(all.equal(size[1], color[1])[1]==TRUE) {
+                  if(names(legendTracker)[1]=="cs") {
+                    names(legendTracker)[1]<-"csz"
+                  } else {
+                    names(legendTracker)[1]<-"cz"
+                  }
+                } else if(all.equal(size[1], shape[1])[1]==TRUE) {
+                  names(legendTracker)[2]<-"sz"
+                } else {
+                  legendTracker[["z"]]<-sizes
+                  if(legend[1]!=TRUE & legend[1] !=FALSE & length(legend)>=3) {
+                    legendTitleTracker[3]<-legend[3]
+                  } else if(legend[1] !=FALSE) {
+                    legendTitleTracker[3]<-" "
+                  }
+                }
+              } else if (all.equal(size[1], color[1])[1]==TRUE) {
+                legendTracker<-list("cz"=levels(by$color))
+              } else {
+                legendTracker[["z"]]<-sizes
+                if(legend[1]!=TRUE & legend[1] != FALSE & length(legend)>=2) {
+                  legendTitleTracker[2]<-legend[2]
+                } else if(legend[1] != FALSE) {
+                  legendTitleTracker[2]<-" "
+                }
+              }
+            } else {
+              legendTracker<-list("z"=sizes)
+              if(legend[1] != TRUE & legend[1] != FALSE) {
+                legendTitleTracker[1]<-legend[1]
+              } else if(legend[1] != FALSE) {
+                legendTitleTracker[1]<-"Legend"
+              }
+            }
           }
-        }
-      } else if(!is.null(by)) {
+        } else if(!is.null(by)) {
         #If by is just a factor.
-        if(shape[1]==TRUE) {
-          if (length(pointShape)<length(levels(by))) {
-            warning("Not enough shape values to uniquely define all levels!\nUse the 'pointShape' argument to define a longer vector of shape values.\n", call. = FALSE)
-            pointShape<-rep(pointShape,trunc(length(levels(by))/length(pointShape))+1)
+          if(color[1]==TRUE) {
+            if (length(plotColors$points)<length(levels(by))) {
+              warning("Not enough color values to uniquely define all levels!\nUse 'plotColors=list(points=c('color1','color2',...)) to define an alternate point color vector.\nSee the help section on themes and formating for more information.\n", call. = FALSE)
+              plotColors$points<-rep(plotColors$points,trunc(length(levels(by))/length(plotColors$points))+1)
+            }
+            myColors<-plotColors$points[by]
+            legendTracker<-list("c"=levels(by))
+            if(legend[1] != TRUE & legend[1] != FALSE) {
+              legendTitleTracker[1]<-legend[1]
+            } else if(legend[1] != FALSE) {
+              legendTitleTracker[1]<-"Legend"
+            }
           }
-          myShapes<-pointShape[by]
-        }
-        if(color[1]==TRUE) {
-          if (length(plotColors$points)<length(levels(by))) {
-            warning("Not enough color values to uniquely define all levels!\nUse 'plotColors=list(points=c('color1','color2',...)) to define an alternate point color vector.\nSee the help section on themes and formating for more information.\n", call. = FALSE)
-            plotColors$points<-rep(plotColors$points,trunc(length(levels(by))/length(plotColors$points))+1)
+          if(shape[1]==TRUE) {
+            if (length(pointShape)<length(levels(by))) {
+              warning("Not enough shape values to uniquely define all levels!\nUse the 'pointShape' argument to define a longer vector of shape values.\n", call. = FALSE)
+              pointShape<-rep(pointShape,trunc(length(levels(by))/length(pointShape))+1)
+            }
+            myShapes<-pointShape[by]
+            shapeScaleLegend<-pointShape[seq(length(levels(by)))]
+            if(color[1]==TRUE) {
+              names(legendTracker)[1]<-"cs"
+            } else {
+              legendTracker<-list("s"=levels(by))
+              if(legend[1] != TRUE & legend[1] != FALSE) {
+                legendTitleTracker[1]<-legend[1]
+              } else if(legend[1] != FALSE) {
+                legendTitleTracker[1]<-"Legend"
+              }
+            }
           }
-          myColors<-plotColors$points[by]
+          if(size[1]==TRUE) {
+            if(is.numeric(preFlightBy)) {
+              #sizes<-cut(as.numeric(as.character(preFlightBy)),breaks=sizeLevels,labels=FALSE)
+              sizes<-seq(min(as.numeric(as.character(by))), max(as.numeric(as.character(by))), length.out=sizeLevels)
+              mySize<-(as.numeric(as.character(by))-min(as.numeric(as.character(by)),na.rm = TRUE))/max(as.numeric(as.character(by)),na.rm=TRUE)*(abs(sizeScale[1]-pointSize[1])) + pointSize[1]
+              #mySize<-((sizes-1)/(sizeLevels-1)*(sizeScale-1))*pointSize[1]+pointSize[1]
+            } else {
+              sizes<-seq(length(levels(by)))
+              mySize<-(as.numeric(by)-1)/max(sizes)*(abs(sizeScale[1]-pointSize[1])) + pointSize[1]
+              sizes<-levels(by)
+            }
+            if(color[1]==TRUE) {
+              if(shape[1] ==TRUE) {
+                legendTracker<-list("csz"=levels(by))
+              } else {
+                legendTracker<-list("cz"=levels(by))
+              }
+            } else if(shape[1]==TRUE) {
+              legendTracker<-list("sz"=levels(by))
+            } else{
+              legendTracker<-list("z"=sizes)
+              if(legend[1] != TRUE & legend[1] != FALSE) {
+                legendTitleTracker[1]<-legend[1]
+              } else if(legend[1] != FALSE) {
+                legendTitleTracker[1]<-"Legend"
+              }
+            }
+          }
         }
-        if(size[1]==TRUE) {
-          sizes<-as.numeric(by)
-          mySize<-((sizes-1)/(length(levels(by))-1)*(sizeScale-1))*pointSize[1]+pointSize[1]
-        }
+      maxSizeScale<-FALSE
+      if(grepl("z",names(legendTracker))[1]){
+        sizeColumn<-grep("z",names(legendTracker))[1]
+        maxSizeScale<-sizeScale
       }
+      x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment, maxSizeScale=maxSizeScale, sizeColumn=sizeColumn)
+      title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$axisLabels)
     }
   }
 
@@ -590,13 +852,19 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
   }
 
   #Note from niceDensity, needs review
-  if(length(legendColors)<length(legendLabels) & legend!=FALSE){
-    legend<-FALSE
-    warning("Not enough point colors to uniquely color subgroups levels\nPlease update plotColors point options to use legend options with this subgroup.", call.=FALSE)
-  }
+  #if(length(legendColors)<length(legendLabels) & legend!=FALSE){
+  #  legend<-FALSE
+  #  warning("Not enough point colors to uniquely color subgroups levels\nPlease update plotColors point options to use legend options with this subgroup.", call.=FALSE)
+  #}
 
-  if(legend!=FALSE) {
-    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=plotColors$legendBorder, lineCol=plotColors$legendLineCol, bg=plotColors$legendBG, col=legendColors, shape="rect",size=theme$legendSize,spacing=theme$legendSpacing)
+  if(legend[1]!=FALSE) {
+    mySizeScaleLegend<-seq(pointSize[1],sizeScale[1],length.out=sizeLevels[1])
+    if(sum(grepl("s", names(legendTracker)))==0){
+      shapeScaleLegend<-FALSE
+    }
+
+    makeNiceLegend(labels=legendTracker, title=legendTitleTracker, fontCol=plotColors$labels, border=plotColors$legendBorder, lineCol=plotColors$legendLineCol, bg=plotColors$legendBG, col=legendColors, shape=names(legendTracker),size=theme$legendSize,spacing=theme$legendSpacing, fontFamily = theme$fontFamily, sizeScale = mySizeScaleLegend,shapeScale=shapeScaleLegend,scaleDefaultColor=plotColors$scaleDefaultColor)
+
   }
   par(col.sub=oSubCol, col.lab=oLabCol,col.main=oMainCol,family=oFont,cex.main=oCexMain,cex.lab=oCexlab,cex.sub=oCexSub)
 

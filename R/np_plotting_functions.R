@@ -12,7 +12,7 @@
 #' @param side logical; if set to true, the error bars will be drawn horizontally.
 #' @param col color; a vector of line colors.
 #' @param lType positive integer; corresponds to lty line type in base R.
-#' @param width positive numeric; corresponds to lwd line width setting in base R.\#'
+#' @param width positive numeric; corresponds to lwd line width setting in base R.
 #' @examples
 #' data(iris)
 #' library(dplyr)
@@ -602,7 +602,6 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subgroup=F,plotAt,p
             filter(.data$tFilter) %>% ungroup()
           drawPoints(pointDat,highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth,col=tempCols[tempCols %in% as.character(pointDat$colCheck)],swarmOverflow=swarmOverflow, calcOnly = calcOnly)
           #Not drawn, just for populating xypos for all data points
-          print("howdy")
           bind_cols(data=prepedData[[1]],fact=by[filter]) %>%
             mutate(at=facetLoc[.data$fact]) %>%
             drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow, calcOnly = TRUE)

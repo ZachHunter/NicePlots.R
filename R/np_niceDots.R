@@ -166,10 +166,10 @@ niceDots.default <- function(x, by=NULL, groupLabels=NULL, drawPoints=TRUE, erro
 
   #Checking to make sure that the error and aggregator functions are valid
   if(!(aggFun[1] %in% c("mean", "median"))) {
-    stop(paste0("The aggFun option needs to be equal to either 'mean' or 'median'.\nCurrently aggFun = ",aggFun,"."))
+    stop(paste0("The aggregate function (aggFun) option needs to be equal to either 'mean' or 'median'.\nCurrently aggFun = ",aggFun,"."))
   }
   if(!(errFun[1] %in% c("sd", "se", "range", "t95ci", "boot95ci"))) {
-    stop(paste0("The errFun option needs to be equal to either 'se', 'se', 'range' or 'boot95ci'.\nCurrently errFun = ",aggFun,".\nSee documentation for details."))
+    stop(paste0("The errFun option needs to be equal to either 'se', 'se', 'range', 't95ci' or 'boot95ci'.\nCurrently error function (errFun) = ",errFun, " using ",aggFun," as the aggregate function (aggFun).\nSee documentation for details."))
   }
 
   #If we are adding this to an existing plot then we can't count on prepCategoryWindow to log transform the data
@@ -187,15 +187,36 @@ niceDots.default <- function(x, by=NULL, groupLabels=NULL, drawPoints=TRUE, erro
     pData<-prepBarData(x=prepedData,by=by,errorMultiple=errorMultiple,upperErrorFun=upperErrorFun,lowerErrorFun=lowerErrorFun,aggFunction=aggFun,stack=FALSE,subgroup=subgroup)
     dRange<-1
     if(errorBars[1]==TRUE) {
-      dRange<-c(min(c(min(pData$plot$AData-pData$plot$lowerError),min(x))),max(c(max(pData$plot$AData+pData$plot$upperError),max(x))))
+      #At this point we need to change the range measurements to be distance from the aggregate function to in in line with other error measure types
+      if(errFun[1]=="range"){
+        pData$plot$upperError<-pData$plot$upperError-pData$plot$AData
+        pData$plot$lowerError<-pData$plot$AData - pData$plot$lowerError
+      }
+      suppressWarnings(dRange<-c(min(c(min(pData$plot$AData-pData$plot$lowerError,na.rm=TRUE),min(x,na.rm=TRUE)),na.rm=TRUE),max(c(max(pData$plot$AData+pData$plot$upperError,na.rm=TRUE),max(x,na.rm=TRUE)),na.rm=TRUE)))
       if(logScale>0 & dRange[1]<.04*(abs(dRange[2]-dRange[1]))) {
         dRange[1]<-.04*(abs(dRange[2]-dRange[1]))
       }
     } else {
-      dRange<-c(min(x),max(x))
+      suppressWarnings(dRange<-c(min(x,na.rm=TRUE),max(x,na.rm=TRUE)))
     }
     dRange[1]<-dRange[1]-.04*(abs(dRange[2]-dRange[1]))
     dRange[2]<-dRange[2]+.04*(abs(dRange[2]-dRange[1]))
+    if(sum(is.null(dRange))>0 | sum(abs(dRange)==Inf)>0) {
+      if(is.null(dRange[1]) | abs(dRange[1])==Inf) {
+        if(all(pData$plot$AData>=0)) {
+          dRange[1]<-0
+        } else {
+          dRange[1]<-min(pData$plot$AData,na.rm=TRUE) * 1.04
+        }
+      }
+      if(is.null(dRange[2]) | abs(dRange[2])==Inf) {
+        if(all(pData$plot$AData<0)) {
+          dRange[2]<-0
+        } else {
+          dRange[2]<-max(pData$plot$AData,na.rm=TRUE) * 1.04
+        }
+      }
+    }
     if(!is.null(yLim)){
       dRange<-yLim
     }
@@ -236,7 +257,11 @@ niceDots.default <- function(x, by=NULL, groupLabels=NULL, drawPoints=TRUE, erro
 
   #Here we calculated all the data to print
   pData<-prepBarData(x=prepedData[[1]],by=by,errorMultiple=errorMultiple,upperErrorFun=upperErrorFun,lowerErrorFun=lowerErrorFun,aggFunction=aggFun,stack=FALSE,subgroup=subgroup)
-
+  #At this point we need to change the range measurements to be distance from the aggregate function to in in line with other error measure types
+  if(errFun[1]=="range"){
+    pData$plot$upperError<-pData$plot$upperError-pData$plot$AData
+    pData$plot$lowerError<-pData$plot$AData - pData$plot$lowerError
+  }
   #Data is set and ready to go. Plotting is handled based on cases handling if 'x' and 'by' are vectors or dataframes
   xypos<-c(1,1)
 
@@ -416,7 +441,7 @@ niceDots.default <- function(x, by=NULL, groupLabels=NULL, drawPoints=TRUE, erro
     if(is.na(legendTitle) | legendTitle=="factTwo") {
       legendTitle<="Legend"
     }
-    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=theme$legendBorder, lineCol=plotColors$LegendLineCol, bg=plotColors$LegendBG, col=legendColors, shape="rect",size=theme$legendSize,spacing=theme$legendSpacing)
+    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=theme$legendBorder, lineCol=plotColors$LegendLineCol, bg=plotColors$LegendBG, col=legendColors, shape="c",size=theme$legendSize,spacing=theme$legendSpacing)
   }
 
   #Add titles, sub and ylab

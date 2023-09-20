@@ -161,6 +161,7 @@ niceBar.default <- function(x, by=NULL, groupLabels=NULL, aggFun=c("mean","media
   if(upperErrorFun[1]=="range"){
     upperErrorFun<-"max"
     lowerErrorFun<-"min"
+    errorMultiple<-1
   }
 
   #Checking to make sure that the error and aggregator functions are valid
@@ -212,8 +213,30 @@ niceBar.default <- function(x, by=NULL, groupLabels=NULL, aggFun=c("mean","media
         }
       }
     } else {
-      #find the size of error bars arround the aggregated data to calculate plotting window ranges
-      dRange<-c(min(pData$plot$AData-pData$plot$lowerError),max(pData$plot$AData+pData$plot$upperError))
+      #find the size of error bars around the aggregated data to calculate plotting window ranges
+      #At this point we need to change the range measurements to be distance from the aggregate function to in in line with other error measure types
+      if(errFun[1]=="range"){
+        pData$plot$upperError<-pData$plot$upperError-pData$plot$AData
+        pData$plot$lowerError<-pData$plot$AData - pData$plot$lowerError
+      }
+      suppressWarnings(dRange<-c(min(pData$plot$AData-pData$plot$lowerError,na.rm=TRUE),max(pData$plot$AData+pData$plot$upperError,na.rm=TRUE)))
+      #If error bar data is missing or Inf we can handle it here
+      if(sum(is.null(dRange))>0 | sum(abs(dRange)==Inf)>0) {
+        if(is.null(dRange[1]) | abs(dRange[1])==Inf) {
+          if(all(pData$plot$AData>=0)) {
+            dRange[1]<-0
+          } else {
+            dRange[1]<-min(pData$plot$AData,na.rm=TRUE) * 1.04
+          }
+        }
+        if(is.null(dRange[2]) | abs(dRange[2])==Inf) {
+          if(all(pData$plot$AData<0)) {
+            dRange[2]<-0
+          } else {
+            dRange[2]<-max(pData$plot$AData,na.rm=TRUE) * 1.04
+          }
+        }
+      }
     }
 
     if(!is.null(yLim)){
@@ -262,8 +285,12 @@ niceBar.default <- function(x, by=NULL, groupLabels=NULL, aggFun=c("mean","media
 
   #Here we calculated all the data to print
   pData<-prepBarData(x=prepedData[[1]],by=by,errorMultiple=errorMultiple,upperErrorFun=upperErrorFun,lowerErrorFun=lowerErrorFun,aggFunction=aggFun,stack=stack,subgroup=subgroup)
-
-  #Now we just need to perform some slight customizations to legend and width options based on inputs.
+  #At this point we need to change the range measurements to be distance from the aggregate function to in in line with other error measure types
+  if(errFun[1]=="range"){
+    pData$plot$upperError<-pData$plot$upperError-pData$plot$AData
+    pData$plot$lowerError<-pData$plot$AData - pData$plot$lowerError
+  }
+  #Now we just need to perform some slight customization to legend and width options based on inputs.
   if(is.numeric(prepedData[[1]])){
     #CASE: by is a factor data is a numeric vector
     if(is.factor(by)) {
@@ -376,38 +403,32 @@ niceBar.default <- function(x, by=NULL, groupLabels=NULL, aggFun=c("mean","media
     print(pData[[2]])
   }
 
-  #Calculating data point positions comparability with npData specs.
-  xypos<-addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc, plotColors=plotColors, drawPoints=TRUE,pointMethod = "linear", calcOnly=TRUE)
+  #Calculating data point positions compatability with npData specs.
+  xypos <- addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=FALSE, pointMethod="jitter", pointShape=pointShape, pointSize=1, width=width, pointLaneWidth=1, plotColors=plotColors, drawPoints=FALSE, outliers=outliers,swarmOverflow = "gutter")
   xyid<-1
   xFilter<-1
   byFilter<-1
   if(is.vector(ActiveOptions$x) | is.factor(ActiveOptions$x)) {
     xyid<-seq(length(ActiveOptions$x))
-    xFilter<-!is.na(x)
+    xFilter<-!is.na(ActiveOptions$x)
   } else {
     if(flipFacts==TRUE) {
       xyid<-rep(seq(dim(as.data.frame(ActiveOptions$x))[1]),ncol(ActiveOptions$x))
-      xFilter<-rep(rowSums(is.na(as.data.frame(x)))==0,ncol(ActiveOptions$x))
+      xFilter<-rep(rowSums(is.na(as.data.frame(ActiveOptions$x)))==0,ncol(ActiveOptions$x))
     } else {
       xyid<-seq(dim(as.data.frame(ActiveOptions$x))[1])
-      xFilter<-rowSums(is.na(as.data.frame(x)))==0
+      xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$x)))==0
     }
   }
   if(is.vector(ActiveOptions$by) | is.factor(ActiveOptions$by)){
     byFilter<-!is.na(ActiveOptions$by)
   } else {
-    xFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
+    byFilter<-rowSums(is.na(as.data.frame(ActiveOptions$by)))==0
   }
   xyid<-xyid[xFilter ==TRUE & byFilter ==TRUE]
   xyid<-xyid[filter]
-  xyLength<-1
-  if(is.numeric(xypos) & !is.matrix(xypos)){
-    xyLength<-length(xypos)
-  } else {
-    xyLength<-nrow(xypos)
-  }
-  if(length(xyid)<xyLength){
-    xyid<-rep(xyid,xyLength/length(xyid))
+  if(length(xyid)<nrow(xypos)){
+    xyid<-rep(xyid,nrow(xypos)/length(xyid))
   }
   ActiveOptions$xypos<-data.frame(xypos,ID=xyid)
 
@@ -431,7 +452,7 @@ niceBar.default <- function(x, by=NULL, groupLabels=NULL, aggFun=c("mean","media
     if(is.na(legendTitle) | legendTitle=="factTwo") {
       legendTitle<="Legend"
     }
-    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=theme$legendBorder, lineCol=plotColors$legendLineCol, bg=plotColors$legendBG, col=legendColors, shape="rect",size=theme$legendSize,spacing=theme$legendSpacing)
+    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=theme$legendBorder, lineCol=plotColors$legendLineCol, bg=plotColors$legendBG, col=legendColors, shape="c",size=theme$legendSize,spacing=theme$legendSpacing)
   }
 
   #Add titles, sub and ylab
