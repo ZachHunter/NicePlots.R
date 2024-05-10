@@ -33,13 +33,20 @@ prepBarData(
 \item{subgroup}{logical; If \code{\link{TRUE}} the data will be faceted into subgroups within the primary factor levels. Ignored if \code{by} is a \code{\link[base]{factor}} or \code{x} is a \code{\link[base]{data.frame}}.}
 }
 \description{
-Processess the input data, factors, and options to produce summary data for drawing bar plots
+Processes the input data, factors, and options to produce summary data for drawing bar plots
 }
 \details{
-todo<-1
+This functions takes the numeric data from \code{x} and the factor information from code{by} along with all
+of the plotting options to calculated aggregate measures (mean/median) and error bars associated with those
+measures. The error options include standard deviation (\code{sd}), standard error of the meand (\code{se}),
+\code{range}, 95\% confidence interval based on the t-statistic (\code{t95ci}) and empirical 95\% confidence
+intervals of the median or mean (\code{boot95ci}). This pre-processing is used to determine the default axis
+limits, the summary data included in the output and passed along to the plotting functions.
 }
 \examples{
-todo<-1
+data(iris)
+#\donttest{myData<-prepBarData(iris[,1:4],by=iris$Species)}
+#\donttest{print(myData)}
 
 }
 \seealso{

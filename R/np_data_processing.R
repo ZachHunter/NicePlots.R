@@ -234,13 +234,20 @@ prepNiceData<- function(prepedData,by, subgroup=FALSE,outliers=TRUE,filter,group
 
 
 #' @title Prepare and print basic statistics for niceBar
-#' @description Processess the input data, factors, and options to produce summary data for drawing bar plots
+#' @description Processes the input data, factors, and options to produce summary data for drawing bar plots
 #'
 #' @details
-#' todo<-1
+#' This functions takes the numeric data from \code{x} and the factor information from code{by} along with all
+#' of the plotting options to calculated aggregate measures (mean/median) and error bars associated with those
+#' measures. The error options include standard deviation (\code{sd}), standard error of the meand (\code{se}),
+#' \code{range}, 95\% confidence interval based on the t-statistic (\code{t95ci}) and empirical 95\% confidence
+#' intervals of the median or mean (\code{boot95ci}). This pre-processing is used to determine the default axis
+#' limits, the summary data included in the output and passed along to the plotting functions.
 #'
 #' @examples
-#' todo<-1
+#' data(iris)
+#' #\donttest{myData<-prepBarData(iris[,1:4],by=iris$Species)}
+#' #\donttest{print(myData)}
 #'
 #' @param x list; a list object returned by \code{\link{prepCategoryWindow}}
 #' @param by factor or dataframe of factors; One or more factors that control how the data is grouped. The first column is the primary grouping factor and the second and thrid columns are used for sub-grouping and/or stacking as needed.
