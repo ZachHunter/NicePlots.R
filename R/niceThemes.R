@@ -1,7 +1,7 @@
 #Themes
 #' @include np_options_processing.R np_utility.R
 #' @title NicePlots Theme: Basic
-#' @description This is the default theme for nicePlots
+#' @description This is the default theme for nicePlots when data point coloring is active
 #' @details This default theme has uses transparent solid circles for point overlays with up to 8 colors.
 #' Fill and line options as constant.
 #' @export
@@ -16,7 +16,7 @@ basicTheme<- list(
   axisLabelSize=1, #overall axis label cex (ei, not the tick mark labels)
   titleSize=1.2, #Plot title cex
   subSize=1, #Sub label cex
-  guides=TRUE, #Logical; draws guide lines at major ticks
+  guides=FALSE, #Logical; draws guide lines at major ticks
   minorTick=FALSE, #Numeric; number of minor tick marks to draw between major marks. Set to FALSE to disable
   minorTickLS=4, #Numeric; number of minor tick marks to draw between major marks if logScale is active. Set to FALSE to disable
   swarmOverflow="wrap", #Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.
@@ -62,7 +62,7 @@ basicTheme<- list(
   errorBarCapWidthBar=.33, #relative width of cap on bar plot error bars
   errorBarCapWidthDP=.25, #relative width of cap on dot plot error bars
   errorBarCapWidthVP=0, #Whisker cap width for box plot overlay in violin plots
-  errorCapType="ball", #Error bar cap type for bar plots.
+  errorCapType="none", #Error bar cap type for bar plots.
   vioBoxWidth=.25, #Factor by which the box plot width should shrick relative to the violins (note: this should be inverted to be more intuitive)
 
   #PlotColor Options
@@ -72,7 +72,7 @@ basicTheme<- list(
     guides="lightgrey", #Color of guide lines
     minorGuides="lightgrey", #Color of minor guide lines
     lines="darkred", #Line color(s)
-    points=purrr::map_chr(RColorBrewer::brewer.pal(9,"Set1"),function(x) setAlpha(x,.5)), #Point color(s)
+    points=purrr::map_chr(RColorBrewer::brewer.pal(9,"Set1"),function(x) setAlpha(x,.6)), #Point color(s)
     fill=setAlpha("grey",.4), #Object fill color(s) (eg box/violin/bar interiors)
     axis="black", #Axis color
     majorTick="black", #Major tick mark color
@@ -92,6 +92,99 @@ basicTheme<- list(
   ))
 )
 class(basicTheme)<-c("npTheme","list")
+
+#' @include np_options_processing.R np_utility.R
+#' @title NicePlots Theme: Default
+#' @description This is the default theme for NicePlots
+#' @details This default theme has uses transparent solid circles over matching backgrounds for point overlays with up to 8 colors.
+#' @export
+npDefaultTheme<- list(
+  #General Plot Settings
+  fontFamily="sans", #Possible values: 'sans', 'mono', or 'serif'
+  groupLabSize=1, #Label cex for the primary group labels
+  subgroupLabSize=.68, #Label cex for subgroup labels
+  groupLabelSpacing=.96, #distance of group labels from axis in lines
+  subgroupLabelSpacing=.26, #distance of subgroup labels from axis in lines
+  yAxisLabSize=.9, #Label cex for y-axis tick labels
+  axisLabelSize=1, #overall axis label cex (ei, not the tick mark labels)
+  titleSize=1.2, #Plot title cex
+  subSize=1, #Sub label cex
+  guides=FALSE, #Logical; draws guide lines at major ticks
+  minorTick=FALSE, #Numeric; number of minor tick marks to draw between major marks. Set to FALSE to disable
+  minorTickLS=4, #Numeric; number of minor tick marks to draw between major marks if logScale is active. Set to FALSE to disable
+  swarmOverflow="gutter", #Valid options are: "none", "wrap", "gutter", "random", and "omit". Controls how to wantly point stacks that would overflow the pointLaneWidth option.
+  curvePoints=200, #Number of points to sample for drawing density curves
+
+  #Legend Settings
+  # legendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
+  # legendLineCol=NA, #Border color for the legend color boxes
+  # legendBG=NA, #Legend background color
+  legendSize=.95, #overall legend cex
+  legendSpacing=.3, #Relative spacing padding legend entries
+
+  #Plot Specific Defaults
+  pointSizeBP=1, #cex-like Numeric; size of points in overlay for boxplots
+  pointSizeVP=1, #cex-like Numeric; size of points in overlay for violin plots
+  pointSizeDP=1, #cex-like Numeric; size of points in overlay for dot plots
+  pointSize2D=1, #cex-like Numeric; size of points in overlay for scatter plots
+  widthBP=.85, #Relative box width of each category for box plots
+  widthVP=.85, #Relative violin width of each category for violin plots
+  widthDP=.45, #Relative category width of each category for dot plots
+  widthBar=1, #Relative bar width of each category for bar plots
+  pointShapeBP=16, #Numeric vector; point shapes for box plots
+  pointShapeVP=16, #Numeric vector; point shapes for vioin plots
+  pointShapeDP=16, #Numeric vector; point shapes for dot plots
+  pointShape2D=c(16:18,15,19), #Numeric vector; point shapes for dot plots
+  pointLaneWidthBP=.4, #Restricts the point overlay to a fraction of the box width
+  pointLaneWidthDP=4, #Restricts the point overlay to a fraction of the category width
+  pointLaneWidthVP=1, #Restricts the point overlay to a fraction of the violin width
+  pointMethodBP="beeswarm", #Point drawing method for box plots
+  pointMethodVP="beeswarm", #Point drawing method for violin plots
+  pointMethodDP="distribution", #Point drawing method for dot plots
+  lWidthBP=1, #Line width (lwd) for box plots
+  lWidthDP=1, #Line width (lwd) for dot plots
+  lWidthVP=1, #Line width (lwd) for violin plots
+  lWidthBar=1, #Line width (lwd) for violin plots
+  lWidth2D=1,  #Line width (lwd) for scatter plots
+  errorBarLineTypeBP=2, #Line type (lty) for boxplot wiskers
+  errorBarLineTypeBar=2, #Line type (lty) for bar plot error bars
+  errorBarLineTypeDP=2, #Line type (lty) for dot plot error bars
+  errorBarLineTypeVP=2, #Whisker line type (lty) for box plot overlay in violin plots
+  errorBarLineType2D=2, #used to determine line types for trend lines in scatter plots.
+  errorBarCapWidthBP=.25, #relative width of cap on box plot wiskers
+  errorBarCapWidthBar=.33, #relative width of cap on bar plot error bars
+  errorBarCapWidthDP=.25, #relative width of cap on dot plot error bars
+  errorBarCapWidthVP=0, #Whisker cap width for box plot overlay in violin plots
+  errorCapType="none", #Error bar cap type for bar plots.
+  vioBoxWidth=.25, #Factor by which the box plot width should shrick relative to the violins (note: this should be inverted to be more intuitive)
+
+  #PlotColor Options
+  plotColors=formatPlotColors(list(
+    bg="open", #Plot area background
+    marginBg="transparent", #plot margin background
+    guides="lightgrey", #Color of guide lines
+    minorGuides="lightgrey", #Color of minor guide lines
+    lines="black", #Line color(s)
+    points=purrr::map_chr(RColorBrewer::brewer.pal(9,"Set1"),function(x) setAlpha(x,.6)), #Point color(s)
+    fill=purrr::map_chr(RColorBrewer::brewer.pal(9,"Set1"),function(x) setAlpha(x,.6)), #Object fill color(s) (eg box/violin/bar interiors)
+    axis="black", #Axis color
+    majorTick="black", #Major tick mark color
+    minorTick="black", #Minor tick mark color
+    title="black", #Title color
+    numbers="black", #Color of y-axis numbers
+    subtext="black", #Color of sub text
+    labels="black", #label color,
+    axisLabels="black", #axis label color
+    subgroupLabels="black", #color of subgroups
+    legendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
+    legendLineCol=NA, #Border color for the legend color boxes
+    legendBG=NA, #Legend background color
+    vioBoxFill=setAlpha("black",.8), #Color of interquartile box for violin plots
+    vioBoxLineCol="black", #Line color for boxplot overlay in violin plots
+    scaleDefaultColor="black" #Color of non-color scales such as shape and size in the legend
+  ))
+)
+class(npDefaultTheme)<-c("npTheme","list")
 
 #' @title NicePlots Theme: Colors
 #' @description A more colorful and sparse option compared to the default
