@@ -237,7 +237,7 @@ prepNiceData<- function(prepedData,by, subgroup=FALSE,outliers=TRUE,filter,group
 #' @description Processes the input data, factors, and options to produce summary data for drawing bar plots
 #'
 #' @details
-#' This functions takes the numeric data from \code{x} and the factor information from code{by} along with all
+#' This functions takes the numeric data from \code{x} and the factor information from \code{by} along with all
 #' of the plotting options to calculated aggregate measures (mean/median) and error bars associated with those
 #' measures. The error options include standard deviation (\code{sd}), standard error of the meand (\code{se}),
 #' \code{range}, 95\% confidence interval based on the t-statistic (\code{t95ci}) and empirical 95\% confidence
