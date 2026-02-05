@@ -95,10 +95,7 @@ class(basicTheme)<-c("npTheme","list")
 
 #' @include np_options_processing.R np_utility.R
 #' @title NicePlots Theme: Default
-<<<<<<< HEAD
 #' @description This is the default theme for NicePlots
-=======
->>>>>>> 145912dfa79fe7241d5fe541c7f9c9cec7173113
 #' @details This default theme has uses transparent solid circles over matching backgrounds for point overlays with up to 8 colors.
 #' @export
 npDefaultTheme<- list(
