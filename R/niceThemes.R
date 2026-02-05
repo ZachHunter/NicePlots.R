@@ -95,7 +95,10 @@ class(basicTheme)<-c("npTheme","list")
 
 #' @include np_options_processing.R np_utility.R
 #' @title NicePlots Theme: Default
+<<<<<<< HEAD
 #' @description This is the default theme for NicePlots
+=======
+>>>>>>> 145912dfa79fe7241d5fe541c7f9c9cec7173113
 #' @details This default theme has uses transparent solid circles over matching backgrounds for point overlays with up to 8 colors.
 #' @export
 npDefaultTheme<- list(
@@ -141,6 +144,7 @@ npDefaultTheme<- list(
   pointMethodBP="beeswarm", #Point drawing method for box plots
   pointMethodVP="beeswarm", #Point drawing method for violin plots
   pointMethodDP="distribution", #Point drawing method for dot plots
+<<<<<<< HEAD
   lWidthBP=2, #Line width (lwd) for box plots
   lWidthDP=2, #Line width (lwd) for dot plots
   lWidthVP=2, #Line width (lwd) for violin plots
@@ -151,6 +155,18 @@ npDefaultTheme<- list(
   errorBarLineTypeDP=1, #Line type (lty) for dot plot error bars
   errorBarLineTypeVP=1, #Whisker line type (lty) for box plot overlay in violin plots
   errorBarLineType2D=1, #used to determine line types for trend lines in scatter plots.
+=======
+  lWidthBP=1, #Line width (lwd) for box plots
+  lWidthDP=1, #Line width (lwd) for dot plots
+  lWidthVP=1, #Line width (lwd) for violin plots
+  lWidthBar=1, #Line width (lwd) for violin plots
+  lWidth2D=1,  #Line width (lwd) for scatter plots
+  errorBarLineTypeBP=2, #Line type (lty) for boxplot wiskers
+  errorBarLineTypeBar=2, #Line type (lty) for bar plot error bars
+  errorBarLineTypeDP=2, #Line type (lty) for dot plot error bars
+  errorBarLineTypeVP=2, #Whisker line type (lty) for box plot overlay in violin plots
+  errorBarLineType2D=2, #used to determine line types for trend lines in scatter plots.
+>>>>>>> 145912dfa79fe7241d5fe541c7f9c9cec7173113
   errorBarCapWidthBP=.25, #relative width of cap on box plot wiskers
   errorBarCapWidthBar=.33, #relative width of cap on bar plot error bars
   errorBarCapWidthDP=.25, #relative width of cap on dot plot error bars
