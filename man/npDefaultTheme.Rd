@@ -11,7 +11,7 @@ An object of class \code{npTheme} (inherits from \code{list}) of length 51.
 npDefaultTheme
 }
 \description{
-This is the default theme for nicePlots
+This is the default theme for NicePlots
 }
 \details{
 This default theme has uses transparent solid circles over matching backgrounds for point overlays with up to 8 colors.
