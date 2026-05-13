@@ -369,15 +369,14 @@ niceBox.default <- function(x, by=NULL, groupLabels=NULL, main=NULL,sub=NULL, yl
 
       #Note we are ignoring pointHighlights here as by is a factor
       if(legend!=FALSE) {
+        if(legend==TRUE){
+          legendTitle<-"Legend"
+        } else {
+          legendTitle<-legend
+        }
         if(flipFacts) {
-          if(legend==TRUE){
-            legendTitle<-"Legend"
-          }
           legendLabels<-levels(by)
         } else {
-          if(legend==TRUE){
-            legendTitle<-"Legend"
-          }
           legendLabels<-colnames(prepedData[[1]])
         }
       }
@@ -422,21 +421,17 @@ niceBox.default <- function(x, by=NULL, groupLabels=NULL, main=NULL,sub=NULL, yl
       xypos<-data.frame(xypos,ID=xyid)
 
       if(legend!=FALSE) {
+        if(legend==TRUE){
+          legendTitle<-"Legend"
+        } else {
+          legendTitle<-legend
+        }
         if(pointHighlights){
-          if(legend==TRUE){
-            legendTitle<-colnames(by)[2]
-          }
           legendLabels<-levels(by[,2])
         } else {
           if(flipFacts) {
-            if(legend==TRUE){
-              legendTitle<-"Legend"
-            }
             legendLabels<-levels(by[,1])
           } else {
-            if(legend==TRUE){
-              legendTitle<-"Legend"
-            }
             legendLabels<-colnames(prepedData[[1]])
           }
         }
@@ -459,7 +454,7 @@ niceBox.default <- function(x, by=NULL, groupLabels=NULL, main=NULL,sub=NULL, yl
     if(is.na(legendTitle) | legendTitle=="factTwo") {
       legendTitle<="Legend"
     }
-    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=theme$legendBorder, lineCol=plotColors$legendLineCol, bg=plotColors$legendBG, col=legendColors, shape="c",size=theme$legendSize,spacing=theme$legendSpacing)
+    makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$legendTextCol,titleCol=plotColors$legendHeaderCol, border=plotColors$legendBorder, lineCol=plotColors$legendLineCol, bg=plotColors$legendBG, col=legendColors, shape="c",size=theme$legendSize,spacing=theme$legendSpacing)
   }
   if(add==FALSE) {
     if(is.null(sub) & showCalc==T & is.null(pvalue)==FALSE){

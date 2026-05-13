@@ -126,6 +126,16 @@ formatPlotColors<-function(plotColors, theme=NA){
     else if (is.null(theme$legendLineCol)) {plotColors$legendLineCol<-NA}
     else {plotColors$legendLineCol<-theme$legendLineCol}
   }
+  if(is.null(plotColors$legendTextCol)){
+    if(is.na(theme[1])) {plotColors$legendTextCol<-"black"}
+    else if (is.null(theme$legendTextCol)) {plotColors$legendTextCol<-"black"}
+    else {plotColors$legendTextCol<-theme$legendTextCol}
+  }
+  if(is.null(plotColors$legendHeaderCol)){
+    if(is.na(theme[1])) {plotColors$legendHeaderCol<-"black"}
+    else if (is.null(theme$legendHeaderCol)) {plotColors$legendHeaderCol<-"black"}
+    else {plotColors$legendHeaderCol<-theme$legendHeaderCol}
+  }
   if(is.null(plotColors$scaleDefaultColor)){
     if(is.na(theme[1])) {plotColors$scaleDefaultColor<-NA}
     else if (is.null(theme$legendLineCol)) {plotColors$scaleDefaultColor<-NA}

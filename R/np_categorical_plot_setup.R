@@ -495,9 +495,9 @@ prepCategoryWindow<-function(x,by=NULL, groupLabels=levels(by), minorTick=FALSE,
   clCex<-par()$cex.axis
   par(cex.axis=labelCex)
   if (sidePlot) {
-    axis(side=1,labels=myLabels,at=myMajorTicks,las=rotateY,col=plotColors$axis,col.axis=axisNumCol,col.ticks=plotColors$majorTick)
+    axis(side=1,labels=myLabels,at=myMajorTicks,las=rotateY,col=plotColors$axis[1],col.axis=axisNumCol[1],col.ticks=plotColors$majorTick)
   } else {
-    axis(side=2,labels=myLabels,at= myMajorTicks,las=rotateY,col=plotColors$axis,col.axis=axisNumCol,col.ticks=plotColors$majorTick)
+    axis(side=2,labels=myLabels,at= myMajorTicks,las=rotateY,col=plotColors$axis[1],col.axis=axisNumCol[1],col.ticks=plotColors$majorTick)
   }
   par(cex.axis=clCex)
   if(guides[1]!=FALSE){
@@ -759,8 +759,8 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
   clCex<-par()$cex.axis
   par(cex.axis=labelCex)
   if(makePlot==TRUE) {
-    axis(side=1,labels=myLabelsX,at= myMajorTicksX,las=rotateLabels,col=plotColors$axis,col.ticks=plotColors$majorTicks)
-    axis(side=2,labels=myLabelsY,at= myMajorTicksY,las=rotateLabels,col=plotColors$axis,col.ticks=plotColors$majorTicks)
+    axis(side=1,labels=myLabelsX,at= myMajorTicksX,las=rotateLabels,col=plotColors$axis,col.ticks=plotColors$majorTicks,col.axis=plotColors$numbers[1])
+    axis(side=2,labels=myLabelsY,at= myMajorTicksY,las=rotateLabels,col=plotColors$axis,col.ticks=plotColors$majorTicks,col.axis=plotColors$numbers[1])
   }
   par(cex.axis=clCex)
 
@@ -768,7 +768,7 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
     abline(v=myMajorTicksX[myMajorTicksX!=par("usr")[1]],col=plotColors$guides,lwd=1)
     abline(h=myMajorTicksY[myMajorTicksY!=par("usr")[2]],col=plotColors$guides,lwd=1)
   }
-  par(mai=oMai,family=cFont)
+  par(mai=oMai,family=cFont,xpd=FALSE)
   return(data.frame(x=xData,y=yData))
 }
 
@@ -796,6 +796,7 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
 #' @param labels character vector; The names of the levels describe in the legend. Typically factor levels.
 #' @param title character; The title of the legend. This defaults to "Legend" if unspecified.
 #' @param fontCol R color; Color of the legend text.
+#' @param titleCol R color; Color of legend title text.
 #' @param border R color; The color of the rectangular border surrounding the legend. Defaults to \code{\link{NULL}} which suppresses this feature
 #' @param lineCol R color; The color of the line colors for the color key. Optional. Defaults to \code{\link{NA}}.
 #' @param bg R color; Sets the background color for the legend area. Note that this can be distinct the the margin background.
@@ -813,7 +814,7 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
 #' @importFrom graphics rect text points
 #' @importFrom purrr map_dbl
 #' @seealso \code{\link{legend}}, \code{\link{prepCategoryWindow}}, \code{\link{niceBox}}, \code{\link{niceDots}}, \code{\link{niceBar}}, \code{\link{niceVio}}
-makeNiceLegend<-function(labels, title="Legend", fontCol="black", border=NULL, lineCol=NA, bg=NA, col=makeColorMatrix()[,3], shape="c",size=.75,spacing=.2, fontFamily="sans",sizeScale=NA,shapeScale=NA, scaleDefaultColor="black") {
+makeNiceLegend<-function(labels, title="Legend", fontCol="black",titleCol="black", border=NULL, lineCol=NA, bg=NA, col=makeColorMatrix()[,3], shape="c",size=.75,spacing=.2, fontFamily="sans",sizeScale=NA,shapeScale=NA, scaleDefaultColor="black") {
   #Making sure the legend titles are fully populated
   if(is.list(labels) & length(labels) > length(title)) {
     warning("Legend titles are not populated for all levels.\nDefaulting to Legend\nThis may be a bug.", call.=FALSE)
@@ -916,7 +917,7 @@ makeNiceLegend<-function(labels, title="Legend", fontCol="black", border=NULL, l
     }
     cH<-startH
     for (l in seq(length(labels))) {
-      text(LegendCo, cH, label=title[l],cex=size, font=2, offset=0, pos=4, col=fontCol)
+      text(LegendCo, cH, label=title[l],cex=size, font=2, offset=0, pos=4, col=titleCol)
       if(grepl("z",shape[l])[1]) {
         cH<-cH-titleH/ConvertH*(1+ spacing/2)-.5*maxSizeLabelH/ConvertH
       } else {
@@ -983,7 +984,7 @@ makeNiceLegend<-function(labels, title="Legend", fontCol="black", border=NULL, l
       rect(LegendCo-oMai[4]/9/ConvertW,startH-totalLegendH/ConvertH-oMai[4]/9/ConvertH*1.1,LegendCo+maxLabelH/ConvertW+maxLabelW/ConvertW+oMai[4]/9/ConvertW*2, startH+oMai[4]/9/ConvertH*2,col=bg,border=border)
     }
     cH<-startH
-    text(LegendCo, cH, label=title[1],cex=size, font=2, offset=0, pos=4, col=fontCol)
+    text(LegendCo, cH, label=title[1],cex=size, font=2, offset=0, pos=4, col=titleCol)
     if(grepl("z",shape[1])[1]) {
       cH<-cH-titleH/ConvertH*(1+ spacing/2)-.5*maxSizeLabelH/ConvertH
     } else {

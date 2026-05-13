@@ -8,6 +8,7 @@ makeNiceLegend(
   labels,
   title = "Legend",
   fontCol = "black",
+  titleCol = "black",
   border = NULL,
   lineCol = NA,
   bg = NA,
@@ -27,6 +28,8 @@ makeNiceLegend(
 \item{title}{character; The title of the legend. This defaults to "Legend" if unspecified.}
 
 \item{fontCol}{R color; Color of the legend text.}
+
+\item{titleCol}{R color; Color of legend title text.}
 
 \item{border}{R color; The color of the rectangular border surrounding the legend. Defaults to \code{\link{NULL}} which suppresses this feature}
 

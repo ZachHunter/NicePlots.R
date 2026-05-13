@@ -86,6 +86,8 @@ basicTheme<- list(
     legendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
     legendLineCol=NA, #Border color for the legend color boxes
     legendBG=NA, #Legend background color
+    legendTextCol="black", #Color legend label text
+    legendHeaderCol="black", #Color of the legend label header(s)
     vioBoxFill=setAlpha("black",.8), #Color of interquartile box for violin plots
     vioBoxLineCol="black", #Line color for boxplot overlay in violin plots
     scaleDefaultColor="black" #Color of non-color scales such as shape and size in the legend
@@ -179,6 +181,8 @@ npDefaultTheme<- list(
     legendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
     legendLineCol=NA, #Border color for the legend color boxes
     legendBG=NA, #Legend background color
+    legendTextCol="black", #Color legend label text
+    legendHeaderCol="black", #Color of the legend label header(s)
     vioBoxFill=setAlpha("black",.8), #Color of interquartile box for violin plots
     vioBoxLineCol="black", #Line color for boxplot overlay in violin plots
     scaleDefaultColor="black" #Color of non-color scales such as shape and size in the legend
@@ -270,6 +274,8 @@ npColorTheme<- list(
     legendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
     legendLineCol=NA, #Border color for the legend color boxes
     legendBG=NA, #Legend background color
+    legendTextCol="black", #Color legend label text
+    legendHeaderCol="black", #Color of the legend label header(s)
     vioBoxFill=purrr::map_chr(RColorBrewer::brewer.pal(9,"Set1"),function(x) setAlpha(x,.3)), #Color of interquartile box for violin plots
     vioBoxLineCol=RColorBrewer::brewer.pal(9,"Set1"), #Line color for boxplot overlay in violin plots
     scaleDefaultColor="black" #Color of non-color scales such as shape and size in the legend
@@ -361,6 +367,8 @@ npStataTheme<- list(
     legendBorder="black", #Color of the border box around legend. Set to NULL to turn off
     legendLineCol=NA, #Border color for the legend color boxes
     legendBG="white", #Legend background color
+    legendTextCol="black", #Color legend label text
+    legendHeaderCol="black", #Color of the legend label header(s)
     vioBoxFill=setAlpha("black",.8), #Color of interquartile box for violin plots
     vioBoxLineCol="black", #Line color for boxplot overlay in violin plots
     scaleDefaultColor="black" #Color of non-color scales such as shape and size in the legend
@@ -452,6 +460,8 @@ npGGTheme<- list(
     legendBorder=NULL, #Color of the border box around legend. Set to NULL to turn off
     legendLineCol="lightgrey", #Border color for the legend color boxes
     legendBG=NA, #Legend background color
+    legendTextCol="black", #Color legend label text
+    legendHeaderCol="black", #Color of the legend label header(s)
     vioBoxFill=setAlpha("black",.8), #Color of interquartile box for violin plots
     vioBoxLineCol="black", #Line color for boxplot overlay in violin plots
     scaleDefaultColor="black" #Color of non-color scales such as shape and size in the legend
