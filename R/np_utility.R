@@ -312,16 +312,15 @@ t95ci<-function(x) {
 #' @param x numeric vector
 #' @param indices numeric vector: Indicies are passed to calculated individual bootstaps of \code{x}
 #' @param agg character: A string corresponding to the aggregate or central tendency function to be modeled (eg. \code{\link[stats]{median}}, \code{\link[base]{mean}}, etc.)
-#'
+#' @importFrom rlang exec
 #' @return a number corresponding to a bootstrap iteration of the aggregator function given by \code{agg}
 #' @examples
 #' #Calculates the median of Sepal.Length from the iris data set
 #' data(iris)
 #' #ci(iris$Sepal.Length,"median",seq(1,length(iris$Sepal.Length)))
 #' @seealso \code{\link[boot]{boot}}, \code{\link{boot95ci}}
-#' @importFrom purrr invoke
 ci<-function(x,indices,agg) {
-  purrr::invoke(agg,list(x=x[indices]))
+  exec(agg,x=x[indices])
 }
 
 #' @title Calculate a basic bootstrap 95\% confidence interval
@@ -347,7 +346,6 @@ ci<-function(x,indices,agg) {
 #' #boot95ci(iris$Sepal.Width,agg="median",upper=TRUE)
 #' @seealso \code{\link{prepBarData}}, \code{\link{niceBar}}, \code{\link[boot]{boot}}, \code{\link[boot]{boot.ci}}
 # @importFrom boot boot boot.ci
-# @importFrom purrr invoke
 boot95ci<-function(x,agg="mean",upper=FALSE,nBoot=1000L) {
   boot::boot.ci(boot::boot(x,ci,agg=agg,R=nBoot),type="perc")$percent[4+upper]
 }
