@@ -307,7 +307,7 @@ prepCategoryWindow<-function(x,by=NULL, groupLabels=levels(by), minorTick=FALSE,
   }
   if (is.null(groupLabels)) {groupLabels<-seq(1:levelCount)}
   oBg<-par("bg")
-  par(bg=plotColors$marginBg)
+  par(bg=plotColors$marginBg[1])
   #plot.new()
   if(sidePlot) {
     if(strictLimits) {
@@ -326,11 +326,11 @@ prepCategoryWindow<-function(x,by=NULL, groupLabels=levels(by), minorTick=FALSE,
       #plot.window(xlim=c(.5,levelCount+0.5),ylim=dataRange)
     }
   }
-  if(plotColors$bg=="open" | plotColors$bg=="Open") {
-    abline(v=par("usr")[1],lwd=2.5,col=plotColors$axis)
-    abline(h=par("usr")[3],lwd=2.5,col=plotColors$axis)
+  if(plotColors$bg[1]=="open" | plotColors$bg[1]=="Open") {
+    abline(v=par("usr")[1],lwd=2.5,col=plotColors$axis[1])
+    abline(h=par("usr")[3],lwd=2.5,col=plotColors$axis[1])
   } else {
-    rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col=plotColors$bg, lwd=2.5,border=plotColors$axis)
+    rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col=plotColors$bg[1], lwd=2.5,border=plotColors$axis[1])
   }
   par(bg=oBg)
   if(rotateLabels!=0){rotateLabels<-2}
@@ -622,7 +622,7 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
 
   #Make the plotting window while setting background and canvass colors
   oBg<-par("bg")
-  par(bg=plotColors$marginBg)
+  par(bg=plotColors$marginBg[1])
   plot.new()
   if(makePlot) {
     if(strictLimits) {
@@ -631,11 +631,11 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
       plot.window(xlim=dataRange$x, ylim=dataRange$y)
     }
     par(xpd=FALSE)
-    if(plotColors$bg=="open" | plotColors$bg=="Open") {
-      abline(v=par("usr")[1],lwd=2.5,col=plotColors$axis)
-      abline(h=par("usr")[3],lwd=2.5,col=plotColors$axis)
+    if(plotColors$bg[1]=="open" | plotColors$bg[1]=="Open") {
+      abline(v=par("usr")[1],lwd=2.5,col=plotColors$axis[1])
+      abline(h=par("usr")[3],lwd=2.5,col=plotColors$axis[1])
     } else {
-      rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col=plotColors$bg, lwd=2.5,border=plotColors$axis)
+      rect(par("usr")[1], par("usr")[3], par("usr")[2], par("usr")[4], col=plotColors$bg[1], lwd=2.5,border=plotColors$axis[1])
     }
   }
     par(bg=oBg)

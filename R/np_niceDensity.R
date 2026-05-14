@@ -163,7 +163,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupLabels=NULL,subg
   oMainCol<-par()$col.main
   oSubCol<-par()$col.sub
   if(!is.na(theme[1]) & !is.null(theme[1])){
-    par(col.sub=plotColors$labels, col.lab=plotColors$labels,col.main=plotColors$labels,cex.main=theme$titleSize, cex.lab=theme$axisLabelSize, cex.sub=theme$subSize, family=theme$fontFamily)
+    par(col.sub=plotColors$labels[1], col.lab=plotColors$labels[1],col.main=plotColors$labels[1],cex.main=theme$titleSize, cex.lab=theme$axisLabelSize, cex.sub=theme$subSize, family=theme$fontFamily)
   }
 
   #Dealing with 2D data
@@ -175,7 +175,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupLabels=NULL,subg
       if(Sys.getenv("RSTUDIO") == "1" & is.null(moreOptions[["RSOverride"]])) {graphics.off()}
 
       x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
-      title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$axisLabels)
+      title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title[1],col.sub=plotColors$subtext[1],col.lab=plotColors$axisLabels[1])
     }
     #Calculate 2D Kernal Density
 
@@ -361,7 +361,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupLabels=NULL,subg
           ylab<-temp
         }
         test<-prepNiceWindow(data.frame(x=x,y=x), by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=FALSE, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
-        title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$axisLabels)
+        title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title[1],col.sub=plotColors$subtext[1],col.lab=plotColors$axisLabels[1])
       }
       #plot(-1,-1,type="n",xlim=c(minx,maxx),ylim=c(0,maxy),main=main,sub=sub,ylab=ylab)
       densities2<-densities
@@ -412,7 +412,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupLabels=NULL,subg
           ylab<-temp
         }
         prepData<-prepNiceWindow(data.frame(x=x,y=x), by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment)
-        title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$axisLabels)
+        title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title[1],col.sub=plotColors$subtext[1],col.lab=plotColors$axisLabels[1])
       }
       #plot(-1,-1,type="n",xlim=c(minx,maxx),ylim=c(0,maxy),main=main,sub=sub,ylab=ylab)
       polygon(densities2,col=theme$plotColors$fill[1],border=0)

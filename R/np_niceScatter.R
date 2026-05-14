@@ -280,7 +280,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
   oSubCol<-par()$col.sub
 
   if(!is.na(theme[1]) & !is.null(theme[1])){
-    par(col.sub=plotColors$labels, col.lab=plotColors$labels,col.main=plotColors$labels,cex.main=theme$titleSize, cex.lab=theme$axisLabelSize, cex.sub=theme$subSize, family=theme$fontFamily)
+    par(col.sub=plotColors$labels[1], col.lab=plotColors$labels[1],col.main=plotColors$labels[1],cex.main=theme$titleSize, cex.lab=theme$axisLabelSize, cex.sub=theme$subSize, family=theme$fontFamily)
   }
 
   #initialize custom formatting vectors and determine plot details for the input
@@ -533,7 +533,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
           maxSizeScale<-sizeScale
         }
         x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment, strictLimits=strictLimits,maxSizeScale=maxSizeScale, sizeColumn=sizeColumn)
-        title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$axisLabels)
+        title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title[1],col.sub=plotColors$subtext[1],col.lab=plotColors$axisLabels[1])
       }
     }
   } else {
@@ -715,7 +715,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
         maxSizeScale<-sizeScale
       }
       x<-prepNiceWindow(x, by, minorTick=minorTick, guides=guides, yLim=yLim, xLim=xLim, rotateLabels=rotateLabels, theme=theme, plotColors=plotColors, logScaleX=logScaleX, logScaleY=logScaleY, axisText=axisText, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, legend=legend, logAdjustment=logAdjustment, maxSizeScale=maxSizeScale, sizeColumn=sizeColumn)
-      title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title,col.sub=plotColors$subtext,col.lab=plotColors$axisLabels)
+      title(main=main,sub=sub,ylab=ylab,xlab=xlab, col.main=plotColors$title[1],col.sub=plotColors$subtext[1],col.lab=plotColors$axisLabels[1])
     }
   }
 

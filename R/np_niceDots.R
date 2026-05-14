@@ -450,9 +450,9 @@ niceDots.default <- function(x, by=NULL, groupLabels=NULL, drawPoints=TRUE, erro
       sub<-pvalue
     }
     if(sidePlot) {
-      title(main=main,col.main=plotColors$title,sub=sub,col.sub=plotColors$subtext,xlab=ylab,col.lab=plotColors$axisLabels)
+      title(main=main,col.main=plotColors$title[1],sub=sub,col.sub=plotColors$subtext[1],xlab=ylab,col.lab=plotColors$axisLabels[1])
     } else {
-      title(main=main,col.main=plotColors$title,sub=sub,col.sub=plotColors$subtext,ylab=ylab,col.lab=plotColors$axisLabels)
+      title(main=main,col.main=plotColors$title[1],sub=sub,col.sub=plotColors$subtext[1],ylab=ylab,col.lab=plotColors$axisLabels[1])
     }
   }
   par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)

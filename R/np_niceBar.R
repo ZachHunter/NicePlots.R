@@ -403,8 +403,8 @@ niceBar.default <- function(x, by=NULL, groupLabels=NULL, aggFun=c("mean","media
     print(pData[[2]])
   }
 
-  #Calculating data point positions compatability with npData specs.
-  xypos <- addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=FALSE, pointMethod="jitter", pointShape=pointShape, pointSize=1, width=width, pointLaneWidth=1, plotColors=plotColors, drawPoints=FALSE, outliers=outliers,swarmOverflow = "gutter")
+  #Calculating data point positions compatibility with npData specs.
+  xypos <- addNicePoints(prepedData=prepedData, by=by, filter=filter, sidePlot=sidePlot, subgroup=subgroup, plotAt=facetLoc,pointHighlights=FALSE, pointMethod="linear", pointShape=pointShape, pointSize=1, width=width, pointLaneWidth=1, plotColors=plotColors, drawPoints=FALSE, outliers=outliers,swarmOverflow = "gutter")
   xyid<-1
   xFilter<-1
   byFilter<-1
@@ -461,9 +461,9 @@ niceBar.default <- function(x, by=NULL, groupLabels=NULL, aggFun=c("mean","media
       sub<-pvalue
     }
     if(sidePlot) {
-      title(main=main,col.main=plotColors$title,sub=sub,col.sub=plotColors$subtext,xlab=ylab,col.lab=plotColors$axisLabels)
+      title(main=main,col.main=plotColors$title[1],sub=sub,col.sub=plotColors$subtext[1],xlab=ylab,col.lab=plotColors$axisLabels[1])
     } else {
-      title(main=main,col.main=plotColors$title,sub=sub,col.sub=plotColors$subtext,ylab=ylab,col.lab=plotColors$axisLabels)
+      title(main=main,col.main=plotColors$title[1],sub=sub,col.sub=plotColors$subtext[1],ylab=ylab,col.lab=plotColors$axisLabels[1])
     }
   }
   par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)

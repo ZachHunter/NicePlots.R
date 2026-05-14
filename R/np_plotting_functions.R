@@ -251,7 +251,6 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
           #this is here to avoid running subset calculations for subgroups with no samples
           if(any(cFilter)){
             filter[[length(filter)+1]]<-data.frame(x=beeswarm::beeswarm(x$data[cFilter],pch=shape[cFilter][1],at=x[cFilter,"at"][1],do.plot=F,corralWidth=width*2,corral=swarmOverflow,cex=size[cFilter][1])$x,y=x$data[cFilter],color=col[cFilter],size=size[cFilter],shape=shape[cFilter])
-            #print(filter[[length(filter)]]$color)
           }
         }
       } else {
@@ -261,7 +260,7 @@ drawPoints<-function(x, type="jitter",col="black",size=1,shape=1,highlight=FALSE
         }
       }
     }
-    #print(str(filter))
+
     for(i in 1:length(filter)){
       if(!is.null(filter[[i]])) {
         #Note that the col option has been factorized and needs an as.character wrapper to function properly
@@ -590,7 +589,7 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subgroup=F,plotAt,p
             drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth,col=plotColors$points,swarmOverflow=swarmOverflow, calcOnly = calcOnly)
         } else {
           #draws outliers if drawPoints is off
-          #This gets thrown off if there are levels with no outliers so there is some addtional handling of color levels here.
+          #This gets thrown off if there are levels with no outliers so there is some additional handling of color levels here.
           tempCols<-plotColors$points
           if(length(tempCols)<length(levels(by[filter]))){
             tempCols<-rep(tempCols,(length(levels(by[filter])) %% length(tempCols)) +1)
@@ -687,7 +686,7 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subgroup=F,plotAt,p
             }
           } else {
             #draws outliers if drawPoints is off
-            #This gets thrown off if there are levels with no outliers so there is some addtional handling of color levels here.
+            #This gets thrown off if there are levels with no outliers so there is some additional handling of color levels here.
             tempCols<-plotColors$points
             if(length(tempCols)<length(levels(by[filter,1]))){
               tempCols<-rep(tempCols,(length(levels(by[filter,1])) %% length(tempCols)) +1)
@@ -729,7 +728,7 @@ addNicePoints<-function(prepedData,by,filter=TRUE,sidePlot=F,subgroup=F,plotAt,p
             drawPoints(highlight=FALSE,sidePlot=sidePlot,type=pointMethod,shape=pointShape,size=pointSize,width=.5*width*pointLaneWidth/dataCols,col=plotColors$points,swarmOverflow=swarmOverflow, calcOnly = calcOnly)
         } else {
           #draws outliers if drawPoints is off
-          #This gets thrown off if there are levels with no outliers so there is some addtional handling of color levels here.
+          #This gets thrown off if there are levels with no outliers so there is some additional handling of color levels here.
           tempCols<-plotColors$points
           if(length(tempCols)<length(levels(by[filter]))){
             tempCols<-rep(tempCols,(length(levels(by[filter])) %% length(tempCols)) +1)
