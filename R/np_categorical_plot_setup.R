@@ -164,6 +164,8 @@ prepLegendMarigins<-function(x,by,theme,legend,pointHighlights=FALSE,subgroup=TR
       }
     }
     if(titleW>maxLabelW){maxLabelW<-titleW}
+    maxLabelW<-maxLabelW + maxLabelH/ConvertW
+    maxLabelW<-maxLabelW+maxLabelW/9
     nMai<-oMai
     nMai[4]<-nMai[4]+maxLabelW
     par(mai=nMai,family=oFont)
@@ -507,7 +509,7 @@ prepCategoryWindow<-function(x,by=NULL, groupLabels=levels(by), minorTick=FALSE,
       abline(h=myMajorTicks[myMajorTicks!=par("usr")[3]],col=plotColors$guides,lwd=1)
     }
   }
-  par(mai=oMai,family=cFont)
+  #par(mai=oMai,family=cFont)
   return(list(data=tData,labels=groupLabels))
 }
 
@@ -768,7 +770,8 @@ prepNiceWindow<-function(x,by=NULL, minorTick=FALSE, guides=TRUE, yLim=NULL, xLi
     abline(v=myMajorTicksX[myMajorTicksX!=par("usr")[1]],col=plotColors$guides,lwd=1)
     abline(h=myMajorTicksY[myMajorTicksY!=par("usr")[2]],col=plotColors$guides,lwd=1)
   }
-  par(mai=oMai,family=cFont,xpd=FALSE)
+  #par(mai=oMai,family=cFont,xpd=FALSE)
+  par(family=cFont,xpd=FALSE)
   return(data.frame(x=xData,y=yData))
 }
 
@@ -855,7 +858,7 @@ makeNiceLegend<-function(labels, title="Legend", fontCol="black",titleCol="black
   iRange<-par("pin")[2]
   uRange<-par("usr")[4]-par("usr")[3]
   ConvertH<-iRange/uRange
-  LegendCo<-oMai[4]/3/ConvertW +par("usr")[2]
+  LegendCo<-oMai[4]/10/ConvertW +par("usr")[2]
 
   #Next we work out what the max height and width for legend titles and labels are
   if(is.list(labels)){
@@ -894,11 +897,11 @@ makeNiceLegend<-function(labels, title="Legend", fontCol="black",titleCol="black
   }
 
   nMai<-oMai
-  nMai[4]<-nMai[4]+maxLabelW #+maxLabelH
-  par(mai=nMai)
+  #nMai[4]<-nMai[4]+maxLabelW #+maxLabelH
+  #par(mai=nMai)
 
 
-  #Draw the labels. StartH is the top of the legend area. LegendCo is the left edge start. Stars at the top and works its way keeping track of the line height and spacing
+  #Draw the labels. StartH is the top of the legend area. LegendCo is the left edge start. Starts at the top and works its way keeping track of the line height and spacing
   if(is.list(labels)){
     totalLegendH<-maxLabelH*1.2*length(labels)+titleH + 2*titleH*(length(labels)-1)
     totalLegendH<-totalLegendH + sum(map_dbl(labels, function(l) maxLabelH*1.2*length(l)))
@@ -913,7 +916,7 @@ makeNiceLegend<-function(labels, title="Legend", fontCol="black",titleCol="black
       startH<-par("usr")[4]-iRange/3/ConvertH + totalLegendH/2/ConvertH
     }
     if(!is.null(border)){
-      rect(LegendCo-oMai[4]/9/ConvertW,startH-totalLegendH/ConvertH-oMai[4]/9/ConvertH*1.1,LegendCo+maxLabelH/ConvertW+maxLabelW/ConvertW+oMai[4]/9/ConvertW*2, startH+oMai[4]/9/ConvertH*2,col=bg,border=border)
+      rect(LegendCo-oMai[4]/40/ConvertW,startH-totalLegendH/ConvertH-maxLabelH/ConvertH-oMai[4]/40/ConvertH,LegendCo+maxLabelH/ConvertW+maxLabelW/ConvertW+oMai[4]/40/ConvertW, startH+oMai[4]/40/ConvertH,col=bg,border=border)
     }
     cH<-startH
     for (l in seq(length(labels))) {
@@ -969,7 +972,7 @@ makeNiceLegend<-function(labels, title="Legend", fontCol="black",titleCol="black
       cH<-cH-titleH/ConvertH
     }
   } else {
-    totalLegendH<-maxLabelH*1.2*length(labels)+titleH
+    totalLegendH<-maxLabelH*1.2*length(labels)+titleH*1.2
     #adjusting for the fact the size scale labels often run larger that the line height and need adjustment
     if(sum(grepl("z", shape))>0 & max(sizeScale) > size +.3){
       totalLegendH<-totalLegendH - maxLabelH*1.2*length(sizeLabels) + maxSizeLabelH*1.2*length(sizeLabels)
@@ -981,7 +984,7 @@ makeNiceLegend<-function(labels, title="Legend", fontCol="black",titleCol="black
       startH<-par("usr")[4]-iRange/3/ConvertH + totalLegendH/2/ConvertH
     }
     if(!is.null(border)){
-      rect(LegendCo-oMai[4]/9/ConvertW,startH-totalLegendH/ConvertH-oMai[4]/9/ConvertH*1.1,LegendCo+maxLabelH/ConvertW+maxLabelW/ConvertW+oMai[4]/9/ConvertW*2, startH+oMai[4]/9/ConvertH*2,col=bg,border=border)
+      rect(LegendCo-oMai[4]/9/ConvertW,startH-totalLegendH/ConvertH,LegendCo +maxLabelH/ConvertW*1.2+maxLabelW/ConvertW*1.2 +oMai[4]/9/ConvertW*2.4, startH + titleH/ConvertH/2*1.2 + oMai[4]/9/ConvertH,col=bg,border=border)
     }
     cH<-startH
     text(LegendCo, cH, label=title[1],cex=size, font=2, offset=0, pos=4, col=titleCol)

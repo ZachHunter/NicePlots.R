@@ -84,6 +84,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset",call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
+  oMai<-par()$mai
 
   #by works a little differently here. It can be a factor/data.frame of factors with the options like color set to T/F
   #Or by will default to NULL and be populated by the factors assigned to color, shape, and size.
@@ -866,7 +867,7 @@ niceScatter.default <-function(x, by=NULL, color=NULL, shape=NULL, size=NULL,tre
     makeNiceLegend(labels=legendTracker, title=legendTitleTracker, fontCol=plotColors$labels, border=plotColors$legendBorder, lineCol=plotColors$legendLineCol, bg=plotColors$legendBG, col=legendColors, shape=names(legendTracker),size=theme$legendSize,spacing=theme$legendSpacing, fontFamily = theme$fontFamily, sizeScale = mySizeScaleLegend,shapeScale=shapeScaleLegend,scaleDefaultColor=plotColors$scaleDefaultColor)
 
   }
-  par(col.sub=oSubCol, col.lab=oLabCol,col.main=oMainCol,family=oFont,cex.main=oCexMain,cex.lab=oCexlab,cex.sub=oCexSub)
+  par(col.sub=oSubCol, col.lab=oLabCol,col.main=oMainCol,family=oFont,cex.main=oCexMain,cex.lab=oCexlab,cex.sub=oCexSub, mai=oMai, xpd=FALSE)
 
   #formatting the output list and setting class int npData
   dataOut<-list(summary=finalSummary,stats=modelStats,plotType="scatter",options=ActiveOptions)

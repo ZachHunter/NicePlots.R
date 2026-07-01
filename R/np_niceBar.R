@@ -61,6 +61,7 @@ niceBar.default <- function(x, by=NULL, groupLabels=NULL, aggFun=c("mean","media
   moreOptions<-list(...)
   ActiveOptions<-list(x=x, by=by, groupLabels=groupLabels, aggFun=aggFun,errFun=errFun, theme=theme, legend=legend, stack=stack, main=main,sub=sub, ylab=ylab, minorTick=minorTick, guides=guides, outliers=outliers, width=width, errorMultiple=errorMultiple, plotColors=plotColors, logScale=logScale, trim=trim, axisText=axisText, showCalc=showCalc, calcType=calcType, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, errorBars=errorBars, errorCap=errorCap, errorLineType=errorLineType,capWidth=capWidth, lWidth=lWidth, na.rm=na.rm, flipFacts=flipFacts, verbose=verbose,logAdjustment=logAdjustment, normalize=normalize,stackLabels=stackLabels)
   ActiveOptions<-append(ActiveOptions,moreOptions)
+  oMai<-par()$mai
 
   if(is.data.frame(x) | is.matrix(x)) {
     if(dim(x)[2]>1 & subgroup==FALSE) {flipFacts<-TRUE}
@@ -466,7 +467,7 @@ niceBar.default <- function(x, by=NULL, groupLabels=NULL, aggFun=c("mean","media
       title(main=main,col.main=plotColors$title[1],sub=sub,col.sub=plotColors$subtext[1],ylab=ylab,col.lab=plotColors$axisLabels[1])
     }
   }
-  par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)
+  par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont, mai=oMai, xpd=FALSE)
 
   #formating the output list and setting class int npData
   dataOut<-list(summary=pData[[2]],stats=statsData,plotType="bar",options=ActiveOptions)

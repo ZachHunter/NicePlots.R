@@ -85,6 +85,7 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupLabels=NULL, main=N
   moreOptions<-list(...)
   ActiveOptions<-list(x=x, by=by, bandwidth=bandwidth, groupLabels=groupLabels,highlightLabels=highlightLabels, main=main,sub=sub, ylab=ylab, minorTick=minorTick, guides=guides, theme=theme, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, drawBox=drawBox, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, drawPoints=drawPoints, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth,flipFacts=flipFacts,  na.rm=na.rm, verbose=verbose,legend=legend, trimViolins=trimViolins,logAdjustment=logAdjustment)
   ActiveOptions<-append(ActiveOptions,moreOptions)
+  oMai<-par()$mai
 
   #Flight check data, remove NAs.
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = flipFacts)
@@ -519,7 +520,7 @@ niceVio.default <- function(x, by=NULL, bandwidth=NULL, groupLabels=NULL, main=N
       title(main=main,col.main=plotColors$title[1],sub=sub,col.sub=plotColors$subtext[1],ylab=ylab,col.lab=plotColors$axisLabels[1])
     }
   }
-  par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)
+  par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont, mai=oMai, xpd=FALSE)
   ActiveOptions$xypos<-xypos
 
   #formatting the output list and setting class int npData

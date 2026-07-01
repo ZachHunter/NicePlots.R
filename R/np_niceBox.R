@@ -75,6 +75,7 @@ niceBox.default <- function(x, by=NULL, groupLabels=NULL, main=NULL,sub=NULL, yl
   capWidth<-NULL
   capType<-NULL
 
+  oMai<-par()$mai
   #documenting all the data and plotting options to attach to the output so the graph can be replotted if desired.
   moreOptions<-list(...)
   ActiveOptions<-list(x=x, by=by, groupLabels=groupLabels, main=main,sub=sub, ylab=ylab, theme=theme, minorTick=minorTick, guides=guides, outliers=outliers, pointSize=pointSize, width=width, pointShape=pointShape, plotColors=plotColors, logScale=logScale, trim=trim, pointMethod=pointMethod, axisText=axisText, showCalc=showCalc, calcType=calcType, drawBox=drawBox, yLim=yLim, rotateLabels=rotateLabels, rotateY=rotateY, add=add, minorGuides=minorGuides, extendTicks=extendTicks, subgroup=subgroup, subgroupLabels=subgroupLabels, expLabels=expLabels, sidePlot=sidePlot, drawPoints=drawPoints, pointHighlights=pointHighlights, pointLaneWidth=pointLaneWidth, flipFacts=flipFacts, na.rm=na.rm, verbose=verbose, legend=legend,logAdjustment=logAdjustment,highlightLabels=highlightLabels)
@@ -184,7 +185,7 @@ niceBox.default <- function(x, by=NULL, groupLabels=NULL, main=NULL,sub=NULL, yl
   if(length(legendColors)<=1 & length(plotColors$fill)>1){
     legendColors<-plotColors$fill
   }
-
+  par(xpd=FALSE)
   #Data is set and ready to go. Plotting is handled based on cases handling if 'x' and 'by' are vectors or dataframes
   xypos<-c(1,1)
   if(is.numeric(prepedData[[1]])){
@@ -466,9 +467,9 @@ niceBox.default <- function(x, by=NULL, groupLabels=NULL, main=NULL,sub=NULL, yl
       title(main=main,col.main=plotColors$title[1],sub=sub,col.sub=plotColors$subtext[1],ylab=ylab,col.lab=plotColors$axisLabels[1])
     }
   }
-  par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)
+  par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont,mai=oMai)
   ActiveOptions$xypos<-xypos
-  #formatting the output list and setting class int npData
+  # formatting the output list and setting class int npData
   dataOut<-list(summary=plotData,stats=statsData,plotType="box",options=ActiveOptions)
   class(dataOut)<-c("npData","list")
 

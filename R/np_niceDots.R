@@ -78,6 +78,7 @@ niceDots.default <- function(x, by=NULL, groupLabels=NULL, drawPoints=TRUE, erro
   if(any(is.na(x)) | any(is.na(by))){warning("Warning: NAs detected in dataset", call.=FALSE)}
   prepedData<-NULL
   plotData<-NULL
+  oMai<-par()$mai
 
   if(is.data.frame(x) | is.matrix(x)) {
     if(dim(x)[2]>1 & subgroup==FALSE) {flipFacts<-TRUE}
@@ -455,9 +456,9 @@ niceDots.default <- function(x, by=NULL, groupLabels=NULL, drawPoints=TRUE, erro
       title(main=main,col.main=plotColors$title[1],sub=sub,col.sub=plotColors$subtext[1],ylab=ylab,col.lab=plotColors$axisLabels[1])
     }
   }
-  par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont)
+  par(cex.main=oCexMain, cex.lab=oCexlab, cex.sub=oCexSub,family=oFont, mai=oMai, xpd=FALSE)
   ActiveOptions$xypos<-xypos
-  #formating the output list and setting class int npData
+  # formatting the output list and setting class int npData
   dataOut<-list(summary=pData[[2]],stats=statsData,plotType="dot",options=ActiveOptions)
   class(dataOut)<-c("npData","list")
 

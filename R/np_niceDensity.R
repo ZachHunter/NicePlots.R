@@ -86,6 +86,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupLabels=NULL,subg
   moreOptions<-list(...)
   ActiveOptions<-list(x=x, by=by, drawPoints=drawPoints, groupLabels=groupLabels,subgroup=subgroup, useRgl=useRgl, plotType=plotType,theme=theme, main=main,sub=sub, ylab=ylab, xlab=xlab, minorTick=minorTick, guides=guides, plotColors=plotColors, logScale=logScale, axisText=axisText, showCalc=FALSE, calcType="none", rotateLabels=rotateLabels, add=add, minorGuides=minorGuides, extendTicks=extendTicks, expLabels=expLabels, lWidth=lWidth, na.rm=na.rm, verbose=verbose,logAdjustment=logAdjustment,xLim=xLim,yLim=yLim, strictLimits=strictLimits, legend=legend,trimCurves=trimCurves)
   ActiveOptions<-append(ActiveOptions,moreOptions)
+  oMai<-par()$mai
 
   #Flight check data and remove na.
   checked<-dataFlightCheck(x,by,na.rm=na.rm,flipFacts = FALSE)
@@ -431,7 +432,7 @@ niceDensity.default<-function(x, by=NULL, drawPoints=TRUE, groupLabels=NULL,subg
   if(legend!=FALSE) {
     makeNiceLegend(labels=legendLabels, title=legendTitle, fontCol=plotColors$labels, border=theme$legendBorder, lineCol=plotColors$legendLineCol, bg=plotColors$legendBG, col=legendColors, shape="c",size=theme$legendSize,spacing=theme$legendSpacing)
   }
-  par(col.sub=oSubCol, col.lab=oLabCol,col.main=oMainCol,family=oFont,cex.main=oCexMain,cex.lab=oCexlab,cex.sub=oCexSub)
+  par(col.sub=oSubCol, col.lab=oLabCol,col.main=oMainCol,family=oFont,cex.main=oCexMain,cex.lab=oCexlab,cex.sub=oCexSub, mai=oMai, xpd=FALSE)
 
   #formating the output list and setting class int npData
   dataOut<-list(summary=finalSummary,stats=finalStats,plotType="density",options=ActiveOptions)

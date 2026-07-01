@@ -10,7 +10,6 @@ Description:
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.3.3
 Depends: 
 Imports: magrittr,dplyr,boot,tidyr,tibble,RColorBrewer,purrr,KernSmooth,beeswarm,scatterplot3d,broom,rlang
 Suggests: shiny,rgl
@@ -27,3 +26,4 @@ Collate:
     'np_niceDots.R'
     'np_niceScatter.R'
     'np_niceVio.R'
+Config/roxygen2/version: 8.0.0
